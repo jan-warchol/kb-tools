@@ -83,8 +83,8 @@ symbols it read, writes one raw item, and reports how many captures are still
 unredacted.
 
 Later, work the captures into notes with `/kb-redact`. It takes the oldest raw
-item with no note, polishes it without altering any claim, and writes nothing
-until you approve.
+item with no note, polishes it without altering any claim, and leaves the note a
+draft until you approve it.
 
 `/kb-ingest <url-or-path>` keeps an external source: a faithful transcription
 plus a summary a tenth as long. Both are marked as the source's claims, not
@@ -100,9 +100,10 @@ Constraints the design exists to protect, not missing features:
   learning.
 - It will not silently correct a claim it finds to be false. It reports and
   stops; you state the correction.
-- It will not edit or overwrite a raw item. Raw is immutable and kept
-  indefinitely; a later correction is a new capture.
+- It will not rewrite a raw item on its own initiative. Raw material is the
+  record of what you said, so a later correction is normally a new capture —
+  though it will edit one if you ask.
 - It will not mark something verified because it sounds right.
-- It will not alter a claim while polishing it, and will not write a note you
-  have not approved.
+- It will not alter a claim while polishing it, and will not mark a note
+  approved on your behalf.
 - It will not add its own voice to an ingested source, in either file.

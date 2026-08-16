@@ -45,7 +45,7 @@ rubric must be checkable by the person reciting it (§3.5).
   package ─────────────▶ scheduler          (review happens here, not here)
 ```
 
-Raw material is immutable and holds the user's words. A note holds the user's
+Raw material holds the user's words and is normally left as written. A note holds the user's
 claims, approved, carrying provenance. A card has stable identity and references
 its notes.
 
@@ -91,15 +91,19 @@ publication's.
 
 `verified` is kept separate from `generated` because whoever wrote something
 need not be whoever checked it, and the three tiers that follow from it (OKF
-§5.3) are what gate the pipeline: a note must be machine-confirmed or better
-before it can produce cards, and a card must be human-reviewed, because that
-entry *is* the user's approval.
+§5.3) are what gate the pipeline: a note must be machine-confirmed or better,
+and out of draft, before it can produce cards, and a card must be
+human-reviewed, because that entry *is* the user's approval.
 
 ### 3.3 Raw items
 
-Immutable once capture ends. Transcription is repaired silently, and a correction
-the user dictates while the capture is still open is folded into the text — a raw
-item holds the user's words, not the exchange that produced them.
+Normally left as written once a capture ends: a raw item is the record of what
+the user said, so the usual way to correct one is a new capture rather than an
+edit. This is a default, not a prohibition — a user who asks for a raw item to be
+changed or removed gets it changed or removed. Transcription is repaired
+silently, and a correction the user dictates while the capture is still open is
+folded into the text — a raw item holds the user's words, not the exchange that
+produced them.
 
 An unverified capture carries no `verified` key and `status: draft`, and cannot
 produce cards.
@@ -109,6 +113,10 @@ produce cards.
 `sources` is a list from the outset, holding both where the note came from and
 what its claims were checked against. `cards` is derived and regenerated on
 export; the authoritative direction is card → note.
+
+A note may be written before the user has seen it, but it stays `status: draft`
+and carries no `human:` entry until they approve it — approval is what stamps
+that entry and moves it to `stable`.
 
 ### 3.5 Cards
 

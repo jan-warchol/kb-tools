@@ -1,13 +1,13 @@
 ---
 name: kb-capture
-description: Capture something the user has just said they learned into their knowledge base as an immutable, verified raw item. Use when the user dictates a piece of knowledge to keep — "capture this", "note that ...", "kb this", "add to my knowledge base" — typically while working inside a project repository. Repairs transcription against the real source, verifies the claims, reports discrepancies without fixing them, and writes one raw item.
+description: Capture something the user has just said they learned into their knowledge base as a verified, timestamped raw item. Use when the user dictates a piece of knowledge to keep — "capture this", "note that ...", "kb this", "add to my knowledge base" — typically while working inside a project repository. Repairs transcription against the real source, verifies the claims, reports discrepancies without fixing them, and writes one raw item.
 allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-capture
 
 Writes **one raw item**: the user's own words, transcription repaired, verified,
-timestamped, immutable. Notes and cards are separate steps.
+timestamped. Notes and cards are separate steps.
 
 ## Bearings
 
@@ -28,10 +28,12 @@ false provenance record.
   their claim, however obvious the correction. Transcription repair is the one
   exception — recovering the identifier they meant to say does not change what
   they claimed.
-- **Raw is immutable.** One capture writes one file, once. A later correction
-  is a new capture, never an edit.
 - **A missing knowledge base never blocks a capture.** Write into the working
   directory and say so. Stopping to configure something loses the capture.
+
+One capture writes one file. Raw items are normally left as written afterwards,
+so a later correction is usually a new capture — but that is a default, not a
+prohibition: edit or delete one when the user asks you to.
 
 ## Procedure
 
@@ -66,11 +68,10 @@ reason from identifier names. Two things this step is routinely under-read on:
 Three outcomes, per claim:
 
 - **Confirmed** — proceed, recording what you actually read.
-- **Contradicted** — **stop.** Report what you found, quote the source, ask
-  what they want to say instead. Write nothing yet, and do not offer a rewrite
-  as a fait accompli: you may say what the source shows, the user states the
-  claim. Their correction is folded into the text — the raw item holds the
-  user's words, not the exchange that produced them.
+- **Contradicted** — **stop.** Report what you found, quote the source, and ask
+  what they want to say instead; write nothing yet. Their correction is folded
+  into the text — the raw item holds the user's words, not the exchange that
+  produced them.
 - **Not checkable** with what is available — say so and ask whether to record
   it unverified. Never mark something verified because it sounds right.
 
@@ -87,7 +88,8 @@ schema below.
 - **`sources`** records where verification actually looked. Record it now:
   revalidation reads exactly these fields, and they cannot be recovered once
   the verifying context is gone.
-- If the dictation covers two unrelated subjects, ask whether to split it.
+- If the dictation covers two unrelated subjects, split it into two raw items
+  and say so in your report.
 
 Then, optionally, check the frontmatter — it catches mechanical mistakes, and a
 skip when PyYAML is missing is not a failure:
@@ -96,12 +98,10 @@ skip when PyYAML is missing is not a failure:
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the file you wrote>
 ```
 
-**5. Report** the path, the transcription repairs, and **how many raw items
-still have no note** — a note takes its raw item's ID, so an ID present in raw
-material and absent from notes is one still unredacted. Always show that number
-when there is a knowledge base: a capture feels finished because it was
-verified, while nothing in it has reached review yet, and this is the only
-pressure anything puts on the pile.
+**5. Report** the path, the transcription repairs, and — where any are
+outstanding — **how many raw items still have no note**: a note takes its raw
+item's ID, so an ID present in raw material and absent from notes is one still
+unredacted.
 
 ## Capturing without verification
 

@@ -59,7 +59,9 @@ something need not be whoever checked it. Three tiers follow (OKF §5.3):
 | machine-confirmed | entries present, none from a `human:` actor |
 | human-reviewed | at least one `human:` actor entry |
 
-A note must be machine-confirmed or better before it can produce cards. A card
+A note must be machine-confirmed or better *and* out of `status: draft` before
+it can produce cards — a draft note is one the user has not approved, or one
+nothing has verified. A card
 must be human-reviewed before it is exported, because that entry *is* the
 user's approval — a card that has been proposed and not yet approved is
 `status: draft` and carries no `verified` key.
@@ -108,7 +110,7 @@ reading; those mentions are decorative and are not maintained.
 ## Per kind
 
 **Raw item** — `origin: human`, `generated.by` is the user (they dictated it),
-`verified` entries are the agent's. Immutable once written.
+`verified` entries are the agent's. Normally left as written.
 
 ```yaml
 ---
