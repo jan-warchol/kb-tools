@@ -12,8 +12,9 @@ knowledge must never reach.
 | `/kb-capture` | writes a verified raw item from dictation |
 | `/kb-redact` | turns raw items into polished notes |
 | `/kb-ingest` | transcribes an external source and summarises it |
+| `/kb-cards` | makes recall cards from a note |
 
-Cards and export are separate steps, not built here.
+Deep cards are placeholders for now, and export is not built here.
 
 The file format is specified once, in
 [`reference/frontmatter.md`](reference/frontmatter.md). The skills inject that

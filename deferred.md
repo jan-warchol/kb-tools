@@ -15,6 +15,7 @@ what should trigger revisiting it.
 | **Machine-graded free recall** | Adds friction where the habit is weakest | Self-graded review has been unbroken for a month |
 | **Knowledge authored by the agent** (answers worth keeping from asking the corpus questions) | Where it lives is unresolved, and whether it may ever become a card sits exactly on the articulation boundary | After the wiki layer settles |
 | **Deletion reconciliation with the scheduler** | Nothing has been retired yet | The first card is retired |
+| **Deep card content** — the question and its 3–6 bullet self-grading rubric | Writing a rubric a person can grade themselves against is the hard half, and it is unclear which notes deserve one. `/kb-cards` writes a placeholder naming the topic, approved and exported like any card — so it reaches review as a bare "explain this", knowingly without the checkable rubric §1.2 requires | Quick cards have been in review long enough to show what they fail to test |
 | **Card kinds beyond the two** | The two have not yet failed to fit anything | They demonstrably don't fit something |
 
 Deferring these costs nothing structurally, with one exception worth naming:
