@@ -204,7 +204,10 @@ instead.
 
 ## 4. Export
 
-Reads the cards, emits one importable package, one deck per card kind.
+Reads the cards, emits one importable package, one deck per card kind — a
+tab-separated text file, because the card ID goes in Anki's `guid` column and
+that is the whole of what stable identity needs; a binary package would add a
+dependency to carry the same fact.
 
 - Only approved cards are exported — `status: draft` is how a proposed card
   awaiting the user sits, and it stays out of the package until it carries a

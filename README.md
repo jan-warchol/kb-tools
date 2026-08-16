@@ -13,8 +13,9 @@ knowledge must never reach.
 | `/kb-redact` | turns raw items into polished notes |
 | `/kb-ingest` | transcribes an external source and summarises it |
 | `/kb-cards` | makes recall cards from a note |
+| `/kb-export` | writes an Anki import file, one deck per card kind |
 
-Deep cards are placeholders for now, and export is not built here.
+Deep cards are placeholders for now.
 
 The file format is specified once, in
 [`reference/frontmatter.md`](reference/frontmatter.md). The skills inject that
