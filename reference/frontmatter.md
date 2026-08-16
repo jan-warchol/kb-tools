@@ -16,7 +16,7 @@ base is free to be arranged any way.
 | note | same ID as its raw item | `2026-08-10-retry-wrapper` |
 | card | `<note-id>-c<n>` | `2026-08-10-retry-wrapper-c1` |
 | source transcript | `<YYYY-MM-DD>-<slug>` | `2026-08-16-cap-theorem` |
-| source summary | `<transcript-id>-summary` | `2026-08-16-cap-theorem-summary` |
+| source summary | `<slug-id>-summary` | `2026-08-16-cap-theorem-summary` |
 
 The filename is `<id>.md`, and the ID is repeated in frontmatter so a moved file
 stays identifiable. A raw item and the note derived from it share an ID —
@@ -99,7 +99,8 @@ once the verifying context is gone.
 
 The **first** source of a derived item is the item it was derived from: a note
 cites its raw item, a summary cites its transcript. That link is what marks the
-original as processed.
+original as processed. A summary written where no transcription was possible has
+nothing internal to cite, and names the original directly.
 
 Frontmatter is authoritative. Prose may name a file inline where it aids
 reading; those mentions are decorative and are not maintained.
