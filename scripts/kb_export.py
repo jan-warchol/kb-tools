@@ -46,7 +46,6 @@ HEADER = [
     f"#notetype:{NOTETYPE}",
     "#deck column:3",
     "#guid column:4",
-    "#tags column:5",
 ]
 
 SKIP_DIRS = {".git", ".repository-mapping"}
@@ -202,9 +201,8 @@ def main(argv):
             held_back.append(str(meta.get("id")))
             continue
         front, back = split_qa(body)
-        tags = " ".join(str(t) for t in (meta.get("tags") or []))
         rows.append(
-            [front, back, DECKS[meta["type"]], str(meta.get("id", "")), tags]
+            [front, back, DECKS[meta["type"]], str(meta.get("id", ""))]
         )
 
     if not dry_run:

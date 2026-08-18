@@ -46,8 +46,6 @@ article is transcribed verbatim and is still `origin: machine`.
 Actors follow OKF §7: `human:jan`, `claude-code/opus-5`, `process:export`.
 Timestamps are UTC, from `date -u +%Y-%m-%dT%H:%M:%SZ`, never invented.
 
-`tags` is an optional list of lowercase slugs.
-
 ## `verified`
 
 A list of `{ by, at }`, kept separate from `generated` because whoever wrote
@@ -194,7 +192,6 @@ id: 2026-08-16-cap-theorem
 type: Source Transcript
 title: CAP theorem revisited
 origin: machine
-tags: [distributed-systems, consistency]
 generated: { by: claude-code/opus-5, at: 2026-08-16T09:12:00Z }
 status: stable
 sources:
