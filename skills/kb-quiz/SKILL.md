@@ -7,4 +7,6 @@ Ask questions about a topic selected from the knowledge base (usually a specific
 
 The questions should focus on reasoning and understanding the topic, not on plain recall - recall is handled by flashcards (if the knowledge base has flashcards related to the notes, you can skip facts covered by the flashcards). Be careful not to give away the answers in the questions. Also, try to formulate the questions so that the answer doesn't have to be a long elaborate.
 
+If you have access to the sources, you can expand the scope of the questions slightly to cover adjacent, related issues. If the user provides information that wasn't previously available in the quizzed item, take that part of his answer and append it to the corresponding raw capture.
+
 After the quiz is done, log the questions, answers, and any important comments on the answers in a file.
