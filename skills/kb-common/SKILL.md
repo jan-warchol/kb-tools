@@ -7,7 +7,7 @@ description: General instructions for working on the knowledge base. Use always 
   articulated it, or it comes from updated source items. NEVER add new information on your own.
   Articulating is the step that does the learning.
 - When updating notes, prefer simply removing stale claims rather than describing change history.
-- After a raw capture is created, it can only be appended to. Don't edit what was written.
+- After a raw capture is created, prefer appending new statements to it rather than editing what was written.
 - When new information is added, update downstream items (notes from row captures, cards from notes etc).
 - When recording source code references, focus on the most important paths and symbols, not all of them.
 - When choosing slug for the item ID, pick something that stands on its own - don't use truncated title.

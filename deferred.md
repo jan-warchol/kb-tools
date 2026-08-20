@@ -15,8 +15,8 @@ what should trigger revisiting it.
 | **Machine-graded free recall** | Adds friction where the habit is weakest | Self-graded review has been unbroken for a month |
 | **Knowledge authored by the agent** (answers worth keeping from asking the corpus questions) | Where it lives is unresolved, and whether it may ever become a card sits exactly on the articulation boundary | After the wiki layer settles |
 | **Deletion reconciliation with the scheduler** | Nothing has been retired yet | The first card is retired |
-| **Deep card content** — the question and its 3–6 bullet self-grading rubric | Writing a rubric a person can grade themselves against is the hard half, and it is unclear which notes deserve one. `/kb-cards` writes a placeholder naming the topic, approved and exported like any card — so it reaches review as a bare "explain this", knowingly without the checkable rubric §1.2 requires | Quick cards have been in review long enough to show what they fail to test |
-| **Card kinds beyond the two** | The two have not yet failed to fit anything | They demonstrably don't fit something |
+| **Reasoning cards** — a card that asks for an explanation and is graded against a 3–6 bullet self-grading rubric | Writing a rubric a person can grade themselves against is the hard half, and it is unclear which notes deserve one. The kind is deferred whole rather than shipped as a placeholder: a card reaching review as a bare "explain this" has nothing to grade against, and §1.2 leaves no other place for the checking to happen. `/kb-quiz` covers some of the same ground conversationally, and needs no rubric written down to do it | Recall cards have been in review long enough to show what they fail to test |
+| **Card kinds beyond recall** | One kind has not yet failed to fit anything, and `type` is open, so a second costs no format change | Something demonstrably doesn't fit |
 
 Deferring these costs nothing structurally, with one exception worth naming:
 revalidation cannot be retrofitted onto material that did not record what it was
@@ -67,10 +67,11 @@ Review is out of scope, but four configuration facts are load-bearing for
 decisions made *here*, and have nowhere else to live. They are the kind that get
 lost and then quietly stop working.
 
-**Separate presets per deck — mandatory, not cosmetic.** Daily limits are a
-property of the preset, not the deck, so quick and deep sharing one preset makes
-the split between them unenforceable. Review load is controlled by per-deck
-new-card limits, and that mechanism does not exist without separate presets.
+**Separate presets per deck — mandatory, not cosmetic**, once there is more
+than one deck. Daily limits are a property of the preset, not the deck, so two
+kinds sharing one preset makes the split between them unenforceable. Review load
+is controlled by per-deck new-card limits, and that mechanism does not exist
+without separate presets.
 
 **FSRS is global; its parameters are not.** The enable toggle applies to the
 whole collection and cannot differ per preset. Parameters and desired retention
@@ -82,17 +83,17 @@ steps must stay shorter than one day.
 
 **Press Again on failure, never Hard.** Hard means "recalled, with effort."
 Using it for a failure inflates every subsequent interval, and the temptation
-peaks on deep cards, where producing three of five rubric points feels like
-partial success. It is a failure — grade it Again. This single habit degrades
-scheduling silently and irreversibly if it slips.
+will peak on reasoning cards, where producing three of five rubric points feels
+like partial success. It is a failure — grade it Again. This single habit
+degrades scheduling silently and irreversibly if it slips.
 
-**Review deep before quick when both are due.** Overlapping cards prime each
-other, and priming flows forward; spending it on the frequently-repeated quick
-cards, where a mis-grade self-corrects, is much cheaper than spending it on
-sparse deep cards where each grade carries real weight. Clicking a parent deck
-does **not** guarantee this — the scheduler gathers across subdecks by card
-state, not by subdeck order. Open the deep deck directly, finish it, then the
-quick one.
+**Review reasoning before recall when both are due.** Overlapping cards prime
+each other, and priming flows forward; spending it on the frequently-repeated
+recall cards, where a mis-grade self-corrects, is much cheaper than spending it
+on sparse reasoning cards where each grade carries real weight. Clicking a
+parent deck does **not** guarantee this — the scheduler gathers across subdecks
+by card state, not by subdeck order. Open the reasoning deck directly, finish
+it, then the recall one.
 
 **Two things never done in the scheduler's own interface:** renaming decks or
 note types, and editing card text. Both break the stable-identity contract the

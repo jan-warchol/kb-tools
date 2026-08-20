@@ -26,7 +26,10 @@ except ImportError:
     sys.exit(0)
 
 STATUSES = {"draft", "stable", "deprecated"}
-ID_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*$")
+# Two accepted shapes, kind-agnostically: a date and a slug, or a slug and a
+# random tail — the latter is how a card ID is built (see the schema).
+SLUG = r"[a-z0-9]+(?:-[a-z0-9]+)*"
+ID_RE = re.compile(rf"^(?:\d{{4}}-\d{{2}}-\d{{2}}-{SLUG}|{SLUG}-[A-Za-z0-9]{{10}})$")
 TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -101,7 +104,9 @@ def check_file(path):
     if item_id and item_id != stem:
         problems.append(("error", f"`id` {item_id!r} does not match filename {stem!r}"))
     elif item_id and not ID_RE.match(item_id):
-        problems.append(("error", "`id` is not a date followed by a lowercase slug"))
+        problems.append(
+            ("error", "`id` is neither `<date>-<slug>` nor `<slug>-<10 random>`")
+        )
 
     if meta.get("origin") not in {"human", "machine"}:
         problems.append(("error", "`origin` must be `human` or `machine`"))

@@ -14,7 +14,7 @@ base is free to be arranged any way.
 |---|---|---|
 | raw item | `<YYYY-MM-DD>-<slug>` | `2026-08-10-retry-wrapper` |
 | note | same ID as its raw item | `2026-08-10-retry-wrapper` |
-| card | `<note-id>-c<n>` | `2026-08-10-retry-wrapper-c1` |
+| card | `<note-slug>-<10 random>` | `retry-wrapper-DXo1jycAlN` |
 | source transcript | `<YYYY-MM-DD>-<slug>` | `2026-08-16-cap-theorem` |
 | source summary | `<slug-id>-summary` | `2026-08-16-cap-theorem-summary` |
 
@@ -23,13 +23,19 @@ stays identifiable. A raw item and the note derived from it share an ID —
 identity is the pair of kind and ID. Within a kind, a second item that would
 take an ID already in use gets a numeric suffix (`-2`, `-3`).
 
+A card ID is the odd one out: no date, and a random tail in place of a counter.
+Draw it with `scripts/kb_cardid.sh <note-id> [count]` and never invent one — a
+card ID doubles as the card's identity in the scheduler, where a repeat silently
+overwrites another card's review history. **Card IDs are permanent**: rewording
+a card keeps its ID, changing what it asks takes a new one.
+
 ## Common keys
 
 Present on every item:
 
 ```yaml
 id: 2026-08-10-retry-wrapper
-type: Note        # the kinds in use: Raw Capture, Note, Quick Card, Deep Card,
+type: Note        # the kinds in use: Raw Capture, Note, Recall Card,
                   # Source Transcript, Source Summary — not a closed set
 title: Retry wrapper ordering    # required on every item, cards included
 origin: human                    # human | machine
@@ -134,7 +140,9 @@ first and the retry re-enqueues it rather than holding it.
 **Note** — same ID as its raw item. `generated.by` is the agent (it wrote the
 text), `origin: human` (the claims are the user's). `sources` begins with the
 raw item, then every evidence source. `verified` carries the raw item's entries
-plus a `human:` entry stamped at approval.
+plus a `human:` entry stamped at approval. A note does not list its cards —
+references run from the derived item to what it came from, so a note's cards are
+found by searching the cards for its path.
 
 ```yaml
 ---
@@ -153,21 +161,22 @@ sources:
 verified:
   - { by: claude-code/opus-5, at: 2026-08-10T14:35:00Z }
   - { by: human:jan, at: 2026-08-10T14:41:00Z }
-cards: [2026-08-10-retry-wrapper-c1]   # generated on export, never hand-edited
 ---
 ```
 
 **Card** — `sources` are notes only, never a repository or a document directly:
 a card is a question about a note, and where the claim came from is recorded
-there. `Quick Card` is one fact and one answer; `Deep Card` asks for an
-explanation and answers with a 3–6 bullet rubric for self-grading. A card's
+there. One kind is in use — `Recall Card`, one fact and one answer. A card's
 `title` names what it asks about, so it can be identified in a listing without
 being read; it is not the question, which lives in the body.
 
+The body is `## Question` and `## Answer`, and export reads those two headings.
+A body with neither is exported whole as the front.
+
 ```yaml
 ---
-id: 2026-08-10-retry-wrapper-c1
-type: Quick Card
+id: retry-wrapper-DXo1jycAlN
+type: Recall Card
 title: Ack ordering on retry
 origin: human
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:42:00Z }
@@ -177,9 +186,13 @@ verified:
   - { by: human:jan, at: 2026-08-10T14:43:00Z }
 ---
 
-**Q:** In what order do the ack and the retry happen for a failed message?
+## Question
 
-**A:** Ack first — the retry re-enqueues the message rather than holding it.
+In what order do the ack and the retry happen for a failed message?
+
+## Answer
+
+Ack first — the retry re-enqueues the message rather than holding it.
 ```
 
 **Source transcript and summary** — both `origin: machine`. The transcript cites

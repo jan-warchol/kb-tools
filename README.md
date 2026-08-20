@@ -15,7 +15,8 @@ knowledge must never reach.
 | `/kb-cards` | makes recall cards from a note |
 | `/kb-export` | writes an Anki import file, one deck per card kind |
 
-Deep cards are placeholders for now.
+One card kind exists, the recall card — one fact, one answer. Cards graded
+against a rubric are a future kind; see [`deferred.md`](deferred.md).
 
 The file format is specified once, in
 [`reference/frontmatter.md`](reference/frontmatter.md). The skills inject that

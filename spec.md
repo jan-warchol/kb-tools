@@ -24,8 +24,10 @@ that boundary.
 
 **Nothing anywhere checks answers.** The scheduler does not grade — it consumes a
 grade the human produces, for every card type, and there is no correctness
-checking to hook into at any point in the pipeline. That is why a deep card's
-rubric must be checkable by the person reciting it (§3.5).
+checking to hook into at any point in the pipeline. That is why the card kind
+graded against a rubric is deferred rather than shipped half-built: the rubric
+would have to be checkable by the person reciting it, and nothing downstream can
+compensate when it is not (`deferred.md`).
 
 ## 2. Flow
 
@@ -73,10 +75,19 @@ one silently overwrites a card's history and changing one resets it to zero.
 what the card *asks* takes a new ID, because the accumulated review history
 describes the old question and resetting is correct.
 
-Cards belonging to a note are found by globbing `<note-id>-c*`, not by living in
-one file — which keeps per-card metadata (status, approval) natural. The glob is
-anchored on the `-c` because IDs colliding within a layer take a numeric suffix,
-and an unanchored prefix would sweep in a longer note's cards.
+A card ID is `<note-slug>-<ten characters of [A-Za-z0-9]>`. The tail is what
+makes it unique, and it matters because a card ID is also its Anki `guid`
+(§4.1) — a namespace shared with every deck the user has ever imported, where a
+counter unique to this base is not enough. `kb_cardid.sh` draws it from
+`/dev/urandom`, because a model asked for a random string does not produce one.
+
+The slug leads so a card is recognisable in a listing. It is not a link: **a
+card cites its note in `sources` and nothing points back**, so a note's cards
+are found by searching for that path, not by globbing the slug — which would
+sweep in the cards of any note whose slug this one is a prefix of.
+
+Cards live one to a file rather than together in the note, which keeps per-card
+metadata — status, approval, its own `verified` — natural.
 
 ### 3.2 Provenance
 
@@ -111,8 +122,9 @@ produce cards.
 ### 3.4 Notes
 
 `sources` is a list from the outset, holding both where the note came from and
-what its claims were checked against. `cards` is derived and regenerated on
-export; the authoritative direction is card → note.
+what its claims were checked against. A note does not list its cards: every
+reference in the system runs from the derived item to what it came from, and a
+back-reference would be a second copy of that fact to keep true.
 
 A note may be written before the user has seen it, but it stays `status: draft`
 and carries no `human:` entry until they approve it — approval is what stamps
@@ -124,16 +136,15 @@ A card's `sources` are notes only — never a repository or a document directly.
 card is a question about a note, and everything about where the underlying claim
 came from is already recorded there.
 
-**Quick Card** is one fact, one answer. **Deep Card** asks for an explanation,
-and its answer is a bullet rubric of 3–6 checkable points used for
-self-grading. A deep card is justified only when the answer has structure —
-causation, ordering, a tradeoff. If the bullets could be shuffled without loss
-it is a list, not a concept, and should be quick cards or nothing.
+**One kind exists: the `Recall Card`** — one fact, one answer. That the set has
+one member is a claim about the deck: everything in it is graded by comparing an
+answer to an answer. A card asking for an *explanation* is graded against a
+rubric instead — a different mechanism, and a deferred one (`deferred.md`).
+`type` is open, so the second kind is not a format change.
 
-**A rubric is grading criteria, not a decomposition.** The bullets say what a
-good answer observably contains. Expanding them into *n* quick cards deletes
-exactly what the card tests: selecting what is relevant without being told,
-relations between facts, and reconstructing a forgotten piece from the others.
+**One fact per card, and never the same fact twice.** A fact split across two
+cards is reviewed twice for one piece of knowledge, and each showing primes the
+other.
 
 ### 3.6 Ingested sources
 
@@ -212,15 +223,49 @@ dependency to carry the same fact.
 - Only approved cards are exported — `status: draft` is how a proposed card
   awaiting the user sits, and it stays out of the package until it carries a
   `human:` entry in `verified`.
-- Export is the one pass that writes back into a note: it regenerates the
-  note's `cards` list from the cards that cite it. That direction is derived,
-  the card → note direction is authoritative, and the write touches frontmatter
-  and never prose.
+- Export reads and does not write. Nothing about a card or a note changes
+  because it was exported.
 - Scheduler identity derives from the card ID, so re-import updates an existing
-  item rather than duplicating it.
+  item rather than duplicating it (§4.1).
+- Fields carry the card's markdown as it sits in the file, not HTML —
+  formatting in the scheduler is a later decision. The export unwraps the
+  file's 80-column wrapping, because Anki renders every newline in a field as a
+  line break.
 - A duplicate card ID is fatal and nothing is written: two cards sharing an ID
   share an identity, and one would silently overwrite the other.
 - `status: deprecated` cards are omitted and listed. **Omission does not suspend
   them** — a package can only add and update, so a card already in the scheduler
   stays active until it is suspended there by hand. The report is what makes that
   happen.
+
+### 4.1 Why the card ID goes in Anki's `guid` column
+
+Anki matches an imported row to an existing note on the first field, or on the
+`guid` column when the file supplies one. **Matching on the first field makes
+the question text the identity**, so fixing a typo in a question orphans its
+review history and adds a second card. That alone is disqualifying — §3.1 exists
+to make rewording free.
+
+Anki's manual nonetheless recommends against the alternative: *"If you are
+creating your own IDs, such as `MYNOTE0001`, then it's recommended that you
+place the IDs in the first field, instead of assigning them to Anki's internal
+GUID."* It does not say why. Three reasons are visible in what a guid is, each
+answered by something this system already does:
+
+- **The namespace is global** — a guid is unique across every collection in the
+  world, which is what makes updating a shared deck work, and a collision is
+  silent: *"if a GUID is provided, and already exists in the collection, a
+  duplicate will not be created."* But that hazard belongs to the IDs, not the
+  column, as the manual's own `MYNOTE0001` shows. The random tail answers it
+  (§3.1).
+- **A guid is invisible from inside Anki** — not shown, not searchable, not
+  editable — so nothing can be repaired on that side. Accepted: this deck is
+  generated, an edit made in Anki does not survive the next import, and the fix
+  for anything wrong is a corrected card and a re-import.
+- **It disables the import dialog's duplicate handling** for rows carrying a
+  guid. Nothing here wants it — a duplicate ID is already fatal at export.
+
+The remaining alternative, an ID in the first field of a custom notetype, costs
+a notetype — and **a text import cannot create one**. It would have to be built
+by hand in Anki, on every machine, before the first import worked anywhere. The
+export targets stock `Basic` instead.

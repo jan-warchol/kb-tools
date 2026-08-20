@@ -10,14 +10,15 @@ allowed-tools: Read, Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_export.py *)
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_export.py     # --dry-run to look first
 ```
 
-Writes `<kb>/export/kb-export.txt` and regenerates each note's `cards:` list.
-Report what it printed: the count per deck, anything held back as unapproved,
-and any deprecated cards — **those it cannot retire for the user**, since a
-package only adds and updates, so they need suspending in Anki by hand.
+Writes `<kb>/export/kb-export.txt` and nothing else — export never writes back
+into the knowledge base. Report what it printed: the
+count per deck, anything held back as unapproved, and any deprecated cards —
+**those it cannot retire for the user**, since a package only adds and updates,
+so they need suspending in Anki by hand.
 
 Then: File → Import in Anki. Re-import matches on the card ID in the guid
 column, so an existing card is updated in its current deck with its scheduling
-intact. Two consequences:
+intact (spec §4.1 for why identity sits there). Two consequences:
 
 - **Editing card text in Anki does not survive** the next import. Edit the
   markdown and re-export.
