@@ -48,8 +48,11 @@ The one optional file is `knowledge-base.yaml`, holding what cannot be read off
 the base itself — today a single key:
 
 ```yaml
-deck: Knowledge::Recall    # where /kb-export writes; this is the default
+anki_deck_name: Knowledge    # the default
 ```
+
+Each card kind gets its own subdeck under that, named after the kind, so recall
+cards land in `Knowledge::Recall`.
 
 **The layout is yours to change.** Only `/kb-init` names a directory; the skills
 read the base to see where each kind of item already lives. Rearrange it and

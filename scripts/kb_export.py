@@ -22,9 +22,9 @@ renamed in Anki's own interface — rename here and re-export instead.
 Fields are markdown, not HTML. Anki turns a newline inside a quoted field into a
 line break, so soft wrapping is joined up on the way out.
 
-The deck comes from `deck:` in `<kb>/knowledge-base.yaml`, falling back to
-Knowledge::Recall. That file is optional and holds only what a reader of the
-base cannot work out for itself.
+Cards land in a subdeck per kind under `anki_deck_name:` from the optional
+`<kb>/knowledge-base.yaml`, falling back to Knowledge — so a Recall Card goes to
+Knowledge::Recall, and a kind added later needs no change here.
 
 Requires PyYAML. Unlike kb_check.py this is a gate, not an aid, so a missing
 dependency is an error rather than a skip.
@@ -39,11 +39,15 @@ try:
 except ImportError:
     sys.exit("kb_export: PyYAML is required to read frontmatter")
 
-# Where a kind's cards land. Stable by contract: the scheduler keys review
-# history off the name, and a rename in Anki's interface does not round-trip.
-# Change it in `knowledge-base.yaml`, re-export, and rename in Anki to match.
+# A card kind is a type ending in "Card", and lands in a subdeck named after
+# what precedes that — so a kind added later needs nothing here. Deck names are
+# stable by contract: the scheduler keys review history off them, and a rename
+# in Anki's interface does not round-trip. Change the root in the base's config,
+# re-export, and rename in Anki to match.
 CONFIG = "knowledge-base.yaml"
-DEFAULT_DECK = "Knowledge::Recall"
+DECK_KEY = "anki_deck_name"
+DEFAULT_DECK = "Knowledge"
+SUFFIX = " Card"
 NOTETYPE = "Basic"
 
 HEADER = [
@@ -84,17 +88,23 @@ def resolve_kb():
     return None
 
 
-def deck_map(kb):
-    """Card kind to deck name, from the base's config or the default."""
-    deck = DEFAULT_DECK
+def deck_root(kb):
+    """The deck everything hangs under, from the base's config or the default."""
     path = os.path.join(kb, CONFIG)
-    if os.path.isfile(path):
-        with open(path, encoding="utf-8") as handle:
-            config = yaml.safe_load(handle) or {}
-        if not isinstance(config, dict):
-            sys.exit(f"kb_export: {CONFIG} is not a mapping")
-        deck = str(config.get("deck") or deck)
-    return {"Recall Card": deck}
+    if not os.path.isfile(path):
+        return DEFAULT_DECK
+    with open(path, encoding="utf-8") as handle:
+        config = yaml.safe_load(handle) or {}
+    if not isinstance(config, dict):
+        sys.exit(f"kb_export: {CONFIG} is not a mapping")
+    return str(config.get(DECK_KEY) or DEFAULT_DECK)
+
+
+def deck_of(item_type, root):
+    """`Recall Card` under `Knowledge` is `Knowledge::Recall`; None if not a card."""
+    if not isinstance(item_type, str) or not item_type.endswith(SUFFIX):
+        return None
+    return f"{root}::{item_type[: -len(SUFFIX)]}"
 
 
 def split_frontmatter(text):
@@ -180,11 +190,12 @@ def main(argv):
     if not kb:
         return print("kb_export: no knowledge base found (/kb-init makes one)") or 1
     out = out or os.path.join(kb, "export", "kb-export.txt")
-    decks = deck_map(kb)
+    root = deck_root(kb)
 
     cards, seen = [], {}
     for path, meta, body in read_items(kb):
-        if meta.get("type") not in decks:
+        deck = deck_of(meta.get("type"), root)
+        if deck is None:
             continue
         card_id = str(meta.get("id", ""))
         if card_id in seen:
@@ -192,10 +203,10 @@ def main(argv):
             print(f"  {seen[card_id]}\n  {path}")
             return print("kb_export: nothing written") or 1
         seen[card_id] = path
-        cards.append((path, meta, body))
+        cards.append((path, meta, body, deck))
 
     rows, deprecated, held_back = [], [], []
-    for path, meta, body in cards:
+    for path, meta, body, deck in cards:
         if meta.get("status") == "deprecated":
             deprecated.append(str(meta.get("id")))
             continue
@@ -204,7 +215,7 @@ def main(argv):
             continue
         front, back = split_qa(body)
         rows.append(
-            [front, back, decks[meta["type"]], str(meta.get("id", ""))]
+            [front, back, deck, str(meta.get("id", ""))]
         )
 
     if not dry_run:
@@ -214,7 +225,9 @@ def main(argv):
             for row in rows:
                 handle.write("\t".join(row) + "\n")
 
-    per_deck = {deck: sum(1 for r in rows if r[2] == deck) for deck in decks.values()}
+    per_deck = {}
+    for row in rows:
+        per_deck[row[2]] = per_deck.get(row[2], 0) + 1
     prefix = "would write" if dry_run else "wrote"
     print(f"kb_export: {prefix} {len(rows)} card(s) to {out}")
     for deck, count in sorted(per_deck.items()):

@@ -22,7 +22,7 @@ intact (spec §4.1 for why identity sits there). Two consequences:
 
 - **Editing card text in Anki does not survive** the next import. Edit the
   markdown and re-export.
-- **Renaming a deck means renaming it in both places** — `deck:` in
+- **Renaming a deck means renaming it in both places** — `anki_deck_name:` in
   `<kb>/knowledge-base.yaml` and Anki. Renaming in Anki alone keeps the existing
   cards where they are, but the next new card recreates a deck under the old
   name and splits the collection in two.
