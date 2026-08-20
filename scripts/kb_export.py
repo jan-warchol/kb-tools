@@ -22,6 +22,10 @@ renamed in Anki's own interface — rename here and re-export instead.
 Fields are markdown, not HTML. Anki turns a newline inside a quoted field into a
 line break, so soft wrapping is joined up on the way out.
 
+The deck comes from `deck:` in `<kb>/knowledge-base.yaml`, falling back to
+Knowledge::Recall. That file is optional and holds only what a reader of the
+base cannot work out for itself.
+
 Requires PyYAML. Unlike kb_check.py this is a gate, not an aid, so a missing
 dependency is an error rather than a skip.
 """
@@ -35,10 +39,11 @@ try:
 except ImportError:
     sys.exit("kb_export: PyYAML is required to read frontmatter")
 
-# Stable by contract: the scheduler keys review history off these names, and a
-# rename in Anki's interface does not round-trip. Change them here, re-export,
-# and rename in Anki to match.
-DECKS = {"Recall Card": "Knowledge::Recall"}
+# Where a kind's cards land. Stable by contract: the scheduler keys review
+# history off the name, and a rename in Anki's interface does not round-trip.
+# Change it in `knowledge-base.yaml`, re-export, and rename in Anki to match.
+CONFIG = "knowledge-base.yaml"
+DEFAULT_DECK = "Knowledge::Recall"
 NOTETYPE = "Basic"
 
 HEADER = [
@@ -77,6 +82,19 @@ def resolve_kb():
         if candidate and os.path.isfile(os.path.join(candidate, "SCHEMA.md")):
             return candidate
     return None
+
+
+def deck_map(kb):
+    """Card kind to deck name, from the base's config or the default."""
+    deck = DEFAULT_DECK
+    path = os.path.join(kb, CONFIG)
+    if os.path.isfile(path):
+        with open(path, encoding="utf-8") as handle:
+            config = yaml.safe_load(handle) or {}
+        if not isinstance(config, dict):
+            sys.exit(f"kb_export: {CONFIG} is not a mapping")
+        deck = str(config.get("deck") or deck)
+    return {"Recall Card": deck}
 
 
 def split_frontmatter(text):
@@ -162,10 +180,11 @@ def main(argv):
     if not kb:
         return print("kb_export: no knowledge base found (/kb-init makes one)") or 1
     out = out or os.path.join(kb, "export", "kb-export.txt")
+    decks = deck_map(kb)
 
     cards, seen = [], {}
     for path, meta, body in read_items(kb):
-        if meta.get("type") not in DECKS:
+        if meta.get("type") not in decks:
             continue
         card_id = str(meta.get("id", ""))
         if card_id in seen:
@@ -185,7 +204,7 @@ def main(argv):
             continue
         front, back = split_qa(body)
         rows.append(
-            [front, back, DECKS[meta["type"]], str(meta.get("id", ""))]
+            [front, back, decks[meta["type"]], str(meta.get("id", ""))]
         )
 
     if not dry_run:
@@ -195,7 +214,7 @@ def main(argv):
             for row in rows:
                 handle.write("\t".join(row) + "\n")
 
-    per_deck = {deck: sum(1 for r in rows if r[2] == deck) for deck in DECKS.values()}
+    per_deck = {deck: sum(1 for r in rows if r[2] == deck) for deck in decks.values()}
     prefix = "would write" if dry_run else "wrote"
     print(f"kb_export: {prefix} {len(rows)} card(s) to {out}")
     for deck, count in sorted(per_deck.items()):

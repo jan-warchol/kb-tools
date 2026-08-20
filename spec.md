@@ -176,9 +176,14 @@ pointer file exists because an environment variable is the one link in this
 chain that can be set correctly and still be absent: it reaches a process only
 through a shell that has already sourced the profile defining it.
 
-**A knowledge base has no configuration file.** `SCHEMA.md` at its root is what
-marks one, and what the walk tests for: a base carries the schema anyway so it
-can be read without this plugin, so nothing exists purely to be detected.
+**`SCHEMA.md` at the root is what marks a base**, and what the walk tests for:
+a base carries the schema anyway so it can be read without this plugin, so
+nothing exists purely to be detected.
+
+`knowledge-base.yaml` beside it is optional, and holds only what cannot be read
+off the base itself — today one key, `deck:`, naming where the export writes.
+It is deliberately not the marker: an optional file cannot be one, and requiring
+it would recreate exactly the file that exists to be detected.
 
 **The layout below that is not fixed.** Nothing outside `/kb-init` names a
 subdirectory. Skills are told what kind of item they are writing and read the
@@ -220,6 +225,10 @@ tab-separated text file, because the card ID goes in Anki's `guid` column and
 that is the whole of what stable identity needs; a binary package would add a
 dependency to carry the same fact.
 
+- The deck comes from `deck:` in `knowledge-base.yaml`, defaulting to
+  `Knowledge::Recall`. It belongs to the identity contract as much as the card
+  ID does: the scheduler keys review history off the name, so changing it means
+  changing it in both places.
 - Only approved cards are exported — `status: draft` is how a proposed card
   awaiting the user sits, and it stays out of the package until it carries a
   `human:` entry in `verified`.

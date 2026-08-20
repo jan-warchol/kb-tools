@@ -39,10 +39,17 @@ The knowledge base is a separate repository this plugin never ships or assumes:
 ```
 
 That records the location in `~/.config/kb-tools/kb-home` and lays out a
-starting arrangement of directories. There is no configuration file: a directory
-with `SCHEMA.md` at its root is a knowledge base. The skills find it from
-`$KB_HOME` if it is exported, else that pointer file, else by walking up from
-the working directory — so nothing depends on a shell restart.
+starting arrangement of directories. A directory with `SCHEMA.md` at its root is
+a knowledge base. The skills find it from `$KB_HOME` if it is exported, else that
+pointer file, else by walking up from the working directory — so nothing depends
+on a shell restart.
+
+The one optional file is `knowledge-base.yaml`, holding what cannot be read off
+the base itself — today a single key:
+
+```yaml
+deck: Knowledge::Recall    # where /kb-export writes; this is the default
+```
 
 **The layout is yours to change.** Only `/kb-init` names a directory; the skills
 read the base to see where each kind of item already lives. Rearrange it and
