@@ -23,8 +23,8 @@ Fields are markdown, not HTML. Anki turns a newline inside a quoted field into a
 line break, so soft wrapping is joined up on the way out.
 
 Cards land in a subdeck per kind under `anki_deck_name:` from the optional
-`<kb>/knowledge-base.yaml`, falling back to Knowledge — so a Recall Card goes to
-Knowledge::Recall, and a kind added later needs no change here.
+`<kb>/knowledge-base.yaml` (or `.yml`), falling back to Knowledge — so a Recall
+Card goes to Knowledge::Recall, and a kind added later needs no change here.
 
 Requires PyYAML. Unlike kb_check.py this is a gate, not an aid, so a missing
 dependency is an error rather than a skip.
@@ -44,7 +44,7 @@ except ImportError:
 # stable by contract: the scheduler keys review history off them, and a rename
 # in Anki's interface does not round-trip. Change the root in the base's config,
 # re-export, and rename in Anki to match.
-CONFIG = "knowledge-base.yaml"
+CONFIG = ("knowledge-base.yaml", "knowledge-base.yml")
 DECK_KEY = "anki_deck_name"
 DEFAULT_DECK = "Knowledge"
 SUFFIX = " Card"
@@ -88,15 +88,27 @@ def resolve_kb():
     return None
 
 
+def config_path(kb):
+    """The base's config file under either spelling, or None.
+
+    Both at once is refused rather than resolved: the deck name is part of the
+    identity contract, and guessing which file meant it could move a deck.
+    """
+    found = [n for n in CONFIG if os.path.isfile(os.path.join(kb, n))]
+    if len(found) > 1:
+        sys.exit(f"kb_export: {' and '.join(found)} both exist — keep one")
+    return os.path.join(kb, found[0]) if found else None
+
+
 def deck_root(kb):
     """The deck everything hangs under, from the base's config or the default."""
-    path = os.path.join(kb, CONFIG)
-    if not os.path.isfile(path):
+    path = config_path(kb)
+    if path is None:
         return DEFAULT_DECK
     with open(path, encoding="utf-8") as handle:
         config = yaml.safe_load(handle) or {}
     if not isinstance(config, dict):
-        sys.exit(f"kb_export: {CONFIG} is not a mapping")
+        sys.exit(f"kb_export: {os.path.basename(path)} is not a mapping")
     return str(config.get(DECK_KEY) or DEFAULT_DECK)
 
 

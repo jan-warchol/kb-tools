@@ -180,8 +180,9 @@ through a shell that has already sourced the profile defining it.
 a base carries the schema anyway so it can be read without this plugin, so
 nothing exists purely to be detected.
 
-`knowledge-base.yaml` beside it is optional, and holds only what cannot be read
-off the base itself — today one key, `anki_deck_name:`, naming the deck the
+`knowledge-base.yaml` beside it — or `.yml`, both spellings read, and having
+both at once refused rather than resolved — is optional, and holds only what
+cannot be read off the base itself — today one key, `anki_deck_name:`, naming the deck the
 export hangs everything under. It is deliberately not the marker: an optional
 file cannot be one, and requiring it would recreate exactly the file that exists
 to be detected.

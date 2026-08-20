@@ -44,8 +44,8 @@ a knowledge base. The skills find it from `$KB_HOME` if it is exported, else tha
 pointer file, else by walking up from the working directory — so nothing depends
 on a shell restart.
 
-The one optional file is `knowledge-base.yaml`, holding what cannot be read off
-the base itself — today a single key:
+The one optional file is `knowledge-base.yaml` — or `.yml`, either spelling is
+read — holding what cannot be read off the base itself, today a single key:
 
 ```yaml
 anki_deck_name: Knowledge    # the default
