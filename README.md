@@ -41,8 +41,11 @@ The knowledge base is a separate repository this plugin never ships or assumes:
 That records the location in `~/.config/kb-tools/kb-home` and lays out a
 starting arrangement of directories. A directory with `SCHEMA.md` at its root is
 a knowledge base. The skills find it from `$KB_HOME` if it is exported, else that
-pointer file, else by walking up from the working directory — so nothing depends
-on a shell restart.
+pointer file, else by looking around the working directory — upwards, then a
+couple of levels below it, then beside it — so nothing depends on a shell
+restart, and a base kept inside a project (`~/src/myproject/kb`) is found from
+anywhere in that project, including from a sibling checkout such as
+`~/src/myproject/frontend`.
 
 The one optional file is `knowledge-base.yaml` — or `.yml`, either spelling is
 read — holding what cannot be read off the base itself, today a single key:

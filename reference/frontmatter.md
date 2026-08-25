@@ -97,10 +97,13 @@ sources:
     retrieved: 2026-08-10
 ```
 
-`path` and `symbol` each have a plural form taking a list; use whichever fits
-what verification actually touched, never both forms of the same key in one
-entry. `commit` and `retrieved` record *what the claim was checked against* and
-are written at capture — revalidation reads them, and they cannot be recovered
+`path` is relative to the root of the repository named by `resource`, never to
+the working directory the item was written from. `path` and `symbol` each have a
+plural form taking a list; use whichever fits what verification actually
+touched, never both forms of the same key in one entry.
+
+`commit` and `retrieved` record *what the claim was checked against* and are
+written at capture — revalidation reads them, and they cannot be recovered
 once the verifying context is gone.
 
 The **first** source of a derived item is the item it was derived from: a note

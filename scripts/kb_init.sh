@@ -19,6 +19,11 @@ case "$kb" in "~") kb=$HOME ;; "~/"*) kb="$HOME/${kb#\~/}" ;; esac
 
 mkdir -p "$kb/raw" "$kb/notes" "$kb/cards" "$kb/sources" "$kb/.repository-mapping"
 
+# Absolute from here on: the pointer file is read from wherever a skill happens
+# to run, so a relative path given here would resolve against the wrong
+# directory — and usually against no directory at all.
+kb=$(cd "$kb" && pwd)
+
 # .repository-mapping/ holds symlinks named after the repository URL, so the
 # mapping needs no configuration file and no parser. It is the one
 # machine-local thing here.

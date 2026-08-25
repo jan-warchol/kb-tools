@@ -171,10 +171,19 @@ afterwards — by then the verifying context is gone.
 ### 3.8 Finding the knowledge base
 
 Resolved in order — `$KB_HOME`, then the pointer file
-`~/.config/kb-tools/kb-home`, then by walking up from the working directory. The
-pointer file exists because an environment variable is the one link in this
-chain that can be set correctly and still be absent: it reaches a process only
-through a shell that has already sourced the profile defining it.
+`~/.config/kb-tools/kb-home`, then by walking up from the working directory,
+then by looking below it and beside it. The pointer file exists because an
+environment variable is the one link in this chain that can be set correctly and
+still be absent: it reaches a process only through a shell that has already
+sourced the profile defining it.
+
+**The last two steps are there because a base is not always an ancestor.** A
+base kept inside the project it serves sits below the working directory; with
+the work happening in one sub-project beside it, it sits to the side of it and
+under a shared parent. Neither is reachable by walking upwards, so the search
+also looks two levels below the working directory and one level below each of
+its ancestors, stopping at `$HOME`. A base found that way is reported as
+unconfigured, because it was found by looking rather than by being told.
 
 **`SCHEMA.md` at the root is what marks a base**, and what the walk tests for:
 a base carries the schema anyway so it can be read without this plugin, so
@@ -194,6 +203,20 @@ directories, and only because an empty base has nothing to read. So the layout
 can be reorganised without touching the plugin, which is the point — a corpus
 outlives the arrangement it started in.
 
+### 3.9 Finding the repository a claim is verified in
+
+**There is rarely exactly one.** A working directory is often the parent of
+several checkouts — `frontend/`, `backend/`, the base itself — and just as often
+somewhere deep inside a single one. So the repositories in view are reported as
+a list: the one enclosing the working directory, and any checked out at most two
+levels below it, each with the checkout root beside its URL and commit. The base
+is listed too, marked as itself rather than as a source.
+
+**The root is reported because a `path` is relative to it**, and the working
+directory is usually not the root. Without it a file read two directories down
+is recorded under a path that resolves nowhere, and the item points at nothing
+the next machine can find.
+
 The single machine-local fact — where each source repository is checked out — is
 carried by `.repository-mapping/<host>/<org>/<repo>` as a symlink to the
 checkout, so the mapping is its own filename and nothing has to parse it. Items
@@ -204,7 +227,7 @@ links. It is the only part of a base not worth committing.
 
 **The mapping is maintained by hand** — `mkdir -p` and `ln -s`, which is the
 whole reason the filename carries the mapping. Nothing reads it yet either:
-capture verifies in the repository it is already standing in, and revalidation,
+capture verifies in a repository already on this machine, and revalidation,
 the one pass that would need to resolve a URL, is deferred. Until then it is a
 convention being kept ready, not a mechanism.
 
