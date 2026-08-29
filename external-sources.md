@@ -51,8 +51,6 @@ claims are the publication's.
 
 ## 4. Constraints
 
-Of the things the system will not do ([`README.md`](README.md)):
-
 - It will not add its own voice to an ingested source, in either file.
 
 ## 5. Use

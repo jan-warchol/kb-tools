@@ -18,7 +18,9 @@ Invoke `/kb-common` skill if you haven't already.
 ## Rules that are not negotiable
 
 - **The user articulates; you never substitute for that.** Capture what the
-  user said. Never compose the knowledge on their behalf.
+  user said. Never compose the knowledge on their behalf, and never write a
+  capture from the session transcript, your own analysis, or the code — that
+  articulation is the step that does the learning.
 - **You report discrepancies; the user fixes them.** On finding an incorrect
   claim, stop and report. Transcription repair is the one
   exception — recovering the identifier they meant to say does not change what

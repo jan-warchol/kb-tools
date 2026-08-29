@@ -179,7 +179,13 @@ nothing exists purely to be detected.
 `knowledge-base.yaml` beside it — or `.yml`, both spellings read, and having
 both at once refused rather than resolved — is optional, and holds only what
 cannot be read off the base itself — today one key, `anki_deck_name:`, naming the deck the
-export hangs everything under. It is deliberately not the marker: an optional
+export hangs everything under.
+
+```yaml
+anki_deck_name: Knowledge    # the default
+```
+
+It is deliberately not the marker: an optional
 file cannot be one, and requiring it would recreate exactly the file that exists
 to be detected.
 
@@ -213,7 +219,14 @@ moving on disk and survives being read elsewhere, which needs only its own
 links. It is the only part of a base not worth committing.
 
 **The mapping is maintained by hand** — `mkdir -p` and `ln -s`, which is the
-whole reason the filename carries the mapping. Nothing reads it yet either:
+whole reason the filename carries the mapping.
+
+```bash
+cd "$KB_HOME/.repository-mapping" && mkdir -p github.com/acme
+ln -s ~/src/acme/backend github.com/acme/backend
+```
+
+Nothing reads it yet either:
 capture verifies in a repository already on this machine, and revalidation,
 the one pass that would need to resolve a URL, is deferred. Until then it is a
 convention being kept ready, not a mechanism.
