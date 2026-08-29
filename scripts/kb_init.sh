@@ -17,20 +17,12 @@ pointer="${XDG_CONFIG_HOME:-$HOME/.config}/kb-tools/kb-home"
 kb=${1:-$HOME/knowledge-base}
 case "$kb" in "~") kb=$HOME ;; "~/"*) kb="$HOME/${kb#\~/}" ;; esac
 
-mkdir -p "$kb/raw" "$kb/notes" "$kb/cards" "$kb/.repository-mapping"
+mkdir -p "$kb/raw" "$kb/notes" "$kb/cards"
 
 # Absolute from here on: the pointer file is read from wherever a skill happens
 # to run, so a relative path given here would resolve against the wrong
 # directory — and usually against no directory at all.
 kb=$(cd "$kb" && pwd)
-
-# .repository-mapping/ holds symlinks named after the repository URL, so the
-# mapping needs no configuration file and no parser. It is the one
-# machine-local thing here.
-if [ ! -e "$kb/.gitignore" ]; then
-  printf '/.repository-mapping/\n' > "$kb/.gitignore"
-  echo "wrote .gitignore (.repository-mapping/ is machine-local)"
-fi
 
 # The base has to be readable without this plugin installed — and its presence
 # is what identifies a directory as a knowledge base.  Assembled rather than

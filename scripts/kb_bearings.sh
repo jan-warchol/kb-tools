@@ -133,7 +133,7 @@ if [ -n "$kb" ]; then
   printf 'kb: %s%s\n' "$kb" "$kb_note"
   printf 'layout:\n'
   find "$kb" -mindepth 1 -maxdepth 2 -type d \
-    ! -path "$kb/.git*" ! -path "$kb/.repository-mapping*" 2>/dev/null |
+    ! -path "$kb/.git*" 2>/dev/null |
     sed "s#^$kb/#  #" | sort
   printf '# Put each item where its kind already lives; ask if nothing fits.\n'
 else

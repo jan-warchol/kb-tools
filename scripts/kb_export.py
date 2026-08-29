@@ -58,7 +58,7 @@ HEADER = [
     "#guid column:4",
 ]
 
-SKIP_DIRS = {".git", ".repository-mapping"}
+SKIP_DIRS = {".git"}
 QA_RE = re.compile(
     r"^#+[ \t]*Question[ \t]*$(.*?)^#+[ \t]*Answer[ \t]*$(.*)",
     re.DOTALL | re.MULTILINE | re.IGNORECASE,

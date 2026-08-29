@@ -32,9 +32,13 @@ The mechanism was worked out before it was deferred. Two triggers, and the
 frontmatter for both is already being written.
 
 - **Change-triggered.** `git log <commit>..HEAD -- <path>` in the repo the
-  repository mapping resolves from the URL. Empty result ⇒ still current, at no
-  cost. This is what makes a sweep affordable: most items are untouched, so most
-  of a pass is a cheap negative. Only entries carrying `commit` participate.
+  item's `resource` URL names. Empty result ⇒ still current, at no cost. This is
+  what makes a sweep affordable: most items are untouched, so most of a pass is
+  a cheap negative. Only entries carrying `commit` participate. **Resolving that
+  URL to a checkout on this machine is the unbuilt half** — an item deliberately
+  records no local path (spec §3.8), so the pass needs some way to be told where
+  the repo is. Decide it with the pass; anything decided now would be a
+  convention kept ready rather than a mechanism.
 - **Time-triggered.** `stale_after: <YYYY-MM-DD>` on the item, measured against
   `reviewed`. An absolute date rather than a relative TTL, so staleness is a
   plain date comparison (OKF §5.5). Both keys arrive with this work.

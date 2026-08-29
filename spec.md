@@ -210,26 +210,15 @@ directory is usually not the root. Without it a file read two directories down
 is recorded under a path that resolves nowhere, and the item points at nothing
 the next machine can find.
 
-The single machine-local fact — where each source repository is checked out — is
-carried by `.repository-mapping/<host>/<org>/<repo>` as a symlink to the
-checkout, so the mapping is its own filename and nothing has to parse it. Items
-record a repository by URL plus repo-relative path, and the symlink resolves the
-URL to wherever the repo sits on this machine, so an item survives the repo
-moving on disk and survives being read elsewhere, which needs only its own
-links. It is the only part of a base not worth committing.
+**An item records a repository by URL, never by local path.** Where that repo
+sits on this machine is machine-local, so recording it would make the item
+false on the next machine — and the item survives the checkout moving on disk
+precisely because it never named the location.
 
-**The mapping is maintained by hand** — `mkdir -p` and `ln -s`, which is the
-whole reason the filename carries the mapping.
-
-```bash
-cd "$KB_HOME/.repository-mapping" && mkdir -p github.com/acme
-ln -s ~/src/acme/backend github.com/acme/backend
-```
-
-Nothing reads it yet either:
-capture verifies in a repository already on this machine, and revalidation,
-the one pass that would need to resolve a URL, is deferred. Until then it is a
-convention being kept ready, not a mechanism.
+Nothing resolves a URL back to a checkout, because nothing needs to yet:
+capture verifies in a repository it is already standing in, and revalidation —
+the one pass that would have to make that jump — is deferred, so the mechanism
+is designed with it rather than kept ready in advance (`deferred.md`).
 
 Who captured an item is likewise not configuration: it comes from `$KB_USER` or
 the system user, because a base may have several contributors and the answer
