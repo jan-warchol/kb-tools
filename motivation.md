@@ -95,5 +95,8 @@ document that makes the agent a disciplined maintainer.
 — markdown files whose YAML frontmatter carries the machine-readable half: what
 links to what, and the fields automated passes read and write:
 
+- The knowledge base is an OKF bundle, so a leading `/` in a reference is
+  base-relative, and derivation and evidence share one field because both
+  answer "where did this come from".
 - `generated` / `verified` already spells the who-wrote / who-confirmed split.
 - The `human:` actor prefix marks sign-off by a person, not a machine.

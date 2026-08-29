@@ -144,7 +144,8 @@ text), `origin: human` (the claims are the user's). `sources` begins with the
 raw item, then every evidence source. `verified` carries the raw item's entries
 plus a `human:` entry stamped at approval. A note does not list its cards —
 references run from the derived item to what it came from, so a note's cards are
-found by searching the cards for its path.
+found by searching the cards for its path. A back-reference would be a second
+copy of that fact, free to drift out of step with the first.
 
 ```yaml
 ---

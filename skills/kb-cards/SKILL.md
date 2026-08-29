@@ -20,7 +20,9 @@ No knowledge base means no cards: say so and offer `/kb-init`.
 
 - **A card asks only what the note says** — not its raw item, not the code, not
   what you know.
-- **One fact, one card**, and the same fact never twice.
+- **One fact, one card**, and the same fact never twice. A fact split across
+  two cards is reviewed twice for one piece of knowledge, and each showing
+  primes the other.
 - **The user approves each card.** Unapproved is `status: draft` with no
   `verified` key; approval stamps the `human:` entry and makes it `stable`.
 - **Card IDs are permanent**, and never invented — `kb_cardid.sh` draws them.

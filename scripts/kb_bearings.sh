@@ -18,7 +18,9 @@ expand() {
 }
 
 # A base carries the schema so it can be read without this plugin; that is what
-# marks one. Nothing here knows the layout below it.
+# marks one, so nothing exists purely to be detected. Not knowledge-base.yaml:
+# an optional file cannot be the marker, and requiring it would recreate exactly
+# the file that exists to be detected. Nothing here knows the layout below it.
 is_kb() { [ -f "$1/SCHEMA.md" ]; }
 
 # Every directory at most two levels below the working directory, shallowest
@@ -32,7 +34,10 @@ nearby() {
 
 # The knowledge base, in order: environment, pointer file, an enclosing base, a
 # base below the working directory. The last one covers a base kept inside the
-# project it serves, which no walk upwards can reach.
+# project it serves, which no walk upwards can reach.  The pointer file exists
+# because the environment variable is the one link here that can be set
+# correctly and still be absent: it reaches a process only through a shell that
+# has already sourced the profile defining it.
 kb=""
 kb_note=""
 if [ -n "${KB_HOME:-}" ]; then
@@ -137,6 +142,9 @@ if [ -n "$kb" ]; then
     sed "s#^$kb/#  #" | sort
   printf '# Put each item where its kind already lives; ask if nothing fits.\n'
 else
+  # Capture never blocks on this: dictation happens at the moment of learning,
+  # so friction here does not delay a capture, it loses one.  A file in the
+  # wrong directory is recoverable with mv; a lost capture is not.
   printf 'kb: NONE — no knowledge base configured (/kb-init makes one).\n'
   printf '    Capture writes into the current directory (%s) and says so;\n' "$PWD"
   printf '    anything that must read the base stops and says so.\n'

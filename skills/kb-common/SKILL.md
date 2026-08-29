@@ -3,6 +3,10 @@ name: kb-common
 description: General instructions for working on the knowledge base. Use always when interacting with knowledge bases managed by kb-tools plugin.
 ---
 
+```
+dictation ─▶ raw capture ─▶ note ─▶ card ─▶ export ─▶ Anki
+```
+
 - When working on items with human origin, only add new information when the user explicitly
   articulated it, or it comes from updated source items. NEVER add new information on your own.
   Articulating is the step that does the learning.

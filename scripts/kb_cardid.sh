@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Draw card IDs.  The tail comes from /dev/urandom because a model asked for a
+# random string does not produce one, and a card ID doubles as its Anki guid —
+# a namespace shared with every deck the user has ever imported, where a
+# counter unique to this base is not enough.
 # Card IDs for a note: its slug, then ten random characters of [A-Za-z0-9].
 #
 # Usage:  kb_cardid.sh <note-id> [count]
