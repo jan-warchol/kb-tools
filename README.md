@@ -26,6 +26,9 @@ on any machine, including ones the knowledge must never reach.
 /kb-capture the retry wrapper wraps the consumer, so retries happen before the ack
 ```
 
+There is no lookup command: asking an agent inside the knowledge base is
+sufficient, and needs no dedicated mechanism.
+
 ## Reading
 
 | | |

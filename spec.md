@@ -11,9 +11,6 @@
 | **Card** | Propose recall items; the user approves them |
 | **Export** | Emit an importable package for the scheduler |
 
-Lookup is not a built operation — asking an agent inside the knowledge base is
-sufficient and requires no dedicated mechanism.
-
 ### 1.2 Boundary
 
 The system owns everything from the spoken sentence to the moment a card is
@@ -83,8 +80,7 @@ counter unique to this base is not enough. `kb_cardid.sh` draws it from
 
 The slug leads so a card is recognisable in a listing. It is not a link: **a
 card cites its note in `sources` and nothing points back**, so a note's cards
-are found by searching for that path, not by globbing the slug — which would
-sweep in the cards of any note whose slug this one is a prefix of.
+are found by searching for that path.
 
 Cards live one to a file rather than together in the note, which keeps per-card
 metadata — status, approval, its own `verified` — natural.
@@ -109,8 +105,7 @@ human-reviewed, because that entry *is* the user's approval.
 
 Normally left as written once a capture ends: a raw item is the record of what
 the user said, so the usual way to correct one is a new capture rather than an
-edit. This is a default, not a prohibition — a user who asks for a raw item to be
-changed or removed gets it changed or removed. Transcription is repaired
+edit. Transcription is repaired
 silently, and a correction the user dictates while the capture is still open is
 folded into the text — a raw item holds the user's words, not the exchange that
 produced them.
@@ -169,8 +164,7 @@ base kept inside the project it serves sits below the working directory; with
 the work happening in one sub-project beside it, it sits to the side of it and
 under a shared parent. Neither is reachable by walking upwards, so the search
 also looks two levels below the working directory and one level below each of
-its ancestors, stopping at `$HOME`. A base found that way is reported as
-unconfigured, because it was found by looking rather than by being told.
+its ancestors, stopping at `$HOME`.
 
 **`SCHEMA.md` at the root is what marks a base**, and what the walk tests for:
 a base carries the schema anyway so it can be read without this plugin, so
@@ -210,11 +204,6 @@ directory is usually not the root. Without it a file read two directories down
 is recorded under a path that resolves nowhere, and the item points at nothing
 the next machine can find.
 
-**An item records a repository by URL, never by local path.** Where that repo
-sits on this machine is machine-local, so recording it would make the item
-false on the next machine — and the item survives the checkout moving on disk
-precisely because it never named the location.
-
 Nothing resolves a URL back to a checkout, because nothing needs to yet:
 capture verifies in a repository it is already standing in, and revalidation —
 the one pass that would have to make that jump — is deferred, so the mechanism
@@ -228,9 +217,7 @@ belongs on the item.
 into the working directory instead and says so. Dictation happens at the moment
 of learning, so friction there does not delay a capture, it loses one (§1.2 of
 the motivation); a file in the wrong directory is recoverable with `mv`, and the
-ID and layer make the destination unambiguous. Redaction has no such fallback —
-it reads raw material and writes notes — so it asks for a knowledge base
-instead.
+ID and layer make the destination unambiguous.
 
 ## 4. Export
 
@@ -242,7 +229,7 @@ dependency to carry the same fact.
 - Each kind gets a subdeck named after it, under the root from
   `anki_deck_name:` in `knowledge-base.yaml` (default `Knowledge`) — so a
   `Recall Card` lands in `Knowledge::Recall`, and a kind added later needs no
-  change to the export. What counts as a card is a `type` ending in "Card".
+  change to the export.
   Deck names belong to the identity contract as much as card IDs do: the
   scheduler keys review history off them, so a rename means renaming in both
   places, and renaming a *kind* moves its cards to a new deck.
@@ -253,10 +240,6 @@ dependency to carry the same fact.
   because it was exported.
 - Scheduler identity derives from the card ID, so re-import updates an existing
   item rather than duplicating it (§4.1).
-- Fields carry the card's markdown as it sits in the file, not HTML —
-  formatting in the scheduler is a later decision. The export unwraps the
-  file's 80-column wrapping, because Anki renders every newline in a field as a
-  line break.
 - A duplicate card ID is fatal and nothing is written: two cards sharing an ID
   share an identity, and one would silently overwrite the other.
 - `status: deprecated` cards are omitted and listed. **Omission does not suspend

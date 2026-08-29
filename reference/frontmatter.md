@@ -95,6 +95,9 @@ sources:
     retrieved: 2026-08-10
 ```
 
+A repository is named by URL, never by a local path: where the checkout sits is
+machine-local, so an item naming it would be false on the next machine — and an
+item survives the checkout moving precisely because it never named the place.
 `path` is relative to the root of the repository named by `resource`, never to
 the working directory the item was written from. `path` and `symbol` each have a
 plural form taking a list; use whichever fits what verification actually
@@ -165,7 +168,10 @@ verified:
 
 **Card** — `sources` are notes only, never a repository or a document directly:
 a card is a question about a note, and where the claim came from is recorded
-there. One kind is in use — `Recall Card`, one fact and one answer. A card's
+there. **A card kind is a `type` ending in `Card`** — export dispatches on that
+and names the subdeck after what precedes it, so a kind spelled otherwise is
+silently never exported. One kind is in use — `Recall Card`, one fact and one
+answer. A card's
 `title` names what it asks about, so it can be identified in a listing without
 being read; it is not the question, which lives in the body.
 

@@ -21,6 +21,9 @@ Invoke `/kb-common` skill if you haven't already.
   polishing seems to require changing a claim, stop and ask.
 - **Redaction reads raw items; it does not rewrite them.**
 - **A contradiction stops you.** 
+- **No knowledge base, no redaction.** Unlike capture, this reads raw material
+  and writes notes, so it has no working-directory fallback: say so and offer
+  `/kb-init`.
 
 ## Procedure
 

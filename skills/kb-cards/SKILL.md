@@ -7,6 +7,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_be
 # kb-cards
 
 One note in, cards out. You propose, the user approves. Export is separate.
+Invoke `/kb-common` skill if you haven't already.
 
 ## Bearings
 
@@ -33,7 +34,9 @@ No knowledge base means no cards: say so and offer `/kb-init`.
 A draft note produces nothing — offer `/kb-redact`. An `origin: machine` item
 never produces cards. Take the one the user named, else the oldest with no
 cards. **Nothing points from a note to its cards** — a note has cards if some
-card names its path in `sources`, so grep the cards for `<note-id>.md`.
+card names its path in `sources`, so grep the cards for `<note-id>.md`. Never
+glob the slug instead: that sweeps in the cards of every note whose slug this
+one is a prefix of.
 
 **2. Draw the IDs.** One per card, in one call:
 
@@ -60,6 +63,11 @@ Ack first — the retry re-enqueues the message rather than holding it.
 ```
 
 A note may yield several, one, or none.
+
+The body is markdown, not HTML, and export joins soft-wrapped lines back into
+one — blank lines, list items and fenced blocks are kept as structure, anything
+else in a paragraph is run together. So wrap the file at 80 columns as usual,
+and use a list where the answer needs line breaks in Anki.
 
 **4. Present, then write** the approved cards where cards live, per the schema.
 `origin: human`, `verified` a single `human:` entry at approval, `status:
