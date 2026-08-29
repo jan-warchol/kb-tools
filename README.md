@@ -11,7 +11,6 @@ knowledge must never reach.
 | `/kb-init` | creates a knowledge base |
 | `/kb-capture` | writes a verified raw item from dictation |
 | `/kb-redact` | turns raw items into polished notes |
-| `/kb-ingest` | transcribes an external source and summarises it |
 | `/kb-cards` | makes recall cards from a note |
 | `/kb-export` | writes an Anki import file, one deck per card kind |
 
@@ -102,11 +101,6 @@ Later, work the captures into notes with `/kb-redact`. It takes the oldest raw
 item with no note, polishes it without altering any claim, and leaves the note a
 draft until you approve it.
 
-`/kb-ingest <url-or-path>` keeps an external source: a faithful transcription
-plus a summary a tenth as long. Both are marked as the source's claims, not
-yours — it is reference material, and the way something becomes a card is still
-you saying it in your own words.
-
 ## What it will not do
 
 Constraints the design exists to protect, not missing features:
@@ -122,4 +116,3 @@ Constraints the design exists to protect, not missing features:
 - It will not mark something verified because it sounds right.
 - It will not alter a claim while polishing it, and will not mark a note
   approved on your behalf.
-- It will not add its own voice to an ingested source, in either file.

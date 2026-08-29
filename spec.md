@@ -8,7 +8,6 @@
 |---|---|
 | **Capture** | Accept dictation, repair transcription, verify claims, store raw |
 | **Redact** | Turn raw material into a polished, structured, provenance-carrying note |
-| **Ingest** | Transcribe an external source and summarise it, as reference material |
 | **Card** | Propose recall items; the user approves them |
 | **Export** | Emit an importable package for the scheduler |
 
@@ -32,16 +31,16 @@ compensate when it is not (`deferred.md`).
 ## 2. Flow
 
 ```
-  dictation                          external source
-     │                                     │
-     ▼  capture ······· verifies           ▼  ingest ······· transcribes faithfully
-   raw                  against repos    source            summarises at a tenth
-     │                  and sources         │
-     ▼  redact ········ polishes one item   ╎  reference only — the claims are the
-   note                 never reorganises   ╎  source's, so nothing here becomes a
-     │                  the corpus          ╎  card without passing through
-     ▼  card ·········· system proposes,    ╎  dictation first
-   card                 user approves ······╯
+  dictation
+     │
+     ▼  capture ······· verifies against repos and sources
+   raw
+     │
+     ▼  redact ········ polishes one item, never reorganises the corpus
+   note
+     │
+     ▼  card ·········· system proposes, user approves
+   card
      │
      ▼  export
   package ─────────────▶ scheduler          (review happens here, not here)
@@ -56,9 +55,10 @@ its notes.
 **The format itself is specified once**, in
 [`reference/frontmatter.md`](reference/frontmatter.md) — every key, the three
 verification tiers, and one worked example per layer. The skills inject that
-file rather than restating it, and `/kb-init` copies it into the knowledge base
-as `SCHEMA.md` so the base is readable without this plugin. This section holds
-only what the reference cannot: why the fields are shaped that way.
+file rather than restating it, and `/kb-init` writes it into the knowledge base
+as `SCHEMA.md` so the base is readable without this plugin — that file plus any
+`frontmatter-*.md` fragment belonging to a separable capability. This section
+holds only what the reference cannot: why the fields are shaped that way.
 
 `kb_check.py` checks the *shape* of frontmatter and nothing else — keys that
 must be present, values that must parse, and the rule that anything unverified
@@ -96,9 +96,8 @@ inferred. `human` means the content asserts what the user asserted; `machine`
 means it does not. This is deliberately a different question from
 `generated.by`, which records who produced the *text*: a polished note is
 written by the agent and still carries `origin: human`, because the claims in it
-are the user's. An ingested source is the mirror image — the agent wrote nothing
-of its own, and it is still `origin: machine`, because the claims are the
-publication's.
+are the user's. `machine` is the mirror image — material whose claims are not
+the user's, whoever produced the text.
 
 `verified` is kept separate from `generated` because whoever wrote something
 need not be whoever checked it, and the three tiers that follow from it (OKF
@@ -146,19 +145,7 @@ rubric instead — a different mechanism, and a deferred one (`deferred.md`).
 cards is reviewed twice for one piece of knowledge, and each showing primes the
 other.
 
-### 3.6 Ingested sources
-
-Ingest exists to keep reading, not to shortcut articulation. Its two files are
-`origin: machine` throughout, and their `verified` entry asserts only that **the
-text is faithful to the source** — never that the source is right.
-
-That is the whole of the segregation the design depends on: external material is
-readable, citable and searchable alongside the user's own, and mechanically
-distinguishable from it by one field. A card drawn straight from an ingested
-source would be knowledge the user never articulated, so the route from a source
-to a card runs through dictation like everything else.
-
-### 3.7 Sources
+### 3.6 Sources
 
 **The knowledge base is an OKF bundle**, so a leading `/` in `resource` is
 base-relative. Derivation and evidence share one field because both answer
@@ -168,7 +155,7 @@ base-relative. Derivation and evidence share one field because both answer
 written at capture. Revalidation depends on them, and they cannot be recovered
 afterwards — by then the verifying context is gone.
 
-### 3.8 Finding the knowledge base
+### 3.7 Finding the knowledge base
 
 Resolved in order — `$KB_HOME`, then the pointer file
 `~/.config/kb-tools/kb-home`, then by walking up from the working directory,
@@ -203,7 +190,7 @@ directories, and only because an empty base has nothing to read. So the layout
 can be reorganised without touching the plugin, which is the point — a corpus
 outlives the arrangement it started in.
 
-### 3.9 Finding the repository a claim is verified in
+### 3.8 Finding the repository a claim is verified in
 
 **There is rarely exactly one.** A working directory is often the parent of
 several checkouts — `frontend/`, `backend/`, the base itself — and just as often

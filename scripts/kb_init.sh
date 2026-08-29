@@ -17,7 +17,7 @@ pointer="${XDG_CONFIG_HOME:-$HOME/.config}/kb-tools/kb-home"
 kb=${1:-$HOME/knowledge-base}
 case "$kb" in "~") kb=$HOME ;; "~/"*) kb="$HOME/${kb#\~/}" ;; esac
 
-mkdir -p "$kb/raw" "$kb/notes" "$kb/cards" "$kb/sources" "$kb/.repository-mapping"
+mkdir -p "$kb/raw" "$kb/notes" "$kb/cards" "$kb/.repository-mapping"
 
 # Absolute from here on: the pointer file is read from wherever a skill happens
 # to run, so a relative path given here would resolve against the wrong
@@ -33,8 +33,16 @@ if [ ! -e "$kb/.gitignore" ]; then
 fi
 
 # The base has to be readable without this plugin installed — and its presence
-# is what identifies a directory as a knowledge base.
+# is what identifies a directory as a knowledge base.  Assembled rather than
+# copied: kinds belonging to a separable capability live in a frontmatter-*.md
+# fragment, so removing that capability needs no change here.
 cp "$root/reference/frontmatter.md" "$kb/SCHEMA.md"
+for fragment in "$root"/reference/frontmatter-*.md; do
+  if [ -e "$fragment" ]; then
+    printf '\n' >> "$kb/SCHEMA.md"
+    cat "$fragment" >> "$kb/SCHEMA.md"
+  fi
+done
 echo "wrote SCHEMA.md"
 
 # A file, not an environment variable: nothing here depends on a shell restart.

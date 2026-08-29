@@ -4,6 +4,9 @@ The one description of the file format. Every other place that needs it — the
 spec, the skills, the copy at `SCHEMA.md` in the knowledge base — either injects
 this file or points at it. `scripts/kb_check.py` enforces it.
 
+Kinds belonging to a separable capability live in a `frontmatter-*.md` fragment
+beside this file; `/kb-init` appends every fragment to `SCHEMA.md`.
+
 This describes frontmatter only. Where a file lives is not part of the format:
 the directory names in the examples below are illustrative, and the knowledge
 base is free to be arranged any way.
@@ -15,8 +18,6 @@ base is free to be arranged any way.
 | raw item | `<YYYY-MM-DD>-<slug>` | `2026-08-10-retry-wrapper` |
 | note | same ID as its raw item | `2026-08-10-retry-wrapper` |
 | card | `<note-slug>-<10 random>` | `retry-wrapper-DXo1jycAlN` |
-| source transcript | `<YYYY-MM-DD>-<slug>` | `2026-08-16-cap-theorem` |
-| source summary | `<slug-id>-summary` | `2026-08-16-cap-theorem-summary` |
 
 The filename is `<id>.md`, and the ID is repeated in frontmatter so a moved file
 stays identifiable. A raw item and the note derived from it share an ID —
@@ -35,8 +36,8 @@ Present on every item:
 
 ```yaml
 id: 2026-08-10-retry-wrapper
-type: Note        # the kinds in use: Raw Capture, Note, Recall Card,
-                  # Source Transcript, Source Summary — not a closed set
+type: Note        # kinds in use: Raw Capture, Note, Recall Card;
+                  # not a closed set
 title: Retry wrapper ordering    # required on every item, cards included
 origin: human                    # human | machine
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:35:00Z }
@@ -46,8 +47,8 @@ status: stable                   # draft | stable | deprecated
 `origin` says **whose claims these are**, and is never inferred: `human` means
 the content asserts what the user asserted. It is a different question from
 `generated.by`, which records who produced the *text* — a polished note is
-written by the agent and still carries `origin: human`, while an ingested
-article is transcribed verbatim and is still `origin: machine`.
+written by the agent and still carries `origin: human`. `machine` is the mirror
+image: material whose claims are not the user's, however it was produced.
 
 Actors follow OKF §7: `human:jan`, `claude-code/opus-5`, `process:export`.
 Timestamps are UTC, from `date -u +%Y-%m-%dT%H:%M:%SZ`, never invented.
@@ -69,9 +70,6 @@ nothing has verified. A card
 must be human-reviewed before it is exported, because that entry *is* the
 user's approval — a card that has been proposed and not yet approved is
 `status: draft` and carries no `verified` key.
-
-On an ingested source the entry means the text is faithful to the original, not
-that the original is correct.
 
 **Unverified means draft**, for everything. That is the one rule `kb_check.py`
 enforces about meaning; the rest of what it checks is shape — required keys,
@@ -106,10 +104,8 @@ touched, never both forms of the same key in one entry.
 written at capture — revalidation reads them, and they cannot be recovered
 once the verifying context is gone.
 
-The **first** source of a derived item is the item it was derived from: a note
-cites its raw item, a summary cites its transcript. That link is what marks the
-original as processed. A summary written where no transcription was possible has
-nothing internal to cite, and names the original directly.
+The **first** source of a derived item is the item it was derived from — a note
+cites its raw item. That link is what marks the original as processed.
 
 Frontmatter is authoritative. Prose may name a file inline where it aids
 reading; those mentions are decorative and are not maintained.
@@ -196,25 +192,4 @@ In what order do the ack and the retry happen for a failed message?
 ## Answer
 
 Ack first — the retry re-enqueues the message rather than holding it.
-```
-
-**Source transcript and summary** — both `origin: machine`. The transcript cites
-the original; the summary cites the transcript first, then the original, so it
-stays traceable on its own.
-
-```yaml
----
-id: 2026-08-16-cap-theorem
-type: Source Transcript
-title: CAP theorem revisited
-origin: machine
-generated: { by: claude-code/opus-5, at: 2026-08-16T09:12:00Z }
-status: stable
-sources:
-  - resource: https://codahale.com/you-cant-sacrifice-partition-tolerance/
-    author: human:codahale
-    retrieved: 2026-08-16
-verified:
-  - { by: claude-code/opus-5, at: 2026-08-16T09:12:00Z }
----
 ```
