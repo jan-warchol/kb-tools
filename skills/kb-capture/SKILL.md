@@ -21,10 +21,9 @@ Invoke `/kb-common` skill if you haven't already.
   user said. Never compose the knowledge on their behalf, and never write a
   capture from the session transcript, your own analysis, or the code — that
   articulation is the step that does the learning.
-- **You report discrepancies; the user fixes them.** On finding an incorrect
-  claim, stop and report. Transcription repair is the one
-  exception — recovering the identifier they meant to say does not change what
-  they claimed.
+- **Transcription repair is the one exception** to reporting rather than
+  fixing: recovering the identifier they meant to say does not change what they
+  claimed.
 - You are transcribing, not summarising: keep user's framing, emphasis and level
   of detail.
 - Write into the working directory if the knowledge base hasn't been configured.
@@ -44,13 +43,9 @@ you cannot tell what was meant. Repair only what was *meant* as an identifier:
 `fileSettings`, because describing a thing in plain English is not a
 mis-transcription of its name.
 
-**3. Verify the claims.** Check what they said against evidence: the codebase
-when the claim is about code, other sources otherwise. Read the code, do not
-reason from identifier names.
-
-If you find an incorrect claim, **STOP** and ask the user for correction.
-Fold their correction into the text — the raw item holds the user's words,
-not the exchange that produced them.
+**3. Verify the claims**, per `/kb-common`. On an incorrect claim, **STOP** and
+ask the user for the correction, then fold it into the text — the raw item holds
+the user's words, not the exchange that produced them.
 
 **4. Write the raw item** per the schema below.
 
@@ -59,7 +54,6 @@ not the exchange that produced them.
   Dictation arrives unpunctuated, so sentence breaks are part of transcription.
 - **`generated`** is the user, **`verified`** is you: different actors doing
   different jobs.
-- **`sources`** records where verification actually looked. 
 
 You can check the frontmatter with:
 
@@ -70,8 +64,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the file you wrote>
 ## Capturing without verification
 
 When the user has no time to verify ("quick", "don't verify"), skip step 3 only.
-Still repair transcription, still record any sources you touched, and write **no
-`verified:` key** with `status: draft`. 
+Still repair transcription, and still record any sources you touched.
 
 ---
 

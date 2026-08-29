@@ -13,7 +13,6 @@ Invoke `/kb-common` skill if you haven't already.
 
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
-Never copy an actor or a timestamp out of an example; re-sample with `date -u`.
 No knowledge base means no cards: say so and offer `/kb-init`.
 
 ## Rules
@@ -23,8 +22,8 @@ No knowledge base means no cards: say so and offer `/kb-init`.
 - **One fact, one card**, and the same fact never twice. A fact split across
   two cards is reviewed twice for one piece of knowledge, and each showing
   primes the other.
-- **The user approves each card.** Unapproved is `status: draft` with no
-  `verified` key; approval stamps the `human:` entry and makes it `stable`.
+- **The user approves each card**, one at a time — approval is per card, not
+  per batch.
 - **Card IDs are permanent**, and never invented — `kb_cardid.sh` draws them.
   Rewording an existing card keeps its ID; changing what it asks takes a new
   one, from a fresh draw.
