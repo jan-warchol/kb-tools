@@ -70,13 +70,6 @@ stamp on each means **the text is faithful to what the source said** — not tha
 the source is correct. You are in no position to assert the latter and must not
 imply it.
 
-Then check the frontmatter — it catches mechanical mistakes, and a skip when
-PyYAML is missing is not a failure:
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the files you wrote>
-```
-
 **6. Report** every path written, the word counts and the ratio where there is a
 transcription to compare against, and anything you had to leave out or could not
 fetch.

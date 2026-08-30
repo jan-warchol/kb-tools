@@ -12,8 +12,6 @@ Invoke `/kb-common` skill if you haven't already.
 
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
-No knowledge base means nothing to quiz on: say so and offer `/kb-init`.
-
 ## Instructions
 
 Ask questions about a topic selected from the knowledge base (usually a specific

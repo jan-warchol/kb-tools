@@ -51,7 +51,7 @@ written by the agent and still carries `origin: human`. `machine` is the mirror
 image: material whose claims are not the user's, however it was produced.
 
 Actors follow OKF §7: `human:jan`, `claude-code/opus-5`, `process:export`.
-Timestamps are UTC, from `date -u +%Y-%m-%dT%H:%M:%SZ`, never invented.
+Timestamps are UTC, ISO 8601 — `date -u +%Y-%m-%dT%H:%M:%SZ` produces them.
 
 ## `verified`
 

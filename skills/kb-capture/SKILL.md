@@ -17,16 +17,14 @@ Invoke `/kb-common` skill if you haven't already.
 
 ## Rules that are not negotiable
 
-- **The user articulates; you never substitute for that.** Capture what the
-  user said. Never compose the knowledge on their behalf, and never write a
-  capture from the session transcript, your own analysis, or the code — that
-  articulation is the step that does the learning.
+- **The user articulates; you never substitute for that** (`/kb-common`).
+  Never write a capture from the session transcript, your own analysis, or the
+  code.
 - **Transcription repair is the one exception** to reporting rather than
   fixing: recovering the identifier they meant to say does not change what they
   claimed.
 - You are transcribing, not summarising: keep user's framing, emphasis and level
   of detail.
-- Write into the working directory if the knowledge base hasn't been configured.
 
 ## Procedure
 
@@ -43,9 +41,9 @@ you cannot tell what was meant. Repair only what was *meant* as an identifier:
 `fileSettings`, because describing a thing in plain English is not a
 mis-transcription of its name.
 
-**3. Verify the claims**, per `/kb-common`. On an incorrect claim, **STOP** and
-ask the user for the correction, then fold it into the text — the raw item holds
-the user's words, not the exchange that produced them.
+**3. Verify the claims**, per `/kb-common`. Fold whatever correction the user
+gives into the text — the raw item holds the user's words, not the exchange that
+produced them.
 
 **4. Write the raw item** per the schema below.
 
@@ -54,13 +52,6 @@ the user's words, not the exchange that produced them.
   Dictation arrives unpunctuated, so sentence breaks are part of transcription.
 - **`generated`** is the user, **`verified`** is you: different actors doing
   different jobs.
-
-Then check the frontmatter — it catches mechanical mistakes, and a skip when
-PyYAML is missing is not a failure:
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the file you wrote>
-```
 
 ## Capturing without verification
 

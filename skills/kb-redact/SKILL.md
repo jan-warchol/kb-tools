@@ -21,9 +21,6 @@ Invoke `/kb-common` skill if you haven't already.
   polishing seems to require changing a claim, stop and ask.
 - **Redaction reads raw items; it does not rewrite them.**
 - **A contradiction stops you.** 
-- **No knowledge base, no redaction.** Unlike capture, this reads raw material
-  and writes notes, so it has no working-directory fallback: say so and offer
-  `/kb-init`.
 
 ## Procedure
 
@@ -44,13 +41,6 @@ item's ID, per the schema below. Points the schema leaves to this step:
 - `verified` carries every entry the raw item had, plus your own if step 1
   verified it, plus a `human:` entry stamped at the user's approval.
 - `status: stable` on an approved note; it stays `draft` while unapproved.
-
-Then check the frontmatter — it catches mechanical mistakes, and a skip when
-PyYAML is missing is not a failure:
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the file you wrote>
-```
 
 ---
 
