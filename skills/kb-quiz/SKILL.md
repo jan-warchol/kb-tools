@@ -6,9 +6,6 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts
 
 # kb-quiz
 
-Asks about material the user already holds, to find the edges of it. Plain
-recall is what cards are for; this is for reasoning and understanding.
-
 ## Bearings
 
 Invoke `/kb-common` skill if you haven't already.
@@ -17,51 +14,40 @@ Invoke `/kb-common` skill if you haven't already.
 
 No knowledge base means nothing to quiz on: say so and offer `/kb-init`.
 
-## Rules
+## Instructions
 
-- **Never give the answer away** — not in the question, and not by framing it so
-  the answer is inferable. This applies to a wrong answer too: point at what is
-  wrong and let the user reach the correction themselves (`/kb-common`).
-- **What the user says in an answer is theirs, and is the only thing worth
-  keeping.** Nothing you know goes into the base because it came up here.
-- **You are not grading.** Nothing in this system checks answers; say where an
-  answer was thin and move on.
+Ask questions about a topic selected from the knowledge base (usually a specific
+note or set of notes). Use the information about sources from the frontmatter to
+gather any additional necessary context, e.g. from source code.
 
-## Procedure
+Ask 1-2 questions per note. The questions should focus on reasoning and
+understanding the topic, not on plain recall - recall is handled by flashcards
+(if the knowledge base has flashcards related to the notes, you can skip facts
+covered by the flashcards). Be careful not to give away the answers in the
+questions. Also, try to formulate the questions so that the answer doesn't have
+to be a long elaborate. If there are any logs of previous quizzes on the topic,
+ask about the aspects that haven't been covered yet or that the user failed to
+answer properly last time.
 
-**1. Pick the material.** The notes the user named, else the ones they have not
-been asked about recently. Read each note, and read the previous quiz logs for
-it if there are any — ask about what was missed last time or not covered at all.
+If you have access to the sources, you can expand the scope of the questions
+slightly to cover adjacent, related issues. If the user provides information
+that wasn't previously available in the quizzed item, take that part of his
+answer and append it to the corresponding raw capture.
 
-**2. Gather context.** Follow `sources` in the frontmatter to whatever the note
-was verified against. With the source in front of you the questions can range a
-little wider than the note, into adjacent behaviour the user plausibly met at
-the same time.
+After the quiz is done, log the questions, answers, and any important comments
+on the answers in a file.
 
-**3. Ask.** One or two questions per note, no more. Each should be answerable in
-a few sentences — if it needs an essay, it is the wrong question. Skip anything
-already covered by a card on that note: those are drilled elsewhere, and asking
-again here primes them.
+## Appending, and the log
 
-**4. Keep what is new.** Where an answer contains something the note does not
-already say, that is dictation and belongs in the base — verify it per
-`/kb-common`, then append it to the raw item behind the note, leaving what is
-already written alone.
-
-If you cannot verify it now, do not append it: an unverified sentence inside a
-verified item makes the whole item's `verified` entry a lie. Say so, and offer
-`/kb-capture` for it instead.
-
-Appending puts the raw item ahead of its note, and the note ahead of its cards.
-Say which ones now trail and offer `/kb-redact`; do not quietly rewrite them.
-
-**5. Log the session** where the previous logs live — the questions, the
-answers, and what was thin or wrong about them, so the next quiz can start where
-this one stopped. The log is a record of an exchange and not a knowledge item:
-plain markdown, no frontmatter, nothing downstream reads it.
-
-**6. Report** what was covered, what the user was shaky on, anything appended,
-and anything left uncaptured for `/kb-capture`.
+- **Verify what you append**, per `/kb-common`. If you cannot verify it now, do
+  not append it: an unverified sentence inside a verified item makes the whole
+  item's `verified` entry a lie. Say so, and offer `/kb-capture` for it instead.
+- **Appending puts the raw item ahead of its note, and the note ahead of its
+  cards.** Say which ones now trail and offer `/kb-redact`; do not quietly
+  rewrite them.
+- **The log is a record of an exchange and not a knowledge item**: plain
+  markdown, no frontmatter, nothing downstream reads it. It goes where the
+  previous logs live.
 
 ---
 
