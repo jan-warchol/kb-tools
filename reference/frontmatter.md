@@ -25,10 +25,6 @@ identity is the pair of kind and ID. Within a kind, a second item that would
 take an ID already in use gets a numeric suffix (`-2`, `-3`).
 
 A card ID is the odd one out: no date, and a random tail in place of a counter.
-Draw it with `scripts/kb_cardid.sh <note-id> [count]` and never invent one — a
-card ID doubles as the card's identity in the scheduler, where a repeat silently
-overwrites another card's review history. **Card IDs are permanent**: rewording
-a card keeps its ID, changing what it asks takes a new one.
 
 ## Common keys
 
@@ -63,13 +59,6 @@ something need not be whoever checked it. Three tiers follow (OKF §5.3):
 | unverified | no `verified` key — must carry `status: draft` |
 | machine-confirmed | entries present, none from a `human:` actor |
 | human-reviewed | at least one `human:` actor entry |
-
-A note must be machine-confirmed or better *and* out of `status: draft` before
-it can produce cards — a draft note is one the user has not approved, or one
-nothing has verified. A card
-must be human-reviewed before it is exported, because that entry *is* the
-user's approval — a card that has been proposed and not yet approved is
-`status: draft` and carries no `verified` key.
 
 **Unverified means draft**, for everything. That is the one rule `kb_check.py`
 enforces about meaning; the rest of what it checks is shape — required keys,
@@ -106,12 +95,6 @@ touched, never both forms of the same key in one entry.
 `commit` and `retrieved` record *what the claim was checked against* and are
 written at capture — revalidation reads them, and they cannot be recovered
 once the verifying context is gone.
-
-The **first** source of a derived item is the item it was derived from — a note
-cites its raw item. That link is what marks the original as processed.
-
-Frontmatter is authoritative. Prose may name a file inline where it aids
-reading; those mentions are decorative and are not maintained.
 
 ## Per kind
 
