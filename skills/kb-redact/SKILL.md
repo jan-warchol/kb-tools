@@ -45,7 +45,8 @@ item's ID, per the schema below. Points the schema leaves to this step:
   verified it, plus a `human:` entry stamped at the user's approval.
 - `status: stable` on an approved note; it stays `draft` while unapproved.
 
-Then optionally `kb_check.py` the file:
+Then check the frontmatter — it catches mechanical mistakes, and a skip when
+PyYAML is missing is not a failure:
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the file you wrote>

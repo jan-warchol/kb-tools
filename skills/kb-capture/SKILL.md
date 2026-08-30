@@ -1,7 +1,7 @@
 ---
 name: kb-capture
 description: Capture something the user has learned into their knowledge base as a verified, timestamped raw item. Use when the user dictates a piece of knowledge to keep — "capture this", "note that ...", "kb this", "add to my knowledge base" — typically while working inside a project repository. Repairs transcription against the real source, verifies the claims, reports discrepancies without fixing them.
-allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-capture
@@ -55,7 +55,8 @@ the user's words, not the exchange that produced them.
 - **`generated`** is the user, **`verified`** is you: different actors doing
   different jobs.
 
-You can check the frontmatter with:
+Then check the frontmatter — it catches mechanical mistakes, and a skip when
+PyYAML is missing is not a failure:
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the file you wrote>

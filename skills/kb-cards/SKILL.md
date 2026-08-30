@@ -7,9 +7,10 @@ allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_be
 # kb-cards
 
 One note in, cards out. You propose, the user approves. Export is separate.
-Invoke `/kb-common` skill if you haven't already.
 
 ## Bearings
+
+Invoke `/kb-common` skill if you haven't already.
 
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
@@ -74,6 +75,9 @@ and use a list where the answer needs line breaks in Anki.
 `origin: human`, `verified` a single `human:` entry at approval, `status:
 stable` when approved and `draft` otherwise. The note is not touched: the card
 cites it and nothing points back.
+
+Then check the frontmatter — it catches mechanical mistakes, and a skip when
+PyYAML is missing is not a failure:
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the files you wrote>

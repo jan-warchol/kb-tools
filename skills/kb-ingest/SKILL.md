@@ -1,7 +1,7 @@
 ---
 name: kb-ingest
 description: Transcribe an external source — an article, paper, doc page or local file — into the knowledge base as clean markdown, plus a summary of it. Use when the user points at a URL or a file and wants to keep it — "ingest this", "save this article", "summarise this for the kb". Never mixes its own claims into what it writes; falls back to a comprehensive summary alone when the source cannot be retrieved in full.
-allowed-tools: Read, Write, Glob, WebFetch, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter-sources.md), Bash(wc -w *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+allowed-tools: Read, Write, Glob, WebFetch, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter-sources.md), Bash(wc -w *), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-ingest
@@ -12,10 +12,11 @@ writes carries the *source's* claims, never yours and never the user's.
 
 ## Bearings
 
+Invoke `/kb-common` skill if you haven't already.
+
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
-Both files go where the bearings show ingested sources live. Never copy an
-actor or a timestamp out of an example.
+Both files go where the bearings show ingested sources live.
 
 ## Rules
 
@@ -69,8 +70,8 @@ stamp on each means **the text is faithful to what the source said** — not tha
 the source is correct. You are in no position to assert the latter and must not
 imply it.
 
-Then, optionally, check the frontmatter — it catches mechanical mistakes, and a
-skip when PyYAML is missing is not a failure:
+Then check the frontmatter — it catches mechanical mistakes, and a skip when
+PyYAML is missing is not a failure:
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the files you wrote>
