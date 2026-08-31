@@ -15,16 +15,13 @@ Invoke `/kb-common` skill if you haven't already.
 
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
-## Rules that are not negotiable
+## Rules
 
 - **The user articulates; you never substitute for that** (`/kb-common`).
   Never write a capture from the session transcript, your own analysis, or the
   code.
-- **Transcription repair is the one exception** to reporting rather than
-  fixing: recovering the identifier they meant to say does not change what they
-  claimed.
-- You are transcribing, not summarising: keep user's framing, emphasis and level
-  of detail.
+- **You are transcribing, not summarising:** keep user's framing, emphasis and
+  level of detail.
 
 ## Procedure
 
@@ -41,22 +38,27 @@ you cannot tell what was meant. Repair only what was *meant* as an identifier:
 `fileSettings`, because describing a thing in plain English is not a
 mis-transcription of its name.
 
-**3. Verify the claims**, per `/kb-common`. Fold whatever correction the user
+Transcription repair is the one exception to "report, don't fix" rule:
+recovering the identifier the user meant to say does not change what they
+claimed.
+
+**3. Verify the claims** (`/kb-common`). Fold whatever correction the user
 gives into the text — the raw item holds the user's words, not the exchange that
 produced them.
 
-**4. Write the raw item** per the schema below.
+**4. Record the sources** (`/kb-common`).
+
+**5. Write the raw item** per the schema below.
 
 - **title**: short and specific — the subject, not the claim.
 - **body**: their words, cleaned of transcription errors and nothing else.
-  Dictation arrives unpunctuated, so sentence breaks are part of transcription.
+  Dictation may be unpunctuated, so sentence breaks are part of transcription.
 - **`generated`** is the user, **`verified`** is you: different actors doing
   different jobs.
 
 ## Capturing without verification
 
 When the user has no time to verify ("quick", "don't verify"), skip step 3 only.
-Still repair transcription, and still record any sources you touched.
 
 ---
 

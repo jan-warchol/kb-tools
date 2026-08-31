@@ -1,8 +1,8 @@
 # Knowledge base frontmatter
 
 The one description of the file format. Every other place that needs it — the
-spec, the skills, the copy at `SCHEMA.md` in the knowledge base — either injects
-this file or points at it. `scripts/kb_check.py` enforces it.
+skills, the copy at `SCHEMA.md` in the knowledge base — either injects this file
+or points at it. `scripts/kb_check.py` enforces it.
 
 Kinds belonging to a separable capability live in a `frontmatter-*.md` fragment
 beside this file; `/kb-init` appends every fragment to `SCHEMA.md`.
@@ -13,18 +13,25 @@ base is free to be arranged any way.
 
 ## Identity
 
+An ID is `[<date>-]<slug>-<suffix>`: an optional `YYYY-MM-DD`, a slug, and a
+suffix that is either a number or a random string. The suffix is always there —
+it is what makes **every ID unique across the base**, kind included: kind is not
+part of identity.
+
 | Kind | ID form | Example |
 |---|---|---|
-| raw item | `<YYYY-MM-DD>-<slug>` | `2026-08-10-retry-wrapper` |
-| note | same ID as its raw item | `2026-08-10-retry-wrapper` |
+| raw item | `<date>-<slug>-<n>` | `2026-08-10-retry-wrapper-1` |
+| note | its raw item's date and slug, next free `<n>` | `2026-08-10-retry-wrapper-2` |
 | card | `<note-slug>-<10 random>` | `retry-wrapper-DXo1jycAlN` |
 
 The filename is `<id>.md`, and the ID is repeated in frontmatter so a moved file
-stays identifiable. A raw item and the note derived from it share an ID —
-identity is the pair of kind and ID. Within a kind, a second item that would
-take an ID already in use gets a numeric suffix (`-2`, `-3`).
+stays identifiable. `<n>` is the lowest number free among the items already
+sharing that date and slug, so a capture is normally `-1` and the note made from
+it `-2`. That shared prefix is a convenience when reading a directory listing
+and nothing more: what pairs a note with its raw item is the `sources` entry —
+which is why a note may draw on several raw items and cite each of them.
 
-A card ID is the odd one out: no date, and a random tail in place of a counter.
+A card ID is the odd one out: no date, and a random tail in place of a number.
 Draw it with `scripts/kb_cardid.sh <note-id> [count]` and never invent one — a
 card ID doubles as the card's identity in the scheduler, where a repeat silently
 overwrites another card's review history. **Card IDs are permanent**: rewording
@@ -35,7 +42,7 @@ a card keeps its ID, changing what it asks takes a new one.
 Present on every item:
 
 ```yaml
-id: 2026-08-10-retry-wrapper
+id: 2026-08-10-retry-wrapper-2
 type: Note        # kinds in use: Raw Capture, Note, Recall Card;
                   # not a closed set
 title: Retry wrapper ordering    # required on every item, cards included
@@ -50,32 +57,20 @@ the content asserts what the user asserted. It is a different question from
 written by the agent and still carries `origin: human`. `machine` is the mirror
 image: material whose claims are not the user's, however it was produced.
 
-Actors follow OKF §7: `human:jan`, `claude-code/opus-5`, `process:export`.
+Actors follow OKF §7: `human:jan`, `claude-code/opus-5`, `process:export`. The
+ones in this file are illustrative: take the human actor from the `user:` the
+bearings report and the machine actor from your own model ID, never from an
+example here.
 Timestamps are UTC, ISO 8601 — `date -u +%Y-%m-%dT%H:%M:%SZ` produces them.
 
 ## `verified`
 
 A list of `{ by, at }`, kept separate from `generated` because whoever wrote
-something need not be whoever checked it. Three tiers follow (OKF §5.3):
-
-| Tier | Condition |
-|---|---|
-| unverified | no `verified` key — must carry `status: draft` |
-| machine-confirmed | entries present, none from a `human:` actor |
-| human-reviewed | at least one `human:` actor entry |
-
-A note must be machine-confirmed or better *and* out of `status: draft` before
-it can produce cards — a draft note is one the user has not approved, or one
-nothing has verified. A card
-must be human-reviewed before it is exported, because that entry *is* the
-user's approval — a card that has been proposed and not yet approved is
-`status: draft` and carries no `verified` key.
+something need not be whoever checked it.
 
 **Unverified means draft**, for everything. That is the one rule `kb_check.py`
 enforces about meaning; the rest of what it checks is shape — required keys,
-timestamps that parse, an `id` matching the filename. It deliberately knows
-nothing about item kinds or where files live, so neither can be changed by
-editing the script.
+timestamps that parse, an `id` matching the filename.
 
 ## `sources`
 
@@ -85,7 +80,7 @@ base.
 
 ```yaml
 sources:
-  - resource: /raw/2026-08-10-retry-wrapper.md   # another item in this base
+  - resource: /raw/2026-08-10-retry-wrapper-1.md   # another item in this base
   - resource: https://github.com/acme/backend    # repository
     path: src/queue/retry.py                     # or paths: [a.py, b.py]
     symbol: RetryWrapper                         # optional; or symbols: [...]
@@ -120,7 +115,7 @@ reading; those mentions are decorative and are not maintained.
 
 ```yaml
 ---
-id: 2026-08-10-retry-wrapper
+id: 2026-08-10-retry-wrapper-1
 type: Raw Capture
 title: Retry wrapper ordering
 origin: human
@@ -139,24 +134,26 @@ sources:
 first and the retry re-enqueues it rather than holding it.
 ```
 
-**Note** — same ID as its raw item. `generated.by` is the agent (it wrote the
-text), `origin: human` (the claims are the user's). `sources` begins with the
-raw item, then every evidence source. `verified` carries the raw item's entries
-plus a `human:` entry stamped at approval. A note does not list its cards —
-references run from the derived item to what it came from, so a note's cards are
-found by searching the cards for its path. A back-reference would be a second
-copy of that fact, free to drift out of step with the first.
+**Note** — the date and slug of the raw item it came from, with the next free
+number. `generated.by` is the agent (it wrote the text), `origin: human` (the
+claims are the user's). `sources` begins with the raw item — with every one of
+them, where the note draws on several — then every evidence source. `verified`
+carries the raw item's entries plus a `human:` entry stamped at approval. A note
+does not list its cards — references run from the derived item to what it came
+from, so a note's cards are found by searching the cards for its path. A
+back-reference would be a second copy of that fact, free to drift out of step
+with the first.
 
 ```yaml
 ---
-id: 2026-08-10-retry-wrapper
+id: 2026-08-10-retry-wrapper-2
 type: Note
 title: Retry wrapper ordering
 origin: human
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:41:00Z }
 status: stable
 sources:
-  - resource: /raw/2026-08-10-retry-wrapper.md
+  - resource: /raw/2026-08-10-retry-wrapper-1.md
   - resource: https://github.com/acme/backend
     path: src/queue/retry.py
     symbol: RetryWrapper
@@ -187,7 +184,7 @@ title: Ack ordering on retry
 origin: human
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:42:00Z }
 status: stable                         # deprecated ⇒ suspend, don't delete
-sources: [{ resource: /notes/2026-08-10-retry-wrapper.md }]
+sources: [{ resource: /notes/2026-08-10-retry-wrapper-2.md }]
 verified:
   - { by: human:jan, at: 2026-08-10T14:43:00Z }
 ---

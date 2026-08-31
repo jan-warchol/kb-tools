@@ -4,6 +4,9 @@
 # a namespace shared with every deck the user has ever imported, where a
 # counter unique to this base is not enough.
 # Card IDs for a note: its slug, then ten random characters of [A-Za-z0-9].
+# The note's date prefix and numeric suffix are both dropped: they say when the
+# note was captured and which item of that name it is, neither of which a card
+# inherits.
 #
 # Usage:  kb_cardid.sh <note-id> [count]
 #
@@ -15,6 +18,7 @@ set -eu
 [ $# -ge 1 ] || { echo "usage: kb_cardid.sh <note-id> [count]" >&2; exit 2; }
 
 slug=${1#[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-}
+slug=$(printf '%s' "$slug" | sed -E 's/-[0-9]+$//')
 count=${2:-1}
 
 i=0

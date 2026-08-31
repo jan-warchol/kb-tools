@@ -26,11 +26,9 @@ Invoke `/kb-common` skill if you haven't already.
 
 ## Procedure
 
-**1. Pick a note.** Eligible: `origin: human`, has `verified`, `status: stable`.
-A draft note produces nothing — offer `/kb-redact`. An `origin: machine` item
-never produces cards. Take the one the user named, else the oldest with no
-cards — grep the cards for `<note-id>.md`, and never glob the slug instead:
-that sweeps in the cards of every note whose slug this one is a prefix of.
+**1. Check the note** the user named — ask which one where they named none.
+Eligible: `origin: human`, has `verified`, `status: stable`. An unverified note
+is not allowed to produce cards — offer `/kb-redact`.
 
 **2. Draw the IDs.** One per card, in one call — never write one yourself, and
 never adapt one from an example:
@@ -42,10 +40,6 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/kb_cardid.sh <note-id> <how-many>
 **3. Draft the cards.** `type: Recall Card` — one fact each, in the note's
 vocabulary. The question must stand alone months later with one right answer. A
 note may yield several, one, or none.
-
-Export joins soft-wrapped lines back into one, keeping blank lines, list items
-and fenced blocks as structure. So wrap the file at 80 columns as usual, and use
-a list where the answer needs line breaks in Anki.
 
 **4. Present, then write** the approved cards where cards live, per the schema.
 `origin: human`, `verified` a single `human:` entry at approval, `status:

@@ -1,12 +1,14 @@
 ---
 name: kb-redact
-description: Turn captured raw items in the knowledge base into polished notes. Use when the user wants to redact, process, or work through their capture backlog — "redact", "process my captures", "turn these into notes". Polishes without altering any claim, verifies anything captured unverified, and never marks a note approved without the user's say-so. Does not make cards.
+description: Turn captured raw items in the knowledge base into polished notes. Use when the user wants to redact, process, or work through their capture backlog — "redact", "process a capture", "turn these into notes". Polishes without altering any claim, verifies anything captured unverified, and never marks a note approved without the user's say-so. Does not make cards.
 allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-redact
 
-Turns raw items into polished notes: **one raw item, one note**.
+Turns raw items into polished notes: **one raw item, one note** by default. A
+note may draw on several raw items where they are about the same thing; it then
+cites every one of them.
 
 ## Bearings
 
@@ -24,7 +26,7 @@ Invoke `/kb-common` skill if you haven't already.
 
 ## Procedure
 
-**1. Verify, if capture did not.** An item with no `verified:` key is not
+**1. Verify if capture did not.** An item with no `verified:` key is not
 machine-confirmed — check its claims now, per `/kb-common`. Otherwise read only
 what you need in order to polish accurately.
 
@@ -35,8 +37,9 @@ Keep the user's framing and vocabulary.
 
 **3. Ask for approval.**
 
-**4. On approval, write the note** alongside the existing notes, taking the raw
-item's ID, per the schema below. Points the schema leaves to this step:
+**4. On approval, write the note** alongside the existing notes, under the raw
+item's date and slug with the next free number (`-2` where the raw item is
+`-1`), per the schema below. Points the schema leaves to this step:
 
 - `verified` carries every entry the raw item had, plus your own if step 1
   verified it, plus a `human:` entry stamped at the user's approval.
