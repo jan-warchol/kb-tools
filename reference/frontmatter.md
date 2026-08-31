@@ -57,6 +57,12 @@ the content asserts what the user asserted. It is a different question from
 written by the agent and still carries `origin: human`. `machine` is the mirror
 image: material whose claims are not the user's, however it was produced.
 
+`generated.at` marks the content's **last meaningful change**, not when the
+file was first written: appending an update to an item moves it. Read against
+`verified`, that is what says whether an item has changed since it was last
+checked — a `generated.at` later than the last `verified.at` means it has — and
+a derived item whose `generated.at` is older than its source's is behind it.
+
 Actors follow OKF §7: `human:jan`, `claude-code/opus-5`, `process:export`. The
 ones in this file are illustrative: take the human actor from the `user:` the
 bearings report and the machine actor from your own model ID, never from an
@@ -111,7 +117,8 @@ reading; those mentions are decorative and are not maintained.
 ## Per kind
 
 **Raw item** — `origin: human`, `generated.by` is the user (they dictated it),
-`verified` entries are the agent's. Normally left as written.
+`verified` entries are the agent's. Normally not rewritten once written — a
+later correction is a section appended to the end of it.
 
 ```yaml
 ---

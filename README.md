@@ -17,6 +17,7 @@ on any machine, including ones the knowledge must never reach.
 | `/kb-init` | create a knowledge base |
 | `/kb-capture` | dictate something learned |
 | `/kb-redact` | work captures into notes |
+| `/kb-update` | correct or extend something already captured |
 | `/kb-cards` | make cards from a note |
 | `/kb-quiz` | be questioned on a note |
 | `/kb-export` | write the Anki import file |
