@@ -27,24 +27,9 @@ Invoke `/kb-common` skill if you haven't already.
 
 **1. Take the dictation.** 
 
-**2. Repair transcription.** Dictation mangles exactly the words
-carrying the meaning: identifiers whose casing was lost, `camelCase` /
-`kebab-case` confusions, approximated paths, similar-sounding substitutions
-(`ack` / `act`, `enqueue` / `and queue`).
+**2. Repair the transcription** (`/kb-common`).
 
-Read the code to find the real spelling; never guess a plausible one, and ask if
-you cannot tell what was meant. Repair only what was *meant* as an identifier:
-"the config file" stays as spoken even where the parameter is called
-`fileSettings`, because describing a thing in plain English is not a
-mis-transcription of its name.
-
-Transcription repair is the one exception to "report, don't fix" rule:
-recovering the identifier the user meant to say does not change what they
-claimed.
-
-**3. Verify the claims** (`/kb-common`). Fold whatever correction the user
-gives into the text — the raw item holds the user's words, not the exchange that
-produced them.
+**3. Verify the claims** (`/kb-common`).
 
 **4. Record the sources** (`/kb-common`).
 
@@ -52,7 +37,6 @@ produced them.
 
 - **title**: short and specific — the subject, not the claim.
 - **body**: their words, cleaned of transcription errors and nothing else.
-  Dictation may be unpunctuated, so sentence breaks are part of transcription.
 - **`generated`** is the user, **`verified`** is you: different actors doing
   different jobs.
 

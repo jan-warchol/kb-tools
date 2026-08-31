@@ -37,9 +37,11 @@ on the answers in a file.
 
 ## Appending, and the log
 
-- **Verify what you append**, per `/kb-common`. If you cannot verify it now, do
-  not append it: an unverified sentence inside a verified item makes the whole
-  item's `verified` entry a lie. Say so, and offer `/kb-capture` for it instead.
+- **Repair and verify what you append**, per `/kb-common` — a spoken answer
+  reaches you with the same transcription damage a dictated capture does. If you
+  cannot verify it now, do not append it: an unverified sentence inside a
+  verified item makes the whole item's `verified` entry a lie. Say so, and offer
+  `/kb-capture` for it instead.
 - **Appending puts the raw item ahead of its note, and the note ahead of its
   cards.** Say which ones now trail and offer `/kb-redact`; do not quietly
   rewrite them.
