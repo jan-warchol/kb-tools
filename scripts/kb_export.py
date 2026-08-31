@@ -15,8 +15,8 @@ reads only: nothing here writes back into a note or a card.
   share an identity in the scheduler, and one would overwrite the other.
 
 Anki identity derives from the guid column, which carries the card ID, so
-re-importing updates an existing card rather than duplicating it (spec §4.1 for
-why identity sits there). That contract breaks if the deck or notetype is
+re-importing updates an existing card rather than duplicating it (decisions.md
+for why identity sits there). That contract breaks if the deck or notetype is
 renamed in Anki's own interface — rename here and re-export instead.
 
 Fields are markdown, not HTML. Anki turns a newline inside a quoted field into a
@@ -58,7 +58,7 @@ HEADER = [
     "#guid column:4",
 ]
 
-SKIP_DIRS = {".git", ".repository-mapping"}
+SKIP_DIRS = {".git"}
 QA_RE = re.compile(
     r"^#+[ \t]*Question[ \t]*$(.*?)^#+[ \t]*Answer[ \t]*$(.*)",
     re.DOTALL | re.MULTILINE | re.IGNORECASE,

@@ -2,7 +2,7 @@
 
 Ingest keeps external material — an article, a paper, a doc page, a local file —
 as reference beside the user's own knowledge. It is specified here rather than
-in [`spec.md`](spec.md) so that it can be lifted out whole.
+apart from the rest so that it can be lifted out whole.
 
 **The capability lives in three files and nothing else:**
 
@@ -30,7 +30,7 @@ Four one-line residues sit outside them and are named at the end of this file.
         ╎  reference only — the claims are the source's, so nothing here
         ╎  becomes a card without passing through dictation first
         ╎
-        ╰┄┄▶ dictation ──▶ capture ──▶ … (the pipeline in `spec.md` §2)
+        ╰┄┄▶ dictation ──▶ capture ──▶ … (the pipeline every item takes)
 ```
 
 ## 3. Why the material is segregated
@@ -45,13 +45,11 @@ distinguishable from it by one field. A card drawn straight from an ingested
 source would be knowledge the user never articulated, so the route from a source
 to a card runs through dictation like everything else.
 
-This is the `machine` half of `origin` (`spec.md` §3.2) put to work: the agent
-wrote nothing of its own, and the item is still `origin: machine`, because the
-claims are the publication's.
+This is the `machine` half of `origin` (`reference/frontmatter.md`) put to
+work: the agent wrote nothing of its own, and the item is still
+`origin: machine`, because the claims are the publication's.
 
 ## 4. Constraints
-
-Of the things the system will not do ([`README.md`](README.md)):
 
 - It will not add its own voice to an ingested source, in either file.
 

@@ -11,10 +11,11 @@ The whole of the external-source capability is separable — see
 
 | Kind | ID form | Example |
 |---|---|---|
-| source transcript | `<YYYY-MM-DD>-<slug>` | `2026-08-16-cap-theorem` |
-| source summary | `<slug-id>-summary` | `2026-08-16-cap-theorem-summary` |
+| source transcript | `<date>-<slug>-<n>` | `2026-08-16-cap-theorem-1` |
+| source summary | the transcript's date and slug, next free `<n>` | `2026-08-16-cap-theorem-2` |
 
-The `type` is `Source Transcript` or `Source Summary`.
+The `type` is `Source Transcript` or `Source Summary`, which is what tells the
+two apart — the ID says only that they are the same material.
 
 ## `verified`
 
@@ -36,7 +37,7 @@ are the publication's and not the user's.
 
 ```yaml
 ---
-id: 2026-08-16-cap-theorem
+id: 2026-08-16-cap-theorem-1
 type: Source Transcript
 title: CAP theorem revisited
 origin: machine

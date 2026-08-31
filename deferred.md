@@ -14,7 +14,7 @@ what should trigger revisiting it.
 | **Machine-graded free recall** | Adds friction where the habit is weakest | Self-graded review has been unbroken for a month |
 | **Knowledge authored by the agent** (answers worth keeping from asking the corpus questions) | Where it lives is unresolved, and whether it may ever become a card sits exactly on the articulation boundary | After the wiki layer settles |
 | **Deletion reconciliation with the scheduler** | Nothing has been retired yet | The first card is retired |
-| **Reasoning cards** — a card that asks for an explanation and is graded against a 3–6 bullet self-grading rubric | Writing a rubric a person can grade themselves against is the hard half, and it is unclear which notes deserve one. The kind is deferred whole rather than shipped as a placeholder: a card reaching review as a bare "explain this" has nothing to grade against, and §1.2 leaves no other place for the checking to happen. `/kb-quiz` covers some of the same ground conversationally, and needs no rubric written down to do it | Recall cards have been in review long enough to show what they fail to test |
+| **Reasoning cards** — a card that asks for an explanation and is graded against a 3–6 bullet self-grading rubric | Writing a rubric a person can grade themselves against is the hard half, and it is unclear which notes deserve one. The kind is deferred whole rather than shipped as a placeholder: a card reaching review as a bare "explain this" has nothing to grade against, and nothing downstream can compensate — the scheduler does not grade, it consumes a grade the human produces, so there is no correctness checking to hook into anywhere in the pipeline. `/kb-quiz` covers some of the same ground conversationally, and needs no rubric written down to do it | Recall cards have been in review long enough to show what they fail to test |
 | **Card kinds beyond recall** | One kind has not yet failed to fit anything, and `type` is open, so a second costs no format change | Something demonstrably doesn't fit |
 
 Deferring these costs nothing structurally, with one exception worth naming:
@@ -32,9 +32,13 @@ The mechanism was worked out before it was deferred. Two triggers, and the
 frontmatter for both is already being written.
 
 - **Change-triggered.** `git log <commit>..HEAD -- <path>` in the repo the
-  repository mapping resolves from the URL. Empty result ⇒ still current, at no
-  cost. This is what makes a sweep affordable: most items are untouched, so most
-  of a pass is a cheap negative. Only entries carrying `commit` participate.
+  item's `resource` URL names. Empty result ⇒ still current, at no cost. This is
+  what makes a sweep affordable: most items are untouched, so most of a pass is
+  a cheap negative. Only entries carrying `commit` participate. **Resolving that
+  URL to a checkout on this machine is the unbuilt half** — an item deliberately
+  records no local path (`reference/frontmatter.md`), so the pass needs some
+  way to be told where the repo is. Decide it with the pass; anything decided
+  now would be a convention kept ready rather than a mechanism.
 - **Time-triggered.** `stale_after: <YYYY-MM-DD>` on the item, measured against
   `reviewed`. An absolute date rather than a relative TTL, so staleness is a
   plain date comparison (OKF §5.5). Both keys arrive with this work.

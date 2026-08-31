@@ -1,12 +1,14 @@
 ---
 name: kb-redact
-description: Turn captured raw items in the knowledge base into polished notes. Use when the user wants to redact, process, or work through their capture backlog — "redact", "process my captures", "turn these into notes". Polishes without altering any claim, verifies anything captured unverified, and never marks a note approved without the user's say-so. Does not make cards.
+description: Turn captured raw items in the knowledge base into polished notes. Use when the user wants to redact, process, or work through their capture backlog — "redact", "process a capture", "turn these into notes". Polishes without altering any claim, verifies anything captured unverified, and never marks a note approved without the user's say-so. Does not make cards.
 allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-redact
 
-Turns raw items into polished notes: **one raw item, one note**.
+Turns raw items into polished notes: **one raw item, one note** by default. A
+note may draw on several raw items where they are about the same thing; it then
+cites every one of them.
 
 ## Bearings
 
@@ -24,34 +26,24 @@ Invoke `/kb-common` skill if you haven't already.
 
 ## Procedure
 
-**1. Verify, if capture did not.** An item with no `verified:` key is not
-machine-confirmed: check its claims as `/kb-capture`
-would, and record what you read as fully as capture would have — the
-repo-relative `path`, the `symbol` where meaningful, and the `commit`.
+**1. Verify if capture did not.** An item with no `verified:` key is not
+machine-confirmed — check its claims now, per `/kb-common`. Otherwise read only
+what you need in order to polish accurately.
 
-Otherwise read only what you need in order to polish accurately. Re-verifying
-what capture already checked is not this step's job.
-
-**3. Polish.** Rewrite the body to read well in six months to someone who has
+**2. Polish.** Rewrite the body to read well in six months to someone who has
 forgotten the context. Cut repetition, false starts and digression. Reorder if
 appropriate. Add structure - bullet lists, paragraphs, subheadings.
 Keep the user's framing and vocabulary.
 
-**4. Ask for approval.**
+**3. Ask for approval.**
 
-**5. On approval, write the note** alongside the existing notes, taking the raw
-item's ID, per the schema below. Points the schema leaves to this step:
+**4. On approval, write the note** alongside the existing notes, under the raw
+item's date and slug with the next free number (`-2` where the raw item is
+`-1`), per the schema below. Points the schema leaves to this step:
 
-- `verified` carries every entry the raw item had, plus your own if step 2
+- `verified` carries every entry the raw item had, plus your own if step 1
   verified it, plus a `human:` entry stamped at the user's approval.
-- `status: stable` on an approved note. It stays `draft` while it is unapproved,
-  and when step 2 could not verify it.
-
-Then optionally `kb_check.py` the file:
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the file you wrote>
-```
+- `status: stable` on an approved note; it stays `draft` while unapproved.
 
 ---
 

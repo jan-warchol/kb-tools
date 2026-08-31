@@ -18,7 +18,7 @@ so they need suspending in Anki by hand.
 
 Then: File → Import in Anki. Re-import matches on the card ID in the guid
 column, so an existing card is updated in its current deck with its scheduling
-intact (spec §4.1 for why identity sits there). Two consequences:
+intact (`decisions.md` for why identity sits there). Two consequences:
 
 - **Editing card text in Anki does not survive** the next import. Edit the
   markdown and re-export.
