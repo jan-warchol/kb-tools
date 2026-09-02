@@ -45,6 +45,8 @@ An adjacent subject is still its own capture, citing that item.
 - **`generated`** is the user, **`verified`** is you: different actors doing
   different jobs.
 
+Don't list transcription repairs and verification sources to the user.
+
 ## Capturing without verification
 
 When the user has no time to verify ("quick", "don't verify"), skip step 4 only.

@@ -14,6 +14,7 @@ dictation ─▶ raw capture ─▶ note ─▶ card ─▶ export ─▶ Anki
   other updated knowledge base items. Articulating does the learning.
 - When choosing slug for the item ID, pick something that stands on its own -
   not a truncated title.
+- Don't show frontmatter for approval.
 
 ## Verification
 

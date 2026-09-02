@@ -1,5 +1,5 @@
 {
   "name": "kb-tools",
   "description": "Personal learning system: capture dictated knowledge, verify it against the source, and redact it into polished notes. Contains tooling only, never knowledge.",
-  "version": "0.9.1"
+  "version": "0.9.2"
 }
