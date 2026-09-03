@@ -31,8 +31,10 @@ slightly to cover adjacent, related issues. If the user provides information
 that wasn't previously available in the quizzed item, take that part of his
 answer and append it to the corresponding raw capture.
 
-After the quiz is done, log the questions and answers (graded correct / partial /
-incorrect) in a file.
+Ask all questions about each note together.
+
+After the quiz is done, ask whether the user would like another round. If not,
+log the questions and answers (graded correct / partial / incorrect) in a file.
 
 ### Mode: quick / default / detailed
 
@@ -41,7 +43,7 @@ incorrect) in a file.
 - Detailed: ask more complex questions that can require a full sentence to answer.
   1-2 questions per note.
 - Quick: ask multiple choice questions using Ask User Question Tool
-  - make sure to shuffle the answers,
+  - **shuffle the answers** - always putting correct answer first ruins the quiz
   - use real alternatives from the knowledge base for the distractions rather than
     inventing them, if possible,
   - up to 4 questions per note.
