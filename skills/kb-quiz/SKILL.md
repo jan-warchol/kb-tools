@@ -18,12 +18,11 @@ Ask questions about a topic selected from the knowledge base (usually a specific
 note or set of notes). Use the information about sources from the frontmatter to
 gather any additional necessary context, e.g. from source code.
 
-Ask 1-2 questions per note. The questions should focus on reasoning and
+The questions should focus on reasoning and
 understanding the topic, not on plain recall - recall is handled by flashcards
 (if the knowledge base has flashcards related to the notes, you can skip facts
 covered by the flashcards). Be careful not to give away the answers in the
-questions. Also, try to formulate the questions so that the answer doesn't have
-to be a long elaborate. If there are any logs of previous quizzes on the topic,
+questions. If there are any logs of previous quizzes on the topic,
 ask about the aspects that haven't been covered yet or that the user failed to
 answer properly last time.
 
@@ -32,8 +31,22 @@ slightly to cover adjacent, related issues. If the user provides information
 that wasn't previously available in the quizzed item, take that part of his
 answer and append it to the corresponding raw capture.
 
-After the quiz is done, log the questions, answers, and any important comments
-on the answers in a file.
+After the quiz is done, log the questions and answers (graded correct / partial /
+incorrect) in a file.
+
+### Mode: quick / default / detailed
+
+- Default: ask the questions so that answering requires no more than a short
+  phrase (1-3 words). 2-3 questions per note.
+- Detailed: ask more complex questions that can require a full sentence to answer.
+  1-2 questions per note.
+- Quick: ask multiple choice questions using Ask User Question Tool
+  - make sure to shuffle the answers,
+  - use real alternatives from the knowledge base for the distractions rather than
+    inventing them, if possible,
+  - up to 4 questions per note.
+- This is not about questions difficulty, just the effort required to answer them -
+  although, obviously, detailed mode allows for harder questions.
 
 ## Appending, and the log
 
@@ -45,9 +58,6 @@ on the answers in a file.
 - **Appending puts the raw item ahead of its note, and the note ahead of its
   cards.** Say which ones now trail and offer `/kb-redact`; do not quietly
   rewrite them.
-- **The log is a record of an exchange and not a knowledge item**: plain
-  markdown, no frontmatter, nothing downstream reads it. It goes where the
-  previous logs live.
 
 ---
 
