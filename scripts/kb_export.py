@@ -19,8 +19,10 @@ re-importing updates an existing card rather than duplicating it (decisions.md
 for why identity sits there). That contract breaks if the deck or notetype is
 renamed in Anki's own interface — rename here and re-export instead.
 
-Fields are markdown, not HTML. Anki turns a newline inside a quoted field into a
-line break, so soft wrapping is joined up on the way out.
+Card bodies are markdown; fields are rendered to HTML on the way out, because
+Anki renders neither markdown nor a bare newline as structure. The subset
+rendered is what cards actually use: paragraphs, bullet lists, fenced and
+inline code, bold and italic. Everything else is escaped and passed through.
 
 Cards land in a subdeck per kind under `anki_deck_name:` from the optional
 `<kb>/knowledge-base.yaml` (or `.yml`), falling back to Knowledge — so a Recall
@@ -52,7 +54,7 @@ NOTETYPE = "Basic"
 
 HEADER = [
     "#separator:tab",
-    "#html:false",
+    "#html:true",
     f"#notetype:{NOTETYPE}",
     "#deck column:3",
     "#guid column:4",
@@ -173,9 +175,87 @@ def unwrap(text):
     return "\n".join(out).strip()
 
 
+BULLET_RE = re.compile(r"[ ]{0,3}(?:[-*+])[ \t]+(.*)")
+ORDERED_RE = re.compile(r"[ ]{0,3}\d+[.)][ \t]+(.*)")
+CODE_RE = re.compile(r"`([^`]+)`")
+STRONG_RE = re.compile(r"\*\*(\S(?:.*?\S)?)\*\*")
+EM_RE = re.compile(r"(?<![*\w])[*_](\S(?:.*?\S)?)[*_](?![*\w])")
+SENTINEL = "\x00"
+
+
+def escape(text):
+    """HTML-escape, leaving the code-span sentinel alone."""
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def inline(text):
+    """Inline markdown to HTML. Code spans are lifted out before escaping so
+    their contents are never read as emphasis."""
+    spans = []
+
+    def stash(match):
+        spans.append(escape(match.group(1)))
+        return f"{SENTINEL}{len(spans) - 1}{SENTINEL}"
+
+    text = CODE_RE.sub(stash, text)
+    text = escape(text)
+    text = STRONG_RE.sub(r"<strong>\1</strong>", text)
+    text = EM_RE.sub(r"<em>\1</em>", text)
+    for index, span in enumerate(spans):
+        text = text.replace(f"{SENTINEL}{index}{SENTINEL}", f"<code>{span}</code>")
+    return text
+
+
+def blocks(lines):
+    """Group unwrapped lines into (kind, lines) blocks."""
+    out, fenced = [], False
+    for line in lines:
+        if line.lstrip().startswith("```"):
+            if fenced:
+                fenced = False
+            else:
+                fenced = True
+                out.append(("code", []))
+            continue
+        if fenced:
+            out[-1][1].append(line)
+            continue
+        if not line.strip():
+            continue
+        for kind, pattern in (("ul", BULLET_RE), ("ol", ORDERED_RE)):
+            match = pattern.match(line)
+            if match:
+                if not out or out[-1][0] != kind:
+                    out.append((kind, []))
+                out[-1][1].append(match.group(1))
+                break
+        else:
+            out.append(("p", [line]))
+    return out
+
+
+def render(text):
+    """The markdown subset cards use, as HTML on a single line.
+
+    Newlines are spent on nothing: Anki collapses them, so a code block carries
+    its own <br>s and every block is a real element.
+    """
+    html = []
+    for kind, lines in blocks(unwrap(text).split("\n")):
+        if kind == "code":
+            body = "<br>".join(escape(line) for line in lines)
+            html.append(f"<pre><code>{body}</code></pre>")
+        elif kind == "p":
+            html.append(f"<p>{inline(lines[0])}</p>")
+        else:
+            items = "".join(f"<li>{inline(line)}</li>" for line in lines)
+            html.append(f"<{kind}>{items}</{kind}>")
+    return "".join(html)
+
+
 def to_field(text):
     """A markdown fragment as one import field, quoted when it has to be."""
-    field = unwrap(text)
+    field = render(text)
     if '"' in field or "\n" in field:
         return '"' + field.replace('"', '""') + '"'
     return field
