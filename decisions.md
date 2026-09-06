@@ -51,10 +51,42 @@ export targets stock `Basic` instead.
 
 ## 3. The export is a tab-separated text file
 
-One importable package, one deck per card kind. The card ID goes in the `guid`
+One importable package, one deck per card kind, split again by `importance` —
+`Knowledge::Recall::Core` and `::Extra` — because daily limits and desired
+retention are settable per deck and nowhere else. The card ID goes in the `guid`
 column and that is the whole of what stable identity needs; a binary package
 would add a dependency to carry the same fact.
+
+The split is uniform across kinds although only recall needs it today: a text
+import creates decks lazily, so a kind that never grades a card `extra` never
+creates that deck, and the day one does, nothing has to be restructured. Making
+the deck path depend on the data instead is how a collection gets split in two.
 
 Deck names belong to the identity contract as much as card IDs do: the
 scheduler keys review history off them, so a rename means renaming in both
 places, and renaming a *kind* moves its cards to a new deck.
+
+## 4. The export renders HTML, not markdown
+
+Card bodies are markdown, but Anki renders markdown not at all: under
+`#html:false` a `**zipapp**` reaches review with its asterisks showing, and a
+blank line between an answer and its example collapses to nothing. Both are
+things the cards rely on — the length rule asks that an explanation be
+*visually separate* from the answer, which needs a real block element to be
+true of the rendered card.
+
+So `kb_export.py` renders the markdown subset the cards use — paragraphs,
+bullet and ordered lists, fenced and inline code, bold and italic — and sets
+`#html:true`. It is deliberately a small hand-written renderer rather than a
+markdown library: the export is a gate, and a second dependency to format five
+constructs is not worth what it costs to install. Anything outside the subset
+is HTML-escaped and passed through, so an unsupported construct degrades to
+its literal text rather than to broken markup.
+
+**The renderer is provisional in a way the `#html:true` above it is not.**
+Rendering at all is forced by what Anki does with a field; hand-writing the
+renderer is a cost judgement, and costs move. Nothing rests on it: swapping in a
+library is a change to `to_field` and what sits beside it, reaching no card, no
+deck name and no part of the identity contract. Revisit when the subset stops
+covering what cards actually use, or when a rendering bug turns out to be one a
+library would not have had.

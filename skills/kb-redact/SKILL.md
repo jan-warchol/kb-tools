@@ -60,8 +60,8 @@ raw item or the sources to understand it.
 **3. Ask for approval.**
 
 **4. On approval, write the note** alongside the existing notes, under the raw
-item's date and slug with the next free number (`-2` where the raw item is
-`-1`), per the schema below. Points the schema leaves to this step:
+item's slug with the next free number (`_2` where the raw item is `_1`), per
+the schema below. Points the schema leaves to this step:
 
 - `verified` carries every entry the raw item had, plus your own if step 1
   verified it, plus a `human:` entry stamped at the user's approval.

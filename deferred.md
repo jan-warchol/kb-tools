@@ -70,19 +70,32 @@ Review is out of scope, but four configuration facts are load-bearing for
 decisions made *here*, and have nowhere else to live. They are the kind that get
 lost and then quietly stop working.
 
-**Separate presets per deck — mandatory, not cosmetic**, once there is more
-than one deck. Daily limits are a property of the preset, not the deck, so two
-kinds sharing one preset makes the split between them unenforceable. Review load
-is controlled by per-deck new-card limits, and that mechanism does not exist
-without separate presets.
+**One preset, per-deck overrides.** Daily limits and desired retention each
+carry a `Preset / This deck / Today only` selector, so core and extra share one
+preset and differ only where they should. Set new cards/day on each leaf and
+leave the parent's above their sum: a parent caps the *total* when you click it,
+so a parent set to 5 yields five cards across both decks, not five each. The
+parent's max reviews/day is the limit actually worth tuning — it is what binds
+once the extra backlog is in circulation.
 
-**FSRS is global; its parameters are not.** The enable toggle applies to the
-whole collection and cannot differ per preset. Parameters and desired retention
-*are* per-preset, which is the real reason presets matter — forgetting curves
-belong to the material, and each preset optimises from its own history. Leave
-desired retention at its default, and do not run optimisation until several
-hundred reviews exist; defaults are good until then. Learning and relearning
-steps must stay shorter than one day.
+**FSRS is global; its parameters are per-preset; desired retention need not be.**
+The enable toggle applies to the whole collection. Parameters are fitted per
+preset from that preset's own history, and are a claim about how memory works —
+which does not differ between core and extra, because importance is a policy
+about how much to hold on, not a property of the forgetting curve. So share the
+preset, keeping one history and one fit, and override desired retention lower on
+extra. Do not run optimisation until several hundred reviews exist; defaults are
+good until then. Learning and relearning steps must stay shorter than one day.
+
+**Gather new cards at random.** The default introduces new cards in deck
+position order — for extra, that means the permanent backlog arrives in the
+order the notes happened to be written. Gather order is preset-wide with no
+per-deck selector, which costs nothing: core has no backlog for it to matter on.
+
+**Demote during review, in Anki, not here.** Whether a card has earned its place
+is visible only from review history. Flag it (Ctrl+1…7) rather than breaking the
+rhythm, and move the flagged cards in the browser afterwards. Import never moves
+an existing card, so the move sticks and `importance:` is never consulted again.
 
 **Press Again on failure, never Hard.** Hard means "recalled, with effort."
 Using it for a failure inflates every subsequent interval, and the temptation

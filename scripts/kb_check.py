@@ -26,14 +26,13 @@ except ImportError:
     sys.exit(0)
 
 STATUSES = {"draft", "stable", "deprecated"}
-# One shape, kind-agnostically: an optional date, a slug, and a mandatory
-# suffix — a number, or the ten random characters a card ID ends in (see the
-# schema). A slug ending in a number is indistinguishable from a suffix here,
-# which is why the check is a shape and not a guarantee of uniqueness.
+# Two shapes (see the schema): an item that stays in the base is
+# `<slug>_<n>`, no date — a card, which leaves the base, is twelve random
+# base62 characters instead. A slug ending in a number is indistinguishable
+# from a suffix here, which is why the check is a shape and not a guarantee
+# of uniqueness.
 SLUG = r"[a-z0-9]+(?:-[a-z0-9]+)*"
-ID_RE = re.compile(
-    rf"^(?:\d{{4}}-\d{{2}}-\d{{2}}-)?{SLUG}-(?:\d+|[A-Za-z0-9]{{10}})$"
-)
+ID_RE = re.compile(rf"^(?:{SLUG}_\d+|[A-Za-z0-9]{{12}})$")
 TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -105,10 +104,14 @@ def check_file(path):
 
     item_id = str(meta.get("id", ""))
     stem = os.path.basename(path)[: -len(".md")]
-    if item_id and item_id != stem:
-        problems.append(("error", f"`id` {item_id!r} does not match filename {stem!r}"))
+    if item_id and stem != item_id and not stem.endswith(f"_{item_id}"):
+        problems.append(
+            ("error", f"filename {stem!r} does not end in `id` {item_id!r}")
+        )
     elif item_id and not ID_RE.match(item_id):
-        problems.append(("error", "`id` is not `[<date>-]<slug>-<suffix>`"))
+        problems.append(
+            ("error", "`id` is not `<slug>_<n>` or 12 base62 characters")
+        )
 
     if meta.get("origin") not in {"human", "machine"}:
         problems.append(("error", "`origin` must be `human` or `machine`"))
