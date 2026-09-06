@@ -13,36 +13,34 @@ base is free to be arranged any way.
 
 ## Identity
 
-An ID is `[<date>-]<slug>-<suffix>`: an optional `YYYY-MM-DD`, a slug, and a
-suffix that is either a number or a random string. The suffix is always there —
-it is what makes **every ID unique across the base**, kind included: kind is not
-part of identity.
+An ID takes one of two forms, chosen by whether the item ever leaves the base:
 
-| Kind | ID form | Example |
+| Scope | ID form | Example |
 |---|---|---|
-| raw item | `<date>-<slug>-<n>` | `2026-08-10-retry-wrapper-1` |
-| note | its raw item's date and slug, next free `<n>` | `2026-08-10-retry-wrapper-2` |
-| card | `<note-slug>-<10 random>` | `retry-wrapper-DXo1jycAlN` |
+| stays in the base (raw item, note) | `<slug>_<n>` | `retry-wrapper_1` |
+| leaves the base (e.g. a card) | 12 random base62 characters | `Xo1jycAlN4xQ` |
 
-The filename is `<id>.md`, and the ID is repeated in frontmatter so a moved file
-stays identifiable. `<n>` is the lowest number free among the items already
-sharing that date and slug, so a capture is normally `-1` and the note made from
-it `-2`. That shared prefix is a convenience when reading a directory listing
-and nothing more: what pairs a note with its raw item is the `sources` entry —
-which is why a note may draw on several raw items and cite each of them.
+`<n>` is the lowest number free among items already sharing that slug — kind
+is not part of identity, so a raw item and the note made from it share one
+pool: a capture is usually `_1`, the note made from it `_2`.
 
-A card ID is the odd one out: no date, and a random tail in place of a number.
-Draw it with `scripts/kb_cardid.sh <note-id> [count]` and never invent one — a
-card ID doubles as the card's identity in the scheduler, where a repeat silently
-overwrites another card's review history. **Card IDs are permanent**: rewording
-a card keeps its ID, changing what it asks takes a new one.
+Random IDs are drawn with `scripts/kb_randomid.sh [count]`, never invented.
+Twelve base62 characters is 62^12 ≈ 3.2×10²¹ possible values, so collisions
+stay unlikely even at scale: with ten million already drawn, the chance any
+two of them collide is still only about one in 64 million.
+
+**Filenames.** The filename must contain the full ID, and may carry a prefix
+ahead of it, underscore-separated — a date, another slug, whatever helps
+browsing. E.g. `2026-08-10_retry-wrapper_1.md`, `retry-wrapper_Xo1jycAlN4xQ.md`.
+The ID is repeated in frontmatter so a moved or renamed file stays
+identifiable.
 
 ## Common keys
 
 Present on every item:
 
 ```yaml
-id: 2026-08-10-retry-wrapper-2
+id: retry-wrapper_2
 type: Note        # kinds in use: Raw Capture, Note, Recall Card;
                   # not a closed set
 title: Retry wrapper ordering    # required on every item, cards included
@@ -76,7 +74,7 @@ something need not be whoever checked it.
 
 **Unverified means draft**, for everything. That is the one rule `kb_check.py`
 enforces about meaning; the rest of what it checks is shape — required keys,
-timestamps that parse, an `id` matching the filename.
+timestamps that parse, an `id` the filename contains.
 
 ## `sources`
 
@@ -86,7 +84,7 @@ base.
 
 ```yaml
 sources:
-  - resource: /raw/2026-08-10-retry-wrapper-1.md   # another item in this base
+  - resource: /raw/2026-08-10_retry-wrapper_1.md   # another item in this base
   - resource: https://github.com/acme/backend    # repository
     path: src/queue/retry.py                     # or paths: [a.py, b.py]
     symbol: RetryWrapper                         # optional; or symbols: [...]
@@ -122,7 +120,7 @@ later correction is a section appended to the end of it.
 
 ```yaml
 ---
-id: 2026-08-10-retry-wrapper-1
+id: retry-wrapper_1
 type: Raw Capture
 title: Retry wrapper ordering
 origin: human
@@ -141,8 +139,8 @@ sources:
 first and the retry re-enqueues it rather than holding it.
 ```
 
-**Note** — the date and slug of the raw item it came from, with the next free
-number. `generated.by` is the agent (it wrote the text), `origin: human` (the
+**Note** — the slug of the raw item it came from, with the next free number.
+`generated.by` is the agent (it wrote the text), `origin: human` (the
 claims are the user's). `sources` begins with the raw item — with every one of
 them, where the note draws on several — then every evidence source. `verified`
 carries the raw item's entries plus a `human:` entry stamped at approval. A note
@@ -153,14 +151,14 @@ with the first.
 
 ```yaml
 ---
-id: 2026-08-10-retry-wrapper-2
+id: retry-wrapper_2
 type: Note
 title: Retry wrapper ordering
 origin: human
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:41:00Z }
 status: stable
 sources:
-  - resource: /raw/2026-08-10-retry-wrapper-1.md
+  - resource: /raw/2026-08-10_retry-wrapper_1.md
   - resource: https://github.com/acme/backend
     path: src/queue/retry.py
     symbol: RetryWrapper
@@ -185,13 +183,13 @@ A body with neither is exported whole as the front.
 
 ```yaml
 ---
-id: retry-wrapper-DXo1jycAlN
+id: Xo1jycAlN4xQ
 type: Recall Card
 title: Ack ordering on retry
 origin: human
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:42:00Z }
 status: stable                         # deprecated ⇒ suspend, don't delete
-sources: [{ resource: /notes/2026-08-10-retry-wrapper-2.md }]
+sources: [{ resource: /notes/2026-08-10_retry-wrapper_2.md }]
 verified:
   - { by: human:jan, at: 2026-08-10T14:43:00Z }
 ---

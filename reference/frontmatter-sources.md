@@ -11,8 +11,8 @@ The whole of the external-source capability is separable — see
 
 | Kind | ID form | Example |
 |---|---|---|
-| source transcript | `<date>-<slug>-<n>` | `2026-08-16-cap-theorem-1` |
-| source summary | the transcript's date and slug, next free `<n>` | `2026-08-16-cap-theorem-2` |
+| source transcript | `<slug>_<n>` | `cap-theorem_1` |
+| source summary | the transcript's slug, next free `<n>` | `cap-theorem_2` |
 
 The `type` is `Source Transcript` or `Source Summary`, which is what tells the
 two apart — the ID says only that they are the same material.
@@ -37,7 +37,7 @@ are the publication's and not the user's.
 
 ```yaml
 ---
-id: 2026-08-16-cap-theorem-1
+id: cap-theorem_1
 type: Source Transcript
 title: CAP theorem revisited
 origin: machine
