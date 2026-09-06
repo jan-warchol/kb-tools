@@ -11,6 +11,8 @@ reads only: nothing here writes back into a note or a card.
 - `status: deprecated` cards are omitted and listed. **Omission does not
   suspend them** — a package can only add and update, so a card already in the
   scheduler stays active until it is suspended there by hand.
+- A card with no `importance:` is held back too — undecided is a state, not a
+  default, and the grade can only take effect before the card's first import.
 - A duplicate card ID is fatal and nothing is written: two cards sharing an ID
   share an identity in the scheduler, and one would overwrite the other.
 
@@ -24,9 +26,18 @@ Anki renders neither markdown nor a bare newline as structure. The subset
 rendered is what cards actually use: paragraphs, bullet lists, fenced and
 inline code, bold and italic. Everything else is escaped and passed through.
 
-Cards land in a subdeck per kind under `anki_deck_name:` from the optional
-`<kb>/knowledge-base.yaml` (or `.yml`), falling back to Knowledge — so a Recall
-Card goes to Knowledge::Recall, and a kind added later needs no change here.
+Cards land in a subdeck per kind, then per importance, under `anki_deck_name:`
+from the optional `<kb>/knowledge-base.yaml` (or `.yml`), falling back to
+Knowledge — so a Recall Card graded `core` goes to Knowledge::Recall::Core, and
+a kind added later needs no change here. An unknown grade is fatal — a typo
+would silently create a deck and split the collection in two.
+
+Importance is the *initial* placement and nothing more. Anki does not move an
+existing card on re-import, so a grade has effect only on a card the scheduler
+has not yet seen — which is why an ungraded card waits here instead of being
+defaulted somewhere: a grade written after the first import would silently do
+nothing at all. Once placed, a card's deck and its `importance:` are free to
+disagree and neither is wrong; demoting during review is the intended workflow.
 
 Requires PyYAML. Unlike kb_check.py this is a gate, not an aid, so a missing
 dependency is an error rather than a skip.
@@ -42,7 +53,9 @@ except ImportError:
     sys.exit("kb_export: PyYAML is required to read frontmatter")
 
 # A card kind is a type ending in "Card", and lands in a subdeck named after
-# what precedes that — so a kind added later needs nothing here. Deck names are
+# what precedes that, split again by importance — so a kind added later needs
+# nothing here, and a kind that never grades a card `extra` never creates the
+# deck, since a text import makes decks lazily. Deck names are
 # stable by contract: the scheduler keys review history off them, and a rename
 # in Anki's interface does not round-trip. Change the root in the base's config,
 # re-export, and rename in Anki to match.
@@ -51,6 +64,8 @@ DECK_KEY = "anki_deck_name"
 DEFAULT_DECK = "Knowledge"
 SUFFIX = " Card"
 NOTETYPE = "Basic"
+IMPORTANCE_KEY = "importance"
+IMPORTANCE = ("core", "extra")
 
 HEADER = [
     "#separator:tab",
@@ -114,11 +129,16 @@ def deck_root(kb):
     return str(config.get(DECK_KEY) or DEFAULT_DECK)
 
 
-def deck_of(item_type, root):
-    """`Recall Card` under `Knowledge` is `Knowledge::Recall`; None if not a card."""
+def kind_of(item_type):
+    """`Recall Card` is the `Recall` kind; None if the item is not a card."""
     if not isinstance(item_type, str) or not item_type.endswith(SUFFIX):
         return None
-    return f"{root}::{item_type[: -len(SUFFIX)]}"
+    return item_type[: -len(SUFFIX)]
+
+
+def deck_of(kind, importance, root):
+    """`Recall` and `core` under `Knowledge` is `Knowledge::Recall::Core`."""
+    return f"{root}::{kind}::{importance.capitalize()}"
 
 
 def split_frontmatter(text):
@@ -284,10 +304,10 @@ def main(argv):
     out = out or os.path.join(kb, "export", "kb-export.txt")
     root = deck_root(kb)
 
-    cards, seen = [], {}
+    cards, seen, misgraded, ungraded = [], {}, [], []
     for path, meta, body in read_items(kb):
-        deck = deck_of(meta.get("type"), root)
-        if deck is None:
+        kind = kind_of(meta.get("type"))
+        if kind is None:
             continue
         card_id = str(meta.get("id", ""))
         if card_id in seen:
@@ -295,7 +315,21 @@ def main(argv):
             print(f"  {seen[card_id]}\n  {path}")
             return print("kb_export: nothing written") or 1
         seen[card_id] = path
-        cards.append((path, meta, body, deck))
+        grade = meta.get(IMPORTANCE_KEY)
+        if grade is None:
+            ungraded.append(card_id)
+            continue
+        if str(grade) not in IMPORTANCE:
+            misgraded.append((path, grade))
+            continue
+        cards.append((path, meta, body, deck_of(kind, str(grade), root)))
+
+    if misgraded:
+        expected = " | ".join(IMPORTANCE)
+        print(f"kb_export: error: unknown {IMPORTANCE_KEY} ({expected} expected)")
+        for path, grade in misgraded:
+            print(f"  {grade!r} in {path}")
+        return print("kb_export: nothing written") or 1
 
     rows, deprecated, held_back = [], [], []
     for path, meta, body, deck in cards:
@@ -326,6 +360,8 @@ def main(argv):
         print(f"  {deck}: {count}")
     if held_back:
         print(f"kb_export: {len(held_back)} unapproved, held back: {' '.join(held_back)}")
+    if ungraded:
+        print(f"kb_export: {len(ungraded)} ungraded, held back: {' '.join(ungraded)}")
     if deprecated:
         print(f"kb_export: {len(deprecated)} deprecated, omitted: {' '.join(deprecated)}")
         print("  omission does not suspend them — suspend in the scheduler by hand")

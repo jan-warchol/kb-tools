@@ -51,9 +51,16 @@ export targets stock `Basic` instead.
 
 ## 3. The export is a tab-separated text file
 
-One importable package, one deck per card kind. The card ID goes in the `guid`
+One importable package, one deck per card kind, split again by `importance` —
+`Knowledge::Recall::Core` and `::Extra` — because daily limits and desired
+retention are settable per deck and nowhere else. The card ID goes in the `guid`
 column and that is the whole of what stable identity needs; a binary package
 would add a dependency to carry the same fact.
+
+The split is uniform across kinds although only recall needs it today: a text
+import creates decks lazily, so a kind that never grades a card `extra` never
+creates that deck, and the day one does, nothing has to be restructured. Making
+the deck path depend on the data instead is how a collection gets split in two.
 
 Deck names belong to the identity contract as much as card IDs do: the
 scheduler keys review history off them, so a rename means renaming in both

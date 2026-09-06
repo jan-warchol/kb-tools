@@ -178,6 +178,18 @@ answer. A card's
 `title` names what it asks about, so it can be identified in a listing without
 being read; it is not the question, which lives in the body.
 
+`importance` is `core` or `extra`, and splits the kind's deck again —
+`Knowledge::Recall::Core`, `Knowledge::Recall::Extra` — so review load and
+desired retention can be set separately for each. Absent, the card is **held
+back from export**: undecided is a state of its own, not a default, because a
+grade can only take effect before the card's first import. An unrecognised value
+is fatal at export. It is the **initial placement, not a live
+classification**: Anki does not move an existing card on re-import, and demoting
+one there is the intended workflow, since whether a card has earned its place is
+a judgement made during review from history this base cannot see. A card's deck
+and its `importance` drifting apart is therefore expected, and not a defect to
+reconcile — the same way the base records no interval or ease.
+
 The body is `## Question` and `## Answer`, and export reads those two headings.
 A body with neither is exported whole as the front.
 
@@ -189,6 +201,8 @@ title: Ack ordering on retry
 origin: human
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:42:00Z }
 status: stable                         # deprecated ⇒ suspend, don't delete
+importance: core                       # core | extra — initial deck only;
+                                       # absent ⇒ held back from export
 sources: [{ resource: /notes/2026-08-10_retry-wrapper_2.md }]
 verified:
   - { by: human:jan, at: 2026-08-10T14:43:00Z }
