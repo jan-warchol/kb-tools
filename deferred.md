@@ -11,11 +11,9 @@ what should trigger revisiting it.
 | **Restructuring the corpus** — a whole-corpus findings pass, and a log with it | A pass over a corpus this small finds nothing, and its shape is unknown until revalidation has run by hand a few times. Scheduling either pass automatically comes after that | Revalidation exists and has been run manually a few times |
 | **Synthesis / wiki layer** | Needs volume to say anything; regeneration is unsolved | Overlap between notes becomes a felt problem |
 | **Cards derived from the wiki** | Not forbidden — the wiki reorganises claims the user already articulated. Blocked on telling reorganisation from genuine synthesis, and on overlapping cards already drawn from the same notes. Free-recall cards especially may belong here, since causation, ordering and tradeoff emerge *across* notes rather than within one | The wiki exists, and note-derived cards are numerous enough to test the overlap against |
-| **Machine-graded free recall** | Adds friction where the habit is weakest | Self-graded review has been unbroken for a month |
+| **Machine-graded free recall** — for *recall* cards; understanding cards are graded through `/kb-quiz` already | Adds friction where the habit is weakest, and recall review on a phone is most of what keeps it going | Self-graded review has been unbroken for a month, and the understanding-card grading has proved itself |
 | **Knowledge authored by the agent** (answers worth keeping from asking the corpus questions) | Where it lives is unresolved, and whether it may ever become a card sits exactly on the articulation boundary | After the wiki layer settles |
 | **Deletion reconciliation with the scheduler** | Nothing has been retired yet | The first card is retired |
-| **Reasoning cards** — a card that asks for an explanation and is graded against a 3–6 bullet self-grading rubric | Writing a rubric a person can grade themselves against is the hard half, and it is unclear which notes deserve one. The kind is deferred whole rather than shipped as a placeholder: a card reaching review as a bare "explain this" has nothing to grade against, and nothing downstream can compensate — the scheduler does not grade, it consumes a grade the human produces, so there is no correctness checking to hook into anywhere in the pipeline. `/kb-quiz` covers some of the same ground conversationally, and needs no rubric written down to do it | Recall cards have been in review long enough to show what they fail to test |
-| **Card kinds beyond recall** | One kind has not yet failed to fit anything, and `type` is open, so a second costs no format change | Something demonstrably doesn't fit |
 
 Deferring these costs nothing structurally, with one exception worth naming:
 revalidation cannot be retrofitted onto material that did not record what it was
@@ -54,64 +52,21 @@ only.
 
 ### The scheduler integration
 
-Suspension of deprecated cards, deletion reconciliation, and machine-graded
-free recall are all the same integration. Build it once, when the first of them
-is actually needed.
+**It now exists** — `scripts/kb_anki.py`, built for understanding cards, which
+needed a grade to travel from a conversation to the scheduler. Suspension of
+deprecated cards, deletion reconciliation and machine-graded free recall are
+the same integration and now hang off it rather than waiting for one.
 
 - **Report, do not delete.** A card missing from the markdown is reported, never
   removed — a parser bug must not be able to reach review history.
-- **Grade strictly** if grading is built. Require each rubric bullet to appear
-  explicitly and fail the card when one is missing. Lenient grading reproduces
-  exactly the weakness that self-grading already has, at greater cost.
+- **The grade is proposed, never sent unasked.** What `/kb-quiz` does for
+  understanding cards is the pattern: the agent says what was right and wrong
+  and recommends a button; the user presses it. That is what makes lenient
+  grading harmless — nobody is grading themselves against their own memory of
+  what they meant.
 
 ## Appendix: scheduler setup
 
-Review is out of scope, but four configuration facts are load-bearing for
-decisions made *here*, and have nowhere else to live. They are the kind that get
-lost and then quietly stop working.
-
-**One preset, per-deck overrides.** Daily limits and desired retention each
-carry a `Preset / This deck / Today only` selector, so core and extra share one
-preset and differ only where they should. Set new cards/day on each leaf and
-leave the parent's above their sum: a parent caps the *total* when you click it,
-so a parent set to 5 yields five cards across both decks, not five each. The
-parent's max reviews/day is the limit actually worth tuning — it is what binds
-once the extra backlog is in circulation.
-
-**FSRS is global; its parameters are per-preset; desired retention need not be.**
-The enable toggle applies to the whole collection. Parameters are fitted per
-preset from that preset's own history, and are a claim about how memory works —
-which does not differ between core and extra, because importance is a policy
-about how much to hold on, not a property of the forgetting curve. So share the
-preset, keeping one history and one fit, and override desired retention lower on
-extra. Do not run optimisation until several hundred reviews exist; defaults are
-good until then. Learning and relearning steps must stay shorter than one day.
-
-**Gather new cards at random.** The default introduces new cards in deck
-position order — for extra, that means the permanent backlog arrives in the
-order the notes happened to be written. Gather order is preset-wide with no
-per-deck selector, which costs nothing: core has no backlog for it to matter on.
-
-**Demote during review, in Anki, not here.** Whether a card has earned its place
-is visible only from review history. Flag it (Ctrl+1…7) rather than breaking the
-rhythm, and move the flagged cards in the browser afterwards. Import never moves
-an existing card, so the move sticks and `importance:` is never consulted again.
-
-**Press Again on failure, never Hard.** Hard means "recalled, with effort."
-Using it for a failure inflates every subsequent interval, and the temptation
-will peak on reasoning cards, where producing three of five rubric points feels
-like partial success. It is a failure — grade it Again. This single habit
-degrades scheduling silently and irreversibly if it slips.
-
-**Review reasoning before recall when both are due.** Overlapping cards prime
-each other, and priming flows forward; spending it on the frequently-repeated
-recall cards, where a mis-grade self-corrects, is much cheaper than spending it
-on sparse reasoning cards where each grade carries real weight. Clicking a
-parent deck does **not** guarantee this — the scheduler gathers across subdecks
-by card state, not by subdeck order. Open the reasoning deck directly, finish
-it, then the recall one.
-
-**Two things never done in the scheduler's own interface:** renaming decks or
-note types, and editing card text. Both break the stable-identity contract the
-export depends on — renames do not round-trip, and edited text is overwritten
-on the next import. Edit the markdown and re-export instead.
+**Moved to [`reference/anki-setup.md`](reference/anki-setup.md).** It stopped
+being a note about deferred work the moment `/kb-quiz` began driving the
+scheduler, and it is now the setup a working system depends on.

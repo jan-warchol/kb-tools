@@ -4,18 +4,29 @@ Choices made about things outside this system, recorded so they are not
 re-litigated. Nothing here is an instruction, and editing a skill never obliges
 a change to this file — that is the point of keeping it separate.
 
-## 1. Review is Anki's, not ours
+## 1. Review is Anki's, not ours — with one deliberate exception
 
 The system owns everything from the spoken sentence to the moment a card is
 handed to the scheduler. It does not own scheduling and does not implement a
 review interface. Noticing when what it holds has stopped being true stays
 inside the boundary.
 
-**Nothing in the motivation puts it there.** A system that scheduled and
-presented its own reviews would satisfy the same obligations. The boundary is
-drawn where it is because Anki already implements that half, well, and reusing
-it is cheaper than rebuilding it — a reason that could stop being true, at
-which point the boundary should move rather than be defended.
+**Understanding cards cross it, knowingly.** They ask whether the user can
+reason with a note, which a self-graded "did I understand that?" cannot answer
+— that judgement is exactly the unreliable one. So for that kind the grade is
+produced here: `/kb-quiz` conducts the review, `scripts/kb_anki.py` sends the
+result.
+
+Scheduling is still not ours, and the split is sharper than it looks: the quiz
+drives **Anki's own reviewer** through AnkiConnect rather than searching for
+due cards, so limits, orders and steps stay the scheduler's. Only the grade
+crosses — and even that is proposed, not sent: the user presses the button.
+
+Two consequences, accepted. **`/kb-quiz` is the only review path for the kind**
+— no phone, no AnkiWeb, Anki running locally; recall review is unaffected. And
+**the kind cannot be reviewed in Anki's interface at all**, since what it shows
+there is a placeholder and any button pressed on it is a wrong grade, which is
+why `reference/anki-setup.md` makes "never click the parent deck" a rule.
 
 ## 2. Why the card ID goes in Anki's `guid` column
 
@@ -90,3 +101,22 @@ library is a change to `to_field` and what sits beside it, reaching no card, no
 deck name and no part of the identity contract. Revisit when the subset stops
 covering what cards actually use, or when a rendering bug turns out to be one a
 library would not have had.
+
+## 5. Every exported card carries a `kb::<id>` tag
+
+A card found in Anki has to lead back to the file that made it — `/kb-quiz`
+needs that when the scheduler hands it one. The ID is already in the `guid`
+column, and **no Anki interface reads a guid back out**: not the browser, not
+AnkiConnect. So it cannot be the mechanism, however right it is as the
+identity.
+
+The tag is written for **every kind** though only one needs it today. Printing
+the ID in a field of that kind instead would work and cost two fewer API calls,
+but it makes the export dispatch on kind for something that is not about kind,
+and puts an identifier on the face of a card a person reads. The cost is one
+collapsed `kb` parent in Anki's tag sidebar; browser searchability pays for it.
+
+Understanding cards additionally show their note's ID on the front and an
+instruction on the back. **That is a fallback for a human, not a mechanism** —
+both are generated from `sources` at export, so neither can drift, and nothing
+reads them back.

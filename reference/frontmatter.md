@@ -173,8 +173,8 @@ verified:
 a card is a question about a note, and where the claim came from is recorded
 there. **A card kind is a `type` ending in `Card`** — export dispatches on that
 and names the subdeck after what precedes it, so a kind spelled otherwise is
-silently never exported. One kind is in use — `Recall Card`, one fact and one
-answer. A card's
+silently never exported. Two kinds are in use — `Recall Card` and
+`Understanding Card`. A card's
 `title` names what it asks about, so it can be identified in a listing without
 being read; it is not the question, which lives in the body.
 
@@ -190,8 +190,9 @@ a judgement made during review from history this base cannot see. A card's deck
 and its `importance` drifting apart is therefore expected, and not a defect to
 reconcile — the same way the base records no interval or ease.
 
-The body is `## Question` and `## Answer`, and export reads those two headings.
-A body with neither is exported whole as the front.
+**Recall Card** — one fact, one answer. The body is `## Question` and
+`## Answer`, and export reads those two headings. A body with neither is
+exported whole as the front.
 
 ```yaml
 ---
@@ -216,3 +217,36 @@ In what order do the ack and the retry happen for a failed message?
 
 Ack first — the retry re-enqueues the message rather than holding it.
 ```
+
+**Understanding Card** — asks whether the user can *reason* with a note, and is
+graded by `/kb-quiz`, never in Anki's reviewer. It carries no question: **the
+card is the note**, so at most one exists per note, and both fields Anki
+receives are generated at export from the frontmatter — no body is read, or
+needed. Rewriting the note therefore never obsoletes its card. Its `sources` is
+the note it stands for, and that is what `/kb-quiz` resolves.
+
+```yaml
+---
+id: 7bQr2mKp9xLd
+type: Understanding Card
+title: Retry wrapper ordering           # what it is about, not a question
+origin: human
+generated: { by: claude-code/opus-5, at: 2026-08-10T14:42:00Z }
+status: stable
+importance: core                        # graded at export, as for any kind
+sources: [{ resource: /notes/2026-08-10_retry-wrapper_2.md }]
+verified:
+  - { by: human:jan, at: 2026-08-10T14:43:00Z }
+---
+```
+
+## Identity in Anki
+
+Every exported card carries the tag `kb::<card id>` — the card ID is the `guid`
+too, but no Anki interface reads a guid back out, so the tag is what traces a
+card there back to the file here. It is written for every kind, not only the
+one that needs it today.
+
+An Understanding Card's generated front repeats its note's ID and its back says
+to quiz on it. Both are a fallback for a human or an agent reading the card in
+Anki; the tag is the mechanism, and `sources` stays the one authority.

@@ -26,6 +26,14 @@ Anki renders neither markdown nor a bare newline as structure. The subset
 rendered is what cards actually use: paragraphs, bullet lists, fenced and
 inline code, bold and italic. Everything else is escaped and passed through.
 
+Every card also carries the tag `kb::<card id>` — the ID is the guid too, but
+no Anki interface reads a guid back out, so the tag is the only thing on that
+side leading back to the file. `/kb-quiz` needs it.
+
+An Understanding Card is the one exception to reading the body: it has no
+question, so both fields are generated here from the frontmatter, and a card
+naming no note in this base is held back.
+
 Cards land in a subdeck per kind, then per importance, under `anki_deck_name:`
 from the optional `<kb>/knowledge-base.yaml` (or `.yml`), falling back to
 Knowledge — so a Recall Card graded `core` goes to Knowledge::Recall::Core, and
@@ -67,12 +75,19 @@ NOTETYPE = "Basic"
 IMPORTANCE_KEY = "importance"
 IMPORTANCE = ("core", "extra")
 
+# Written for every kind, not only the one that needs it, so nothing here
+# dispatches on kind to produce it.
+TAG_PREFIX = "kb::"
+
+UNDERSTANDING = "Understanding"
+
 HEADER = [
     "#separator:tab",
     "#html:true",
     f"#notetype:{NOTETYPE}",
     "#deck column:3",
     "#guid column:4",
+    "#tags column:5",
 ]
 
 SKIP_DIRS = {".git"}
@@ -289,6 +304,42 @@ def split_qa(body):
     return to_field(body), ""
 
 
+def note_ids(kb, items):
+    """Every item by its base-relative path, leading slash and all, as
+    `sources` names it."""
+    return {
+        "/" + os.path.relpath(path, kb).replace(os.sep, "/"): str(meta.get("id", ""))
+        for path, meta, _ in items
+    }
+
+
+def note_of(meta, by_path):
+    """The ID of the note a card stands for, or None where it names none.
+
+    `sources` names it by path; the ID is what means anything on the Anki side.
+    """
+    sources = meta.get("sources") or []
+    if not sources or not isinstance(sources[0], dict):
+        return None
+    return by_path.get(str(sources[0].get("resource", ""))) or None
+
+
+def render_understanding(meta, note_id):
+    """The two fields of an Understanding Card, generated from frontmatter.
+
+    The kind carries no question, so there is no body to read. Both fields are
+    a fallback for whoever opens the card in Anki; the tag is the mechanism.
+    """
+    title = escape(str(meta.get("title", "")))
+    front = f"<p>{title}</p><p><small>{escape(note_id)}</small></p>"
+    back = (
+        "<p>Understanding card — not answered here.</p>"
+        f"<p>Run <code>/kb-quiz</code> on <code>{escape(note_id)}</code>;"
+        " it grades this card.</p>"
+    )
+    return front, back
+
+
 def main(argv):
     dry_run = "--dry-run" in argv
     argv = [a for a in argv if a != "--dry-run"]
@@ -304,8 +355,11 @@ def main(argv):
     out = out or os.path.join(kb, "export", "kb-export.txt")
     root = deck_root(kb)
 
+    items = list(read_items(kb))
+    by_path = note_ids(kb, items)
+
     cards, seen, misgraded, ungraded = [], {}, [], []
-    for path, meta, body in read_items(kb):
+    for path, meta, body in items:
         kind = kind_of(meta.get("type"))
         if kind is None:
             continue
@@ -322,7 +376,7 @@ def main(argv):
         if str(grade) not in IMPORTANCE:
             misgraded.append((path, grade))
             continue
-        cards.append((path, meta, body, deck_of(kind, str(grade), root)))
+        cards.append((path, meta, body, deck_of(kind, str(grade), root), kind))
 
     if misgraded:
         expected = " | ".join(IMPORTANCE)
@@ -331,17 +385,26 @@ def main(argv):
             print(f"  {grade!r} in {path}")
         return print("kb_export: nothing written") or 1
 
-    rows, deprecated, held_back = [], [], []
-    for path, meta, body, deck in cards:
+    rows, deprecated, held_back, unresolved = [], [], [], []
+    for path, meta, body, deck, kind in cards:
         if meta.get("status") == "deprecated":
             deprecated.append(str(meta.get("id")))
             continue
         if not is_approved(meta):
             held_back.append(str(meta.get("id")))
             continue
-        front, back = split_qa(body)
+        if kind == UNDERSTANDING:
+            note_id = note_of(meta, by_path)
+            # Held back rather than fatal: it makes one card useless and
+            # corrupts nothing, unlike a repeated ID.
+            if note_id is None:
+                unresolved.append(str(meta.get("id")))
+                continue
+            front, back = render_understanding(meta, note_id)
+        else:
+            front, back = split_qa(body)
         rows.append(
-            [front, back, deck, str(meta.get("id", ""))]
+            [front, back, deck, str(meta.get("id", "")), TAG_PREFIX + str(meta.get("id", ""))]
         )
 
     if not dry_run:
@@ -362,6 +425,9 @@ def main(argv):
         print(f"kb_export: {len(held_back)} unapproved, held back: {' '.join(held_back)}")
     if ungraded:
         print(f"kb_export: {len(ungraded)} ungraded, held back: {' '.join(ungraded)}")
+    if unresolved:
+        print(f"kb_export: {len(unresolved)} naming no note, held back: {' '.join(unresolved)}")
+        print("  an understanding card's first source must be a note in this base")
     if deprecated:
         print(f"kb_export: {len(deprecated)} deprecated, omitted: {' '.join(deprecated)}")
         print("  omission does not suspend them — suspend in the scheduler by hand")

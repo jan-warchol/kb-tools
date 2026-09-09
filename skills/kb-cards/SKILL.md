@@ -42,7 +42,7 @@ Invoke `/kb-common` skill if you haven't already.
 Eligible: `origin: human`, has `verified`, `status: stable`. An unverified note
 is not allowed to produce cards — offer `/kb-redact`.
 
-**2. Draw the IDs.** One per card, in one call — never write one yourself, and
+**2. Draw the IDs.** One per card, understanding cards counted, in one call — never write one yourself, and
 never adapt one from an example:
 
 ```bash
@@ -52,6 +52,10 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh <how-many>
 **3. Draft the cards.** `type: Recall Card` — one fact each, in the note's
 vocabulary. The question must stand alone months later with one right answer. A
 note may yield several, one, or none.
+
+Offer an `Understanding Card` too where a note is worth understanding and not
+merely knowing — at most one, often none. No question and no body: `sources`
+names the note, export generates the fields, `/kb-quiz` grades it.
 
 **4. Present, then write** the approved cards where cards live, per the schema.
 `origin: human`, `verified` a single `human:` entry at approval, `status:

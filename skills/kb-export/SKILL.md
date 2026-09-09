@@ -17,13 +17,16 @@ it cannot retire for the user**, since a package only adds and updates, so they
 need suspending in Anki by hand.
 
 **Ungraded cards are the one thing to act on here**, and the only edit this
-skill makes. Read them, then propose a grade for each in one pass — `core` is
-what the user would be materially worse at their work for not producing
-unprompted, `extra` is what it is enough to recognise or to know to look up.
-Propose `extra` unless a card clears that bar: core stays useful only while it
-stays small. Judge them against each other, which is the whole reason the grade
-waits until here. Write `importance:` on the ones the user agrees with, then
-re-run the export.
+skill makes. Every kind is graded, understanding cards included. Read them,
+then propose a grade for each in one pass — `core` is what the user would be
+materially worse at their work for not producing unprompted, `extra` is what it
+is enough to recognise or to know to look up. Propose `extra` unless a card
+clears that bar: core stays useful only while it stays small. Judge them
+against each other, which is the whole reason the grade waits until here. Write
+`importance:` on the ones the user agrees with, then re-run the export.
+
+An understanding card held back for **naming no note** needs its `sources`
+fixed or the card dropped — that reference is its entire content.
 
 Then: File → Import in Anki. Re-import matches on the card ID in the guid
 column, so an existing card is updated in its current deck with its scheduling

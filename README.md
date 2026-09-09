@@ -19,7 +19,7 @@ on any machine, including ones the knowledge must never reach.
 | `/kb-redact` | work captures into notes |
 | `/kb-update` | correct or extend something already captured |
 | `/kb-cards` | make cards from a note |
-| `/kb-quiz` | be questioned on a note |
+| `/kb-quiz` | review what Anki says is due, or be questioned on a note |
 | `/kb-export` | write the Anki import file |
 
 ```
@@ -29,6 +29,17 @@ on any machine, including ones the knowledge must never reach.
 
 There is no lookup command: asking an agent inside the knowledge base is
 sufficient, and needs no dedicated mechanism.
+
+## Anki
+
+Recall cards are reviewed in Anki as usual. **Understanding cards are reviewed
+by `/kb-quiz`**, which drives Anki's own reviewer over
+[AnkiConnect](https://foosoft.net/projects/anki-connect/) and sends the grade
+you pick — so that half needs Anki running locally with the add-on. Everything
+else works without it.
+
+[`reference/anki-setup.md`](reference/anki-setup.md) holds the settings that
+matter, worth reading once before the first import.
 
 ## Configuration
 
@@ -46,5 +57,6 @@ anki_deck_name: Knowledge    # the default
 |---|---|
 | [`motivation.md`](motivation.md) | the problem this exists for, and the obligations that follow |
 | [`decisions.md`](decisions.md) | choices made about Anki, and where the boundary sits |
+| [`reference/anki-setup.md`](reference/anki-setup.md) | the scheduler settings this depends on, and backups |
 | [`reference/frontmatter.md`](reference/frontmatter.md) | the file format, specified once |
 | [`deferred.md`](deferred.md) | what it deliberately does not do yet |
