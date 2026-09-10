@@ -50,6 +50,9 @@ raw item or the sources to understand it.
   understates what the item knows. Unconfirmed, or never checked, and it stays.
   A scope qualifier is not a hedge — "usually", "only when CORS is involved" are
   about the subject, not the speaker, and no checking removes one.
+- **Add structure that ditation couldn't convey.** E.g. when dictating I would
+  say "checkout the foo branch" but the note should simply state `git checkout foo`.
+  Also, use arrows and diagrams (prefer mermaid) wherever it makes sense.
 - **Bullets over prose** wherever the material is a list of facts: a bullet
   drops the connective tissue prose needs and nothing else. Reorder freely; add
   subheadings once there is enough to need them.
