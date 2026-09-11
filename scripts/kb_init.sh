@@ -17,7 +17,7 @@ pointer="${XDG_CONFIG_HOME:-$HOME/.config}/kb-tools/kb-home"
 kb=${1:-$HOME/knowledge-base}
 case "$kb" in "~") kb=$HOME ;; "~/"*) kb="$HOME/${kb#\~/}" ;; esac
 
-mkdir -p "$kb/raw" "$kb/notes" "$kb/cards"
+mkdir -p "$kb/raw" "$kb/notes" "$kb/cards" "$kb/quizzes"
 
 # Absolute from here on: the pointer file is read from wherever a skill happens
 # to run, so a relative path given here would resolve against the wrong

@@ -38,8 +38,8 @@ Present on every item:
 
 ```yaml
 id: retry-wrapper_2
-type: Note        # kinds in use: Raw Capture, Note, Recall Card;
-                  # not a closed set
+type: Note        # kinds in use: Raw Capture, Note, Recall Card,
+                  # Understanding Card, Quiz Log; not a closed set
 title: Retry wrapper ordering    # required on every item, cards included
 origin: human                    # human | machine
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:35:00Z }
@@ -235,6 +235,44 @@ sources: [{ resource: /notes/2026-08-10_retry-wrapper_2.md }]
 verified:
   - { by: human:jan, at: 2026-08-10T14:43:00Z }
 ---
+```
+
+**Quiz log** — what `/kb-quiz` asked, what the user answered, and how each
+answer was graded. `origin: machine`: what it asserts is the agent's grading,
+not the user's knowledge. Anything the user says during a quiz that is worth
+keeping leaves through `/kb-update` or `/kb-capture` instead, so a log is
+written once and never revised.
+
+`sources` lists **every note quizzed**, and that is how the next quiz finds it:
+search the logs for the note's path, exactly as a note's cards are found. The
+`verified` entry is the agent's, and says the grades were arrived at by reading
+the note and its sources rather than from memory of them.
+
+The ID is the note's slug with the next free number where one note was quizzed,
+and `quiz-<date>` where the session spanned several — a scheduled review
+usually does.
+
+```yaml
+---
+id: retry-wrapper_3
+type: Quiz Log
+title: Quiz — retry wrapper ordering
+origin: machine
+generated: { by: claude-code/opus-5, at: 2026-08-14T09:20:00Z }
+status: stable
+sources:
+  - resource: /notes/2026-08-10_retry-wrapper_2.md
+verified:
+  - { by: claude-code/opus-5, at: 2026-08-14T09:20:00Z }
+---
+
+## Retry wrapper ordering
+
+**Q.** A message fails after the wrapper has run. What is in the queue?
+**A.** "a copy of it, re-enqueued" — correct
+**Q.** Why does the ack not wait for the retry to succeed?
+**A.** "so the consumer doesn't block" — partial: missed that the broker would
+redeliver it.
 ```
 
 ## Identity in Anki
