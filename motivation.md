@@ -50,7 +50,7 @@ knowledge in the user's place.
 ## 2. Goal
 
 > **Take knowledge the user has articulated themselves, verify it, hold it in a
-> durable, structured form, schedule it for recall, and detect when it has
+> durable, structured form, schedule reinforcement, and detect when it has
 > stopped being true.**
 
 Five obligations, each load-bearing:
@@ -60,7 +60,7 @@ Five obligations, each load-bearing:
 | **Articulate** | stated in the user's own words | storage without learning |
 | **Verify** | checked against the source before it is kept | memorised falsehoods |
 | **Structure** | connected to what is already known | an unnavigable pile |
-| **Schedule** | re-presented before it is forgotten | ordinary note-taking |
+| **Schedule** | re-presented before it is forgotten | no retention |
 | **Revalidate** | rechecked as the subject changes | falsehoods on a delay fuse |
 
 **Success criterion.** The user can answer questions about things they learned
