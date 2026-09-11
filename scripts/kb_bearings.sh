@@ -7,6 +7,10 @@
 
 set -u
 
+# Absolute, so the no-base message can name the init script by a path that
+# works from wherever the skill happened to run.
+init="$(cd "$(dirname "$0")" && pwd)/kb_init.sh"
+
 pointer="${XDG_CONFIG_HOME:-$HOME/.config}/kb-tools/kb-home"
 
 expand() {
@@ -145,7 +149,8 @@ else
   # Capture never blocks on this: dictation happens at the moment of learning,
   # so friction here does not delay a capture, it loses one.  A file in the
   # wrong directory is recoverable with mv; a lost capture is not.
-  printf 'kb: NONE — no knowledge base configured (/kb-init makes one).\n'
+  printf 'kb: NONE — no knowledge base configured.\n'
+  printf '    %s makes one; offer it.\n' "$init"
   printf '    Capture writes into the current directory (%s) and says so;\n' "$PWD"
   printf '    anything that must read the base stops and says so.\n'
 fi

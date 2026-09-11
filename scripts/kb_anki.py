@@ -35,7 +35,7 @@ import urllib.error
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from kb_export import TAG_PREFIX, deck_root, read_items, resolve_kb  # noqa: E402
+from kb_export import INIT, TAG_PREFIX, deck_root, read_items, resolve_kb  # noqa: E402
 
 ENDPOINT = os.environ.get("ANKI_CONNECT_URL", "http://127.0.0.1:8765")
 TIMEOUT = 15
@@ -74,7 +74,7 @@ class AnkiError(Exception):
 def base():
     kb = resolve_kb()
     if not kb:
-        sys.exit("kb_anki: no knowledge base found (/kb-init makes one)")
+        sys.exit(f"kb_anki: no knowledge base found ({INIT} makes one)")
     return kb
 
 

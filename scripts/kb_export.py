@@ -55,6 +55,8 @@ import os
 import re
 import sys
 
+INIT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kb_init.sh")
+
 try:
     import yaml
 except ImportError:
@@ -351,7 +353,7 @@ def main(argv):
 
     kb = resolve_kb()
     if not kb:
-        return print("kb_export: no knowledge base found (/kb-init makes one)") or 1
+        return print(f"kb_export: no knowledge base found ({INIT} makes one)") or 1
     out = out or os.path.join(kb, "export", "kb-export.txt")
     root = deck_root(kb)
 

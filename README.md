@@ -10,11 +10,21 @@ on any machine, including ones the knowledge must never reach.
 /plugin install kb-tools@kb
 ```
 
+Then create a knowledge base, once per machine, with the init script from the
+installed plugin:
+
+```
+scripts/kb_init.sh                     # or scripts/kb_init.sh ~/somewhere-else
+```
+
+It is a plain script rather than a command because it runs once and needs no
+judgement. Every skill prints its full path when it finds no base, so there is
+nothing to remember.
+
 ## Commands
 
 | | |
 |---|---|
-| `/kb-init` | create a knowledge base |
 | `/kb-capture` | dictate something learned |
 | `/kb-redact` | work captures into notes |
 | `/kb-update` | correct or extend something already captured |
@@ -23,7 +33,6 @@ on any machine, including ones the knowledge must never reach.
 | `/kb-export` | write the Anki import file |
 
 ```
-/kb-init                               # or /kb-init ~/somewhere-else
 /kb-capture the retry wrapper wraps the consumer, so retries happen before the ack
 ```
 
