@@ -1,10 +1,15 @@
 ---
 name: kb-quiz
-description: Quiz the user on topics from their knowledge base. Use when the user wants to be tested — "quiz me", "test me on X", "quiz me on last week's notes". Asks about reasoning and understanding rather than plain recall, captures anything new the user says, and logs the session.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_anki.py *), AskUserQuestion
+description: Quiz the user on topics from their knowledge base. Use when the user wants to be tested — "quiz me", "test me on X", "quiz me on last week's notes". Asks about reasoning rather than plain recall, grades understanding cards, and logs the session so the next quiz leads with what was missed.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_anki.py *), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), AskUserQuestion
 ---
 
 # kb-quiz
+
+Questions the user on what the base holds, grades the answers, and leaves a log
+the next quiz reads.
+
+**No topic → review what Anki says is due. A topic → quiz that topic.**
 
 ## Bearings
 
@@ -12,48 +17,82 @@ Invoke `/kb-common` skill if you haven't already.
 
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
-## Two ways in
+## Rules
 
-**No topic → review what Anki says is due** (below). **A topic → quiz it**, and
-grade its understanding card too if it has one.
+- **Ask about reasoning, not recall.** Plain facts are what the cards drill;
+  skip anything a card on that note already asks. A question here makes the user
+  derive a consequence, compare two things, predict what would happen, or say
+  why something is the way it is.
+- **Never give the answer away** — not in the question, not in its framing, not
+  in a set of options where only one is not absurd.
+- **Grade against the note and what it cites**, never against plausibility
+  (`/kb-common`). Read the code its `sources` name before judging an answer that
+  turns on it.
+- **Repair a spoken answer before judging it** (`/kb-common`). An answer arrives
+  with the same transcription damage a dictated capture does, and marking
+  `camelCase` wrong because it was heard as two words is a false negative.
+- **Lead with what was missed.** The logs for a note say what went wrong last
+  time and what has never been asked; open there, and move on once it is
+  answered well.
+- **Anything new the user articulates leaves through the front door.** A claim
+  they make mid-quiz is knowledge the base does not hold yet: `/kb-update` where
+  the subject is already there, `/kb-capture` where it is not. Never append it
+  to a note or a raw item yourself, and never let the log carry it — a log
+  records what was asked and answered, not what is true.
+- **The grade is proposed, never sent unasked**: say what was right and what was
+  missed, recommend one of the four buttons, and let the user choose
+  (`decisions.md` §1).
 
-## Instructions
+## Modes
 
-Ask questions about a topic selected from the knowledge base (usually a specific
-note or set of notes). Use the information about sources from the frontmatter to
-gather any additional necessary context, e.g. from source code.
+| Mode | Per note | An answer is |
+|---|---|---|
+| quick | up to 4 questions | one of up to 4 options, via AskUserQuestion |
+| normal (default) | 2–3 questions | a short phrase, 1–3 words; avoid bare yes/no |
+| detailed | 1–2 questions | a full sentence |
 
-The questions should focus on reasoning and
-understanding the topic, not on plain recall - recall is handled by flashcards
-(if the knowledge base has flashcards related to the notes, skip facts already
-covered by them). Be careful not to give away the answers in the
-questions. If there are any logs of previous quizzes on the topic,
-ask about the aspects that haven't been covered yet or that the user failed to
-answer properly last time. Questions can contain short code snippets.
+Mode sets the effort answering takes, not how hard the question is — though
+detailed leaves room for harder ones.
 
-Ask all questions about each note together.
+- **Quick:** shuffle the options, and take the wrong ones from the base — a
+  neighbouring note's real answer — rather than inventing them.
+- **Normal and detailed:** the scope may widen slightly onto adjacent material.
 
-After the quiz is done, ask whether the user would like another round. If not,
-log the questions and answers (graded correct / partial / incorrect) in a file,
-with the grade sent to Anki for each card. **What was missed is what the log is
-for** — the next quiz on that note leads with it.
+## Procedure
 
-### Mode: quick / normal / detailed
+**1. Pick what to quiz.** A topic names the notes; ask which where it matches
+several and the user plainly meant one. No topic is a scheduled review — go to
+the section below, then return here from step 3.
 
-- Normal: ask the questions so that answering requires no more than a short
-  phrase (1-3 words, avoid bare yes/no). 2-3 questions per note.
-- Detailed: ask more complex questions that can require a full sentence to answer.
-  1-2 questions per note.
-- Quick: ask multiple choice questions using Ask User Question Tool
-  - **shuffle the answers** - always putting correct answer first ruins the quiz
-  - use real alternatives from the knowledge base for the distractions rather than
-    inventing them, if possible,
-  - up to 4 questions per note.
-- This is not about questions difficulty, just the effort required to answer them -
-  although, obviously, detailed mode allows for harder questions.
-- In normal and detailed modes you can slightly expand the scope of the questions
-  to cover adjacent, related issues. If the user provides information that wasn't
-  previously articulated, capture it.
+**2. Gather, per note.** Its prior logs (grep the logs for the note's path — the
+same search that finds its cards), its cards, and whatever its `sources` name
+that you need in order to grade.
+
+**3. Ask.** All the questions about one note together, then the next note.
+
+**4. Grade each answer** correct / partial / incorrect, and say which was which
+once the note's questions are done.
+
+**5. Grade the card.** Offer the four buttons with AskUserQuestion, your
+recommendation first, then send what the user picked:
+
+- scheduled review — `grade <ease> <card>`, for the card the reviewer is
+  showing, then `next`;
+- topic mode — find the note's understanding card and `grade-card <card-id>
+  <ease>`. A note without one is quizzed all the same; there is simply nothing
+  to send.
+
+**6. Offer another round.** Another round asks what was still missed.
+
+**7. Write the log** where the logs already live — a `quizzes/` directory
+where the base has none — one file for the session, per the schema below: `sources`
+naming every note quizzed, the body carrying each question, the answer as given,
+and its grade. **What was missed is what the log is for** — write the missed
+part in full, since next time's quiz opens on it.
+
+**8. Report** the log's path, what was missed, and anything the user said that
+belongs in the base — offering `/kb-update` or `/kb-capture` for it, never doing
+it silently.
 
 ## Scheduled review
 
@@ -63,29 +102,11 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_anki.py session   # open the reviewer, 
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_anki.py next      # the card showing now
 ```
 
-`session` is Anki's Study Now button, so every limit and ordering is the
-scheduler's — never search for due cards instead. `card: none` ends the
-session. Exit 3 means Anki is not running: offer a topic quiz, and grade
+`session` is Anki's Study Now button, so every limit and ordering stays the
+scheduler's — **never search for due cards instead**. Each card reports the note
+it stands for: quiz that note (steps 2–5), then `next`. `card: none` ends the
+session. Exit 3 means Anki is not running — offer a topic quiz, and grade
 nothing.
-
-Per card: quiz the note it names; say which answers were
-right and which were not; offer the four grades with AskUserQuestion, your
-recommendation first.
-Then `grade <ease> <card>`, then `next`.
-
-Topic mode has no reviewer to drive: find the note's understanding card and
-grade it with `grade-card <card-id> <ease>`.
-
-## Appending, and the log
-
-- **Repair and verify what you append**, per `/kb-common` — a spoken answer
-  reaches you with the same transcription damage a dictated capture does. If you
-  cannot verify it now, do not append it: an unverified sentence inside a
-  verified item makes the whole item's `verified` entry a lie. Say so, and offer
-  `/kb-capture` for it instead.
-- **Appending puts the raw item ahead of its note, and the note ahead of its
-  cards.** Say which ones now trail and offer `/kb-redact`; do not quietly
-  rewrite them.
 
 ---
 
