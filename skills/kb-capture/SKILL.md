@@ -25,7 +25,10 @@ Invoke `/kb-common` skill if you haven't already.
 
 ## Procedure
 
-**1. Take the dictation.** 
+**1. Take the dictation.** What the user just said is the whole of the
+material — the command's argument, or the message that invoked you. Do not go
+looking in the session for more of it, do not fill a gap from what you know, and
+ask only where a sentence cannot be read at all.
 
 **2. Check whether the base already holds this subject.** Glance over the item
 titles, grep the distinctive terms — a minute, not a survey; friction here loses
@@ -49,7 +52,16 @@ Don't list transcription repairs and verification sources to the user.
 
 ## Capturing without verification
 
-When the user has no time to verify ("quick", "don't verify"), skip step 4 only.
+When the user has no time to verify ("quick", "don't verify"), skip step 4. The
+item then carries no `verified:` key and `status: draft` (`/kb-common`), and
+`/kb-redact` checks it later.
+
+**Step 5 still runs, on less.** Record the repository and its `commit` from the
+bearings report, plus any path the user named themselves — not as evidence,
+since nothing was read, but because that is the one thing nobody can recover
+afterwards: the redaction that verifies this capture has to know which code, at
+which revision, the user was looking at. Record no `symbol`, and no path you did
+not hear.
 
 ---
 

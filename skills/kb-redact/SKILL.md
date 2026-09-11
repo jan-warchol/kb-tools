@@ -23,7 +23,12 @@ Invoke `/kb-common` skill if you haven't already.
   what verification settled (step 2). If compressing seems to require changing a
   claim, stop and ask.
 - **Redaction reads raw items; it does not rewrite them.**
-- **A contradiction stops you.** 
+- **A contradiction stops you** — the raw item against itself, two raw items
+  about one subject against each other, or the item against what you read while
+  verifying. Quote the two statements that clash and let the user settle which
+  holds; never pick the one that reads better, and never write a note that
+  asserts both. This is *report, don't fix* (`/kb-common`) applied to the
+  material rather than to the world.
 
 ## Procedure
 
@@ -50,9 +55,11 @@ raw item or the sources to understand it.
   understates what the item knows. Unconfirmed, or never checked, and it stays.
   A scope qualifier is not a hedge — "usually", "only when CORS is involved" are
   about the subject, not the speaker, and no checking removes one.
-- **Add structure that ditation couldn't convey.** E.g. when dictating I would
-  say "checkout the foo branch" but the note should simply state `git checkout foo`.
-  Also, use tables, arrows and diagrams (prefer mermaid) wherever it makes sense.
+- **Add structure that dictation could not carry.** Speech has no code
+  formatting and no layout: "checkout the foo branch" becomes `git checkout
+  foo`, a spoken enumeration becomes a list, a spoken comparison becomes a
+  table. Arrows and diagrams (prefer mermaid) wherever they beat a paragraph.
+  This is a change of presentation only — it may not add or drop a claim.
 - **Bullets over prose** wherever the material is a list of facts: a bullet
   drops the connective tissue prose needs and nothing else. Reorder freely; add
   subheadings once there is enough to need them.

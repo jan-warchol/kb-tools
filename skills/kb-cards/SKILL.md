@@ -59,7 +59,9 @@ names the note, export generates the fields, `/kb-quiz` grades it.
 
 **4. Present, then write** the approved cards where cards live, per the schema.
 `origin: human`, `verified` a single `human:` entry at approval, `status:
-stable` when approved and `draft` otherwise, and no `importance:` — that is graded later. The note is not touched: the card
+stable`, and no `importance:` — that is graded later. Only approved cards are
+written, so there is no draft case: a card the user turns down is dropped, and
+one they want reworded is presented again. The note is not touched: the card
 cites it and nothing points back. A card ID is opaque, so name the file
 `<slug>_<id>.md` — a short slug of what the card asks, as a prefix ahead of
 the ID — to keep a directory listing legible; the slug is decoration, the ID
