@@ -22,8 +22,6 @@ Invoke `/kb-common` skill if you haven't already.
 - **The raw layer is the log; the note is the current state.** The note absorbs
   the update and **loses whatever it made false**; it never narrates its own
   change history.
-- **Never fold a human claim into an `origin: machine` item** — a remark about
-  an ingested source is a new capture citing it.
 
 ## Procedure
 

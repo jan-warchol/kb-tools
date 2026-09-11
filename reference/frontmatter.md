@@ -4,9 +4,6 @@ The one description of the file format. Every other place that needs it — the
 skills, the copy at `SCHEMA.md` in the knowledge base — either injects this file
 or points at it. `scripts/kb_check.py` enforces it.
 
-Kinds belonging to a separable capability live in a `frontmatter-*.md` fragment
-beside this file; `/kb-init` appends every fragment to `SCHEMA.md`.
-
 This describes frontmatter only. Where a file lives is not part of the format:
 the directory names in the examples below are illustrative, and the knowledge
 base is free to be arranged any way.
