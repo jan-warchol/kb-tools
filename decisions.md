@@ -22,6 +22,17 @@ drives **Anki's own reviewer** through AnkiConnect rather than searching for
 due cards, so limits, orders and steps stay the scheduler's. Only the grade
 crosses — and even that is proposed, not sent: the user presses the button.
 
+**Topic mode is the one grade that does not come from the reviewer.** Asked to
+quiz a note by name, `/kb-quiz` grades its understanding card with `grade-card`
+whether or not the scheduler had it due — a real crossing of the line above,
+recorded here rather than left as an inconsistency. It is taken because the
+alternative is worse: the review happened and the user answered, and discarding
+that to keep the boundary tidy would throw away the only signal the kind
+produces. What it costs is one card pulled forward inside its interval, which
+FSRS already handles as the early review it is; nothing is gathered, no limit is
+consulted and no other card moves. The scheduled path stays the default, and
+there the reviewer is never bypassed.
+
 Two consequences, accepted. **`/kb-quiz` is the only review path for the kind**
 — no phone, no AnkiWeb, Anki running locally; recall review is unaffected. And
 **the kind cannot be reviewed in Anki's interface at all**, since what it shows
