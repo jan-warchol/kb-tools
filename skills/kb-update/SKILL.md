@@ -1,65 +1,41 @@
 ---
 name: kb-update
-description: Correct or extend something already in the knowledge base and carry the change downstream. Use when the user amends or corrects existing knowledge — "update the note about X", "actually it's ..." — or when a raw item has an appended section nothing has processed yet.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+description: Correct or extend something already in the knowledge base and carry the change downstream. Use when the user amends or corrects existing knowledge — "update the note about X", "actually it's ..." — when a capture has an appended section nothing has processed yet, or when a note's diagrams need redrawing against changed code.
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-update
 
-The subject is already in the base: what the user just said belongs on the
-item that holds it.
-
-## Bearings
+The subject is already in the base: the raw layer is the log, the note is the
+current state.
 
 Invoke `/kb-common` skill if you haven't already.
 
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
-## Rules
-
-- **Raw items are append-only** — a section at the end, never an edit to what is
-  there. A default, not a prohibition: asked to change or drop one, do it.
-- **The raw layer is the log; the note is the current state.** The note absorbs
-  the update and **loses whatever it made false**; it never narrates its own
-  change history.
-
-## Procedure
-
-**1. Find the chain** — the raw item above whatever the user named, and the
-notes and cards below it (search for the path; there are no back-references).
-Nothing covers the subject? Not an update: `/kb-capture`.
-
-**2. Split the prompt into claim and instruction.** "Make that a bullet list and
-add that it fires on shutdown" is both: the claim is recorded, the instruction
-carried out and never recorded. Where a fragment could be either, ask.
-
-**3. Repair the transcription** of the claim (`/kb-common`).
-
-**4. Verify the claim** (`/kb-common`).
-
-**5. Append to the raw item**: their words under `## Update — 2026-08-31`, or
-`## Correction` where they are overturning themselves. `generated.at` moves to
-now (the last meaningful change), `generated.by` stays the user; add your
-`verified` entry and the `sources` you read, rewriting none.
-
-**6. Carry it downstream.** Fold the update into the note — the instruction half
-of the prompt applies here, shape being the note's business. Present it, write
-on approval (`/kb-redact`). Then its cards: reword freely, **keeping the ID**;
-one the note no longer supports is `status: deprecated` on the user's say-so,
-suspended by hand in the scheduler. New cards are `/kb-cards`, not you.
-
-**7. Report** paths, what was verified, what was deprecated, what is left.
-
-## Without verification
-
-"Quick" skips step 4, marks the heading `## Update (unverified) — …` and **stops
-after step 5**: a note mixing checked and unchecked claims cannot say which is
-which. Nothing else records that — `generated.at` now sits later than the last
-`verified` entry, exactly "changed since last checked". Leave `status` alone.
-
-That comparison is also how the leftovers are found, and they resume at step 4:
-a raw item ahead of its last `verified` entry holds unchecked material, and a
-note behind its raw item's `generated.at` has not caught up.
+1. **Find the chain**: the capture above what was named, the note and cards
+   below (search for the path; there are no back-references). Nothing covers
+   it ⇒ `/kb-capture`.
+2. **Split claim from instruction.** "Make that a table and add that it fires
+   on shutdown" is both: the claim is recorded, the instruction carried out
+   and never recorded. Ask where a fragment could be either.
+3. **Repair, verify at the requested effort** (`/kb-common`).
+4. **Append the claim to the capture** under `## Update — <date>` (or
+   `## Correction`); `generated.at` moves, `generated.by` stays the user; add
+   your `verified` entry and sources. Quick ⇒ heading `## Update (unverified)`
+   and **stop here**: a note must not mix checked and unchecked claims.
+5. **Fold it into the note.** The note loses whatever the update made false and
+   never narrates its history. Then re-read the whole note: does it read as
+   one document written today, or as a document with a postscript? Reordering
+   and rewording the user's claims is not altering them.
+6. **Machine blocks you redraw freely** — against the current code, new stamp,
+   no approval needed. A code change that falsifies a *claim* is reported, not
+   fixed: the user states the correction, or the claim is dropped on their
+   say-so.
+7. **Cards**: reword freely keeping the ID; one the note no longer supports is
+   `status: deprecated` on the user's say-so. New cards are `/kb-cards`.
+8. Write on approval (`approved` moves to now), record what you left open in
+   the machine-origin capture (`/kb-common`), and run the check.
 
 ---
 

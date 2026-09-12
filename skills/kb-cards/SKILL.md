@@ -1,73 +1,40 @@
 ---
 name: kb-cards
-description: Make recall cards from a polished note. Use when the user wants cards — "make cards", "card this note". Does not export.
+description: Make recall cards from an approved note or capture. Use when the user wants cards — "make cards", "card this note". Does not export.
 allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh *), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-cards
 
-One note in, cards out. You propose, the user approves. Export is separate.
-
-## Bearings
+One item in, cards out. You propose, the user approves. Export is separate.
 
 Invoke `/kb-common` skill if you haven't already.
 
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
-## Rules
-
-- **A card asks only what the note says** — not its raw item, not the code, not
-  what you know.
-- **One fact, one card**, and the same fact never twice. A fact split across
-  two cards is reviewed twice for one piece of knowledge, and each showing
-  primes the other.
-- **The user approves each card**, one at a time — approval is per card, not
-  per batch. Approval settles the wording and nothing else.
-- **Importance is not graded here.** An approved card is written with no
-  `importance:` and waits: export holds it back until it has one. Grading a card
-  beside the note that produced it is the worst vantage available — everything
-  looks important there. The grade wants several notes' cards side by side,
-  which is where `/kb-export` reports them.
-- **Card IDs are permanent.** A card ID doubles as its Anki guid, where a
-  repeat silently overwrites another card's review history — rewording a card
-  keeps its ID; changing what it asks takes a new one.
-- **Cards must be short,** especially answers. Don't use full sentences. Less
-  than 10 words is ideal, more than 20 should be avoided. Bullets are ok (up to
-  4). If explanation/example is necessary for understanding, make sure it's
-  visually separate from the answer.
-
-## Procedure
-
-**1. Check the note** the user named — ask which one where they named none.
-Eligible: `origin: human`, has `verified`, `status: stable`. An unverified note
-is not allowed to produce cards — offer `/kb-redact`.
-
-**2. Draw the IDs.** One per card, understanding cards counted, in one call — never write one yourself, and
-never adapt one from an example:
-
-```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh <how-many>
-```
-
-**3. Draft the cards.** `type: Recall Card` — one fact each, in the note's
-vocabulary. The question must stand alone months later with one right answer. A
-note may yield several, one, or none.
-
-Offer an `Understanding Card` too where a note is worth understanding and not
-merely knowing — at most one, often none. No question and no body: `sources`
-names the note, export generates the fields, `/kb-quiz` grades it.
-
-**4. Present, then write** the approved cards where cards live, per the schema.
-`origin: human`, `verified` a single `human:` entry at approval, `status:
-stable`, and no `importance:` — that is graded later. Only approved cards are
-written, so there is no draft case: a card the user turns down is dropped, and
-one they want reworded is presented again. The note is not touched: the card
-cites it and nothing points back. A card ID is opaque, so name the file
-`<slug>_<id>.md` — a short slug of what the card asks, as a prefix ahead of
-the ID — to keep a directory listing legible; the slug is decoration, the ID
-is what identifies the file.
-
-**5. Report** the paths and what was approved.
+1. **Eligible**: `origin: human`, `status: stable`, and `approved` — a note,
+   or a capture the user points at directly, where asking for cards is itself
+   the approval: stamp it then. Unverified ⇒ offer `/kb-redact` instead.
+   Machine blocks are invisible here: nothing inside one becomes a card.
+2. **How many is the effort** (`/kb-common`) — the obvious one or two, a full
+   sweep, or a sweep plus cross-item cards.
+3. **Draw IDs** for every card in one call, never write one yourself:
+   `${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh <how-many>`.
+4. **Draft**: one fact, one card, never the same fact twice; asks only what
+   the item says, in its vocabulary; stands alone months later with one right
+   answer. Short — answers under 10 words ideally, never over 20, up to 4
+   bullets; an example is visually separate from the answer.
+5. **An Understanding Card asks nothing itself**: `sources` names the note and
+   export generates its two fields. Put the questions worth asking about the
+   note — and follow-ups the note deserves — in a **machine block** in its
+   body, for `/kb-quiz` to draw on. They are suggestions, not claims: the user
+   approves the card, not them, and nothing there is ever exported.
+6. **Approve one at a time.** Turned down ⇒ dropped; reworded ⇒ shown again.
+   Write only approved cards: `approved` at approval, `status: stable`, no
+   `importance` (graded at export). Filename `<slug>_<id>.md`.
+7. **IDs are permanent**: rewording keeps the ID, changing what is asked takes
+   a new one.
+8. Report paths and what you left open (`/kb-common`), and run the check.
 
 ---
 

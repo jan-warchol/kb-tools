@@ -131,3 +131,27 @@ Understanding cards additionally show their note's ID on the front and an
 instruction on the back. **That is a fallback for a human, not a mechanism** —
 both are generated from `sources` at export, so neither can drift, and nothing
 reads them back.
+
+## 6. Agent material is fenced, and never converted
+
+Agent-written material is kept — a diagram, a walkthrough, a delta report,
+suggested follow-ups — because re-dictating it is the cost that made it
+unaffordable. Where it lives is decided by what fragmentation costs at each
+layer: at the raw layer **its own file**, because the raw layer is a journal
+nobody rereads and a capture's value is that it is exactly what the user said;
+in a note or an understanding card a **machine block**, because those are what
+the user reads, and one subject must stay one file.
+
+**`origin` carries the distinction, not `type`.** A separate kind for the
+agent's file was considered and dropped: every skill that could confuse the two
+already has to read `origin` — nothing may be carded from machine material
+wherever it sits — so a second kind would be a duplicate switch, one more thing
+to keep in step, and a false suggestion that the layer has two halves.
+
+The rules travel with the origin and the fence, not the file: never carded,
+rewritten freely by the agent, quizzable. **No operation converts machine text
+into the user's.**
+Reading agent prose and thinking "yes, exactly" is the illusion of
+understanding `motivation.md` §1.3 exists to prevent; what the user says in
+answering a question about a block is theirs, and enters through capture or
+update. This removes a per-item decision and closes the only real hazard.

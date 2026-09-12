@@ -1,81 +1,46 @@
 ---
 name: kb-redact
-description: Turn captured raw items in the knowledge base into short, dense notes. Use when the user wants to redact, process, or work through their capture backlog — "redact", "process a capture", "turn these into notes". Compresses without altering any claim or losing the user's voice, verifies anything captured unverified, and never marks a note approved without the user's say-so. Does not make cards.
-allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+description: Turn captures in the knowledge base into short, structured notes. Use when the user wants to redact, process, or work through their capture backlog — "redact", "process a capture", "turn these into notes". Every claim stays the user's; the shape is the agent's. Verifies anything captured unverified, and never marks a note approved without the user's say-so. Does not make cards.
+allowed-tools: Read, Write, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-redact
 
-Turns raw items into short, dense notes: **one raw item, one note** by default. A
-note may draw on several raw items where they are about the same thing; it then
-cites every one of them.
-
-## Bearings
+One subject, one note. Usually one capture in; several where they are about
+the same thing, each cited.
 
 Invoke `/kb-common` skill if you haven't already.
 
 !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
-## Rules
-
-- **Compress; never alter a claim.** The note must assert exactly what the raw
-  item asserts — no hedge added, no qualifier dropped, nothing sharpened beyond
-  what verification settled (step 2). If compressing seems to require changing a
-  claim, stop and ask.
-- **Redaction reads raw items; it does not rewrite them.**
-- **A contradiction stops you** — the raw item against itself, two raw items
-  about one subject against each other, or the item against what you read while
-  verifying. Quote the two statements that clash and let the user settle which
-  holds; never pick the one that reads better, and never write a note that
-  asserts both. This is *report, don't fix* (`/kb-common`) applied to the
-  material rather than to the world.
-
-## Procedure
-
-**1. Verify if capture did not.** An item with no `verified:` key is not
-machine-confirmed — check its claims now, per `/kb-common`. Otherwise read only
-what you need in order to compress accurately.
-
-**2. Compress.** The note is what is left of the capture once everything
-carrying no claim has been struck out — as short as that leaves it, in the
-user's own words. It stands on its own: the user must never have to open the
-raw item or the sources to understand it.
-
-- **Cut words rather than replacing them.** The note should be reachable by
-  striking things out of the capture rather than by writing new text. Where a
-  sentence must be recast, recast it in the user's own words from elsewhere in
-  the capture.
-- **What goes:** false starts, digression, filler, scaffolding like "the thing
-  to keep in mind is". Restatement — dictation says a thing vaguely and then
-  precisely, so keep the precise one, their own better articulation. Of each
-  surviving sentence ask which claim is lost if it goes; if none, it goes.
-- **A hedge that verification settled goes.** "Probably", "I think", "if I
-  remember right" record how sure the user was as they spoke, not what is true.
-  Once confirmed, the `verified` entry carries that precisely and the hedge only
-  understates what the item knows. Unconfirmed, or never checked, and it stays.
-  A scope qualifier is not a hedge — "usually", "only when CORS is involved" are
-  about the subject, not the speaker, and no checking removes one.
-- **Add structure that dictation could not carry.** Speech has no code
-  formatting and no layout: "checkout the foo branch" becomes `git checkout
-  foo`, a spoken enumeration becomes a list, a spoken comparison becomes a
-  table. Arrows and diagrams (prefer mermaid) wherever they beat a paragraph.
-  This is a change of presentation only — it may not add or drop a claim.
-- **Bullets over prose** wherever the material is a list of facts: a bullet
-  drops the connective tissue prose needs and nothing else. Reorder freely; add
-  subheadings once there is enough to need them.
-- **The test is recognition.** The user should read the note and think *that is
-  what I said, tidied*. "A good summary of what I said" is a failure: accurate,
-  and not theirs.
-
-**3. Ask for approval.**
-
-**4. On approval, write the note** alongside the existing notes, under the raw
-item's slug with the next free number (`_2` where the raw item is `_1`), per
-the schema below. Points the schema leaves to this step:
-
-- `verified` carries every entry the raw item had, plus your own if step 1
-  verified it, plus a `human:` entry stamped at the user's approval.
-- `status: stable` on an approved note; it stays `draft` while unapproved.
+1. **Gather**: the capture(s), the machine-origin captures beside them, any
+   note already on the subject. Verify what was captured unverified, at the
+   requested effort (`/kb-common`).
+2. **Claims are theirs, shape is yours.** Every sentence outside a machine
+   block must trace to something the user said; reorder and recast freely,
+   add or drop a claim never. A hedge that verification settled goes; a scope
+   qualifier ("only when…") stays. A contradiction — within the material or
+   against the code — stops you: quote both sides, let the user settle it.
+3. **Outline first**, except at quick effort. Propose only the skeleton —
+   headings, "these five steps become a flow", "this becomes a table with
+   these columns" — and take the correction before writing prose. Useful
+   shapes: **flow** (trigger, ordered steps with real identifiers, decisions
+   with their conditions, terminal states, the invariant; mermaid for topology
+   plus a numbered list for detail), **comparison** (the axis, the subjects,
+   the choosing rule), **gotcha** (symptom, the wrong model that made it
+   surprising, cause, fix). Plain prose stays legitimate.
+4. **Fill.** Bullets over prose for lists of facts; code formatting speech
+   could not carry. Diagrams and walkthroughs from the machine-origin capture
+   go in **machine blocks**; the scaffolding you fill in yourself (paths,
+   symbols, topology) too. The note stands on its own without the capture.
+5. **Record what you left open** — unchecked claims, follow-ups, patterns you
+   noticed — under `## Open / follow-ups` in the machine-origin capture, never
+   in the note (`/kb-common`).
+6. **Present, then on approval write** it under the capture's slug, next free
+   number: `verified` from the captures plus yours, `approved` stamped now,
+   `status: stable`. A capture already short enough is promoted as-is.
+   Unapproved stays `draft`.
+7. Run the check.
 
 ---
 

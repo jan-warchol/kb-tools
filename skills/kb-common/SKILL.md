@@ -3,76 +3,105 @@ name: kb-common
 description: General instructions for working on the knowledge base. Use always when interacting with knowledge bases managed by kb-tools plugin.
 ---
 
-## General flow
+## Flow
 
 ```
-dictation ─▶ raw capture ─▶ note ─▶ card ─▶ export ─▶ Anki
+dictation    ─▶ capture ─┬▶ note ─▶ card ─▶ export ─▶ Anki
+                         └▶ card
+agent output ─▶ capture (origin: machine) ─▶ machine blocks in the note
 ```
 
-- **NEVER add new information to items with human origin on your own.** Only add
-  information that the user explicitly articulated, or that comes directly from
-  other updated knowledge base items. Articulating does the learning.
-- When choosing slug for the item ID, pick something that stands on its own -
-  not a truncated title.
-- Don't show frontmatter for approval.
+Every stage after capture is optional: a capture is a finished item. A capture
+is one kind; `origin` says whether the user dictated it or you wrote it.
+
+## Claims and scaffolding
+
+- **Claims are the user's, always** — causation, consequence, why, tradeoffs.
+  Never add a claim to a human-origin item that the user did not articulate.
+  Articulating does the learning.
+- **Scaffolding you may supply** — identifiers, paths, call order, the
+  topology of a diagram. That is transcription of the code, not composition
+  of knowledge.
+- Agent-written material lives in a machine-origin capture or a machine block
+  (schema), is never carded, and never becomes the user's by being agreed
+  with: the user's *answer* to a question about it is theirs.
+- Choose slugs that stand on their own, not truncated titles. Don't show
+  frontmatter for approval.
+
+## The general pattern
+
+Under most project-specific stumbles there is a general pattern — the
+language, the framework's execution model, a pattern with a name. You may
+suggest it. The user articulates it, and their sentence is what is kept, like
+any other claim. It is captured on its own and verified like any other
+capture, against the code the pattern was seen in — never against the capture
+it came out of, which is a mention at most and not a source.
+
+**Crossing to the private base.** Nothing is pushed from a work machine to
+private storage, and the private base is not copied the other way either, so a
+general pattern crosses as text — read aloud into the other machine, or
+retyped. Write it to cross: self-contained, and naming no repository, path,
+identifier or term belonging to the client. That check runs here, on the
+machine that can see what it is checking.
+
+On the other side it arrives as an ordinary dictation — the user's words,
+verified against an example you can see. Find none and keep it unverified: a
+pattern that cannot be grounded outside the codebase that prompted it is
+probably not general yet.
+
+## Effort
+
+The user's word — quick, normal (the default), thorough — sets **how much work
+happens, never how well it is done**. Nothing in the quick column is done
+sloppily; it is simply not done, and what was left is written down (below).
+
+| | quick | normal | thorough |
+|---|---|---|---|
+| **verifying** | nothing; record the repository and `commit` from the bearings and any path the user named; no `verified` key, `status: draft` | the claims the item turns on, hedged ones first; say which you left | everything, following the code paths |
+| **capture** | the dictation, and stop | plus the glance at the base, and the general pattern suggested where you see one | plus the neighbouring items noted for the redactor |
+| **redact** | promote as-is or compress minimally; no outline step | one capture, outline then fill | several captures into one subject note; sibling notes checked for contradiction |
+| **cards** | the one or two obvious facts | a full sweep of the item | plus cross-item cards and an understanding card |
+| **update** | append to the capture and stop | fold into the note | plus cards and sibling notes checked against the change |
+
+`/kb-quiz` has its own three modes, which set the length of an answer rather
+than the amount of work; they are in that skill.
 
 ## Verification
 
-Applies wherever a claim is checked — capture, redaction, and anything that
-writes a `verified` entry:
-
-- **Report, don't fix silently.** An incorrect or outdated claim stops you:
-  let the user state the correction. Discovering the error is the most valuable
-  thing a check produces, and a silent repair spends it. Once they have stated
-  it, fold it into the text — an item holds what the user claims, not the
-  exchange that produced it.
-
-- **Check what has not been checked.** Material already carrying a `verified`
-  entry is rechecked by revalidation, not here. One item can hold both, where
-  something was appended after the last check.
-
-- **Don't give the answer away:** give the user a pointer to what is wrong, so
-  that they can figure it out on their own and learn. Don't make the answer
-  inferable from the pointer.
-
-- **Check claims against evidence, never against plausibility.** The codebase
-  when the claim is about code, the cited sources otherwise. Read the code;
-  never reason from identifier names.
-
-- **Record what you read**, in `sources`: the repo-relative
-  `path`, the `symbol` where one is meaningful, and the `commit` it was read at.
-  Focus on the most important paths and symbols, not all of them.
-
-- **Your `verified` entry is machine confirmation and nothing more.** A `human:`
-  entry means the user has said so themselves; never stamp one on their behalf,
-  and never read it out of their silence.
-
-- Where the claims were not checked, write no `verified` key and
-  `status: draft`.
+- **Report, don't fix silently.** An incorrect or outdated claim stops you: let
+  the user state the correction, then fold it into the text.
+- **Don't give the answer away** — point at what is wrong, not at what is right.
+- **Check against evidence, never plausibility.** Read the code; never reason
+  from identifier names. If you explored this code with the user in the same
+  session, verify in a fresh context (a subagent that has to go and look), not
+  from what you already hold.
+- **Record what you read** in `sources`: `path`, `symbol` where meaningful,
+  `commit`. The important ones, not all of them.
+- **Your `verified` entry is machine confirmation.** `approved` is the user's,
+  stamped only when they say so, never read out of silence.
 
 ## Dictation
 
-Wherever the user speaks — a capture, an update, an answer during a quiz —
-recognition predicts from context, so the errors land on exactly the words
-carrying the meaning: identifiers whose casing was lost, `camelCase` /
-`kebab-case` confusions, approximated paths, similar-sounding substitutions
-(`ack` / `act`, `enqueue` / `and queue`).
+Recognition predicts from context, so errors land on the words carrying the
+meaning: lost casing, `camelCase` / `kebab-case`, approximated paths,
+sound-alikes (`ack` / `act`). Read the code to find the real spelling; never
+guess; ask if you cannot tell. Repair only what was *meant* as an identifier —
+"the config file" stays as spoken. Add sentence breaks. Nothing else about the
+user's words is touched.
 
-Read the code to find the real spelling; never guess a plausible one, and ask if
-you cannot tell what was meant. Repair only what was *meant* as an identifier:
-"the config file" stays as spoken even where the parameter is called
-`fileSettings`, because describing a thing in plain English is not a
-mis-transcription of its name. Dictation may be unpunctuated, so sentence breaks
-are part of the repair.
+## Stopping
 
-This is the one exception to **report, don't fix**: recovering the identifier
-the user meant to say does not change what they claimed. Nothing else about
-their words is touched.
+- **Every run records what it skipped** — claims left unchecked, follow-ups
+  worth a look, patterns you saw — under `## Open / follow-ups` in the
+  machine-origin capture for the subject, creating that capture if there is
+  none. Always there, never in the note: the note is what the user reads for
+  understanding, and a todo list is not that. Low effort is then never a loss.
+- **Report it to the user too**, in a line or two, and offer nothing further.
+- `status: abandoned` is how the user declines something — a capture that will
+  not be redacted, a follow-up not worth pursuing, a note overtaken by events.
+  Ask before stamping it, record it, and delete nothing.
 
 ## After writing
-
-Check the frontmatter of every item you wrote or changed — it catches mechanical
-mistakes, and a skip when PyYAML is missing is not a failure:
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py <the files you wrote>

@@ -21,6 +21,13 @@ reconstructible from first principles, forgotten fast without practice. The mix
 will shift, so neither may be the secondary case — which means the system must
 own the problem of knowledge going stale.
 
+Project knowledge is worth memorising for the duration of the engagement, not
+for ever. That makes retirement, not revalidation, the right answer for most
+of it: its cards are retired when the project is left, rather than maintained
+against a codebase nobody is reading any more. Revalidation is for what
+outlives the project. Which of the two an item is needs no label: it is
+legible in the sources it was checked against.
+
 ### 1.2 Dictation is the input, and dictation is lossy
 
 Knowledge enters by voice; anything with more friction goes unused at the moment
@@ -43,9 +50,27 @@ An agent can summarise a codebase better than the user can, but knowledge the
 user did not articulate themselves does not become theirs. Encoding happens in
 the effort of finding the words, so the raw material has to be the user's own.
 
-Agent-written material is not prohibited in principle: the requirement is to
-keep it mechanically separable from the user's claims and never compose
-knowledge in the user's place.
+Agent-written material is not prohibited in principle, but the line has to be
+drawn in the right place. **Claims** — causation, consequence, why, tradeoffs,
+what follows from what — must be the user's, always. **Scaffolding** —
+identifiers, paths, call order, the topology of a diagram — is transcription
+of the source, not composition of knowledge, and an agent supplying it takes
+nothing from the user.
+
+So agent material is kept, mechanically separable, and never carded. The route
+out of it is not approval: reading a paragraph and agreeing with it is the
+illusion of understanding, which is what this section is about. The route is
+a question — **the claim the user states in answering is theirs**, whatever
+prompted it, and it enters the way any other articulation does.
+
+### 1.4 The corpus drifts toward whatever the trigger catches
+
+Capture fires on stumbling under work pressure, so what accumulates is
+whatever was in the way: plumbing. What would have prevented the stumble — the
+language, the framework's execution model — is never what one is stuck on, and
+so is never captured. The bias is structural, so the system corrects for it
+rather than hoping: under most specific stumbles there is a general pattern,
+and it is cheapest to name with the instance still on screen.
 
 ## 2. Goal
 
@@ -65,7 +90,8 @@ Five obligations, each load-bearing:
 
 **Success criterion.** The user can answer questions about things they learned
 several months earlier, understands a codebase they no longer actively develop,
-and is not drilled on anything that has become false.
+is not drilled on anything that has become false — and is still using the
+system, because it never demanded more of a week than was in it.
 
 **Durability.** The knowledge must outlive this project's code, so it lives in
 plain files readable without it.

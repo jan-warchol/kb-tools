@@ -6,8 +6,10 @@ Usage:  kb_export.py [--out PATH] [--dry-run]
 Reads every card in the knowledge base and writes one importable file. It
 reads only: nothing here writes back into a note or a card.
 
-- Only approved cards are exported: `status: stable` plus a `human:` entry in
-  `verified`. A proposal awaiting the user is `status: draft` and stays out.
+- Only approved cards are exported: `status: stable` plus an `approved` stamp
+  by a `human:` actor (a `human:` entry in `verified` is read the same way, for
+  cards written before the two were split). A proposal awaiting the user is
+  `status: draft` and stays out.
 - `status: deprecated` cards are omitted and listed. **Omission does not
   suspend them** — a package can only add and update, so a card already in the
   scheduler stays active until it is suspended there by hand.
@@ -31,8 +33,9 @@ no Anki interface reads a guid back out, so the tag is the only thing on that
 side leading back to the file. `/kb-quiz` needs it.
 
 An Understanding Card is the one exception to reading the body: it has no
-question, so both fields are generated here from the frontmatter, and a card
-naming no note in this base is held back.
+question of its own, so both fields are generated here from the frontmatter,
+and a card naming no note in this base is held back. Its body, where it has
+one, holds questions the agent suggested for `/kb-quiz` and is never exported.
 
 Cards land in a subdeck per kind, then per importance, under `anki_deck_name:`
 from the optional `<kb>/knowledge-base.yaml` (or `.yml`), falling back to
@@ -187,11 +190,15 @@ def read_items(kb):
                 yield path, meta, body.strip()
 
 
+def is_human(entry):
+    return isinstance(entry, dict) and str(entry.get("by", "")).startswith("human:")
+
+
 def is_approved(meta):
-    entries = meta.get("verified") or []
-    return meta.get("status") == "stable" and any(
-        isinstance(e, dict) and str(e.get("by", "")).startswith("human:")
-        for e in entries
+    if meta.get("status") != "stable":
+        return False
+    return is_human(meta.get("approved")) or any(
+        is_human(e) for e in meta.get("verified") or []
     )
 
 
@@ -329,8 +336,9 @@ def note_of(meta, by_path):
 def render_understanding(meta, note_id):
     """The two fields of an Understanding Card, generated from frontmatter.
 
-    The kind carries no question, so there is no body to read. Both fields are
-    a fallback for whoever opens the card in Anki; the tag is the mechanism.
+    The kind carries no question of its own, so the body — suggested questions
+    for `/kb-quiz`, where there are any — is not read. Both fields are a
+    fallback for whoever opens the card in Anki; the tag is the mechanism.
     """
     title = escape(str(meta.get("title", "")))
     front = f"<p>{title}</p><p><small>{escape(note_id)}</small></p>"

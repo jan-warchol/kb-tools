@@ -12,9 +12,9 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_export.py     # --dry-run to look first
 
 The script writes `<kb>/export/kb-export.txt` and nothing else — it never
 writes back into the knowledge base. Report what it printed: the count per deck,
-anything held back as unapproved or ungraded, and any deprecated cards — **those
-it cannot retire for the user**, since a package only adds and updates, so they
-need suspending in Anki by hand.
+anything held back as unapproved (no `approved` key) or ungraded, and any
+deprecated cards — **those it cannot retire for the user**, since a package
+only adds and updates, so they need suspending in Anki by hand.
 
 **Ungraded cards are the one thing to act on here**, and the only edit this
 skill makes. Every kind is graded, understanding cards included. Read them,

@@ -8,8 +8,9 @@ affect the exit code. Requires PyYAML; without it the check is skipped rather
 than failed, since it is an aid and never a gate.
 
 Deliberately mechanical. It checks the shape of the frontmatter — keys that
-must be present, values that must parse — and nothing that depends on what kind
-of item this is or where it lives. Types are open (OKF permits any) and the
+must be present, values that must parse — plus that machine blocks in the body
+open and close in turn, and nothing that depends on what kind of item this is
+or where it lives. Types are open (OKF permits any) and the
 layout is free to change, so a checker that enumerated either would be wrong
 before it was useful. Everything about meaning is the reader's job.
 """
@@ -25,7 +26,7 @@ except ImportError:
     print("kb_check: PyYAML not installed — frontmatter check skipped")
     sys.exit(0)
 
-STATUSES = {"draft", "stable", "deprecated"}
+STATUSES = {"draft", "stable", "deprecated", "abandoned"}
 # Two shapes (see the schema): an item that stays in the base is
 # `<slug>_<n>`, no date — a card, which leaves the base, is twelve random
 # base62 characters instead. A slug ending in a number is indistinguishable
@@ -42,6 +43,23 @@ def split_frontmatter(text):
         return None
     end = text.find("\n---", 3)
     return None if end < 0 else text[4:end]
+
+
+def check_blocks(problems, body):
+    """Machine blocks must open and close in turn; an unclosed one would
+    swallow the user's claims, a stray close would leak the agent's."""
+    depth = 0
+    for match in re.finditer(r"^<!-- (machine:.*|/machine) -->\s*$", body, re.M):
+        if match.group(1).startswith("machine:"):
+            if depth:
+                problems.append(("error", "machine block opened inside another"))
+            depth = 1
+        else:
+            if not depth:
+                problems.append(("error", "machine block closed but never opened"))
+            depth = 0
+    if depth:
+        problems.append(("error", "machine block never closed"))
 
 
 def is_timestamp(value):
@@ -129,13 +147,24 @@ def check_file(path):
             for i, entry in enumerate(verified):
                 check_actor_stamp(problems, f"verified[{i}]", entry)
 
+    approved = meta.get("approved")
+    if approved is not None:
+        check_actor_stamp(problems, "approved", approved)
+        by = str(approved.get("by", "")) if isinstance(approved, dict) else ""
+        if isinstance(approved, dict) and not by.startswith("human:"):
+            problems.append(("error", "`approved.by` must be a `human:` actor"))
+
     # The one rule with teeth: nothing unverified may claim to be settled.
-    # A draft is how anything not yet checked or not yet approved is spelled.
-    if not verified and meta.get("status") != "draft":
+    # A draft is how anything not yet checked is spelled. A card carries no
+    # `verified` of its own — its claim was checked where it came from — so
+    # approval stands in for it there.
+    if not verified and not approved and meta.get("status") != "draft":
         problems.append(("error", "unverified item must carry `status: draft`"))
 
     if "sources" in meta:
         check_sources(problems, meta["sources"])
+
+    check_blocks(problems, raw[len(block) + 8:])
 
     return problems
 

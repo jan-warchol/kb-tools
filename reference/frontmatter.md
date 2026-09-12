@@ -4,9 +4,10 @@ The one description of the file format. Every other place that needs it — the
 skills, the copy at `SCHEMA.md` in the knowledge base — either injects this file
 or points at it. `scripts/kb_check.py` enforces it.
 
-This describes frontmatter only. Where a file lives is not part of the format:
-the directory names in the examples below are illustrative, and the knowledge
-base is free to be arranged any way.
+This describes frontmatter, plus the one body convention that carries meaning
+(machine blocks, below). Where a file lives is not part of the format: the
+directory names in the examples are illustrative, and the knowledge base is
+free to be arranged any way.
 
 ## Identity
 
@@ -14,11 +15,11 @@ An ID takes one of two forms, chosen by whether the item ever leaves the base:
 
 | Scope | ID form | Example |
 |---|---|---|
-| stays in the base (raw item, note) | `<slug>_<n>` | `retry-wrapper_1` |
+| stays in the base (capture, note) | `<slug>_<n>` | `retry-wrapper_1` |
 | leaves the base (e.g. a card) | 12 random base62 characters | `Xo1jycAlN4xQ` |
 
 `<n>` is the lowest number free among items already sharing that slug — kind
-is not part of identity, so a raw item and the note made from it share one
+is not part of identity, so a capture and the note made from it share one
 pool: a capture is usually `_1`, the note made from it `_2`.
 
 Random IDs are drawn with `scripts/kb_randomid.sh [count]`, never invented.
@@ -38,12 +39,12 @@ Present on every item:
 
 ```yaml
 id: retry-wrapper_2
-type: Note        # kinds in use: Raw Capture, Note, Recall Card,
+type: Note        # kinds in use: Capture, Note, Recall Card,
                   # Understanding Card, Quiz Log; not a closed set
 title: Retry wrapper ordering    # required on every item, cards included
 origin: human                    # human | machine
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:35:00Z }
-status: stable                   # draft | stable | deprecated
+status: stable                   # draft | stable | deprecated | abandoned
 ```
 
 `origin` says **whose claims these are**, and is never inferred: `human` means
@@ -51,6 +52,13 @@ the content asserts what the user asserted. It is a different question from
 `generated.by`, which records who produced the *text* — a polished note is
 written by the agent and still carries `origin: human`. `machine` is the mirror
 image: material whose claims are not the user's, however it was produced.
+**Machine-origin material never produces a card.** It is also what tells two
+items of the same `type` apart — a dictated capture from one the agent wrote
+beside it — so no kind is duplicated to carry the distinction.
+
+`status`: `draft` until verified (and, for a note or card, approved);
+`deprecated` when it has stopped being true; `abandoned` when the user has
+decided not to pursue it — a recorded decision, never a deletion.
 
 `generated.at` marks the content's **last meaningful change**, not when the
 file was first written: appending an update to an item moves it. Read against
@@ -64,14 +72,21 @@ bearings report and the machine actor from your own model ID, never from an
 example here.
 Timestamps are UTC, ISO 8601 — `date -u +%Y-%m-%dT%H:%M:%SZ` produces them.
 
-## `verified`
+## `verified` and `approved`
 
-A list of `{ by, at }`, kept separate from `generated` because whoever wrote
-something need not be whoever checked it.
+Two different acts, two keys. **`verified`**, a list of `{ by, at }`: the
+claims were checked against evidence — normally the agent's entries.
+**`approved`**, a single `{ by, at }`, human only: this is mine, worded right,
+worth keeping — stamped at the user's say-so and never on their behalf, and
+what makes an item eligible for cards. A note or card carries one; so does a
+capture the user chooses to card directly, where the asking is the approval.
+A `human:` entry in `verified` on an item written before the split reads as
+approval.
 
-**Unverified means draft**, for everything. That is the one rule `kb_check.py`
-enforces about meaning; the rest of what it checks is shape — required keys,
-timestamps that parse, an `id` the filename contains.
+**Unverified means draft**, for everything. That is the one rule
+`kb_check.py` enforces about meaning; the rest of what it checks is shape —
+required keys, timestamps that parse, an `id` the filename contains, machine
+blocks that close.
 
 ## `sources`
 
@@ -103,22 +118,65 @@ touched, never both forms of the same key in one entry.
 written at capture — revalidation reads them, and they cannot be recovered
 once the verifying context is gone.
 
-The **first** source of a derived item is the item it was derived from — a note
-cites its raw item. That link is what marks the original as processed.
+The **first** sources of a derived item are the items it was derived from — a
+note takes its captures as sources. That link is what marks the original as
+processed. **Evidence is recorded once, where it was read**: a note repeats
+none of its captures' evidence, and lists only what it was itself checked
+against beyond them. Revalidation follows the chain.
 
-Frontmatter is authoritative. Prose may name a file inline where it aids
-reading; those mentions are decorative and are not maintained.
+What each kind may take as a source:
+
+| Item | Sources |
+|---|---|
+| Capture, `origin: human` | evidence only — never another capture; the raw layer is the log, and consolidation happens in notes |
+| Capture, `origin: machine` | the capture it accompanies, if any, then evidence |
+| Note | one or more captures and notes; then evidence read beyond them |
+| Card | notes or captures in this base — never a repository or a document directly, so that staleness reaches a card through the chain |
+| Quiz Log | every note quizzed |
+
+**These are restrictions on `sources`, not on mentioning.** A source says this
+item was derived from that one, or checked against it, and is the link every
+downstream pass follows. Naming another item in prose is always free: those
+mentions are decorative and are not maintained. Frontmatter is authoritative.
+
+## Machine blocks
+
+Inside an `origin: human` item, agent-written material lives in a **machine
+block**: a fenced region invisible when rendered and unambiguous to a parser,
+carrying who wrote it, when, and the commit it was read at.
+
+````markdown
+<!-- machine: claude-code/opus-5, 2026-09-12, commit a1b2c3d -->
+```mermaid
+graph LR
+  Handler --> Validator --> Queue
+```
+<!-- /machine -->
+````
+
+Rules attached to the fence, not the file: nothing inside is ever carded, and
+the file keeps `origin: human`; the agent rewrites a block freely, with a new
+stamp; the quiz may ask about one, and the user's answer is theirs. What
+belongs inside is scaffolding — a diagram, a walkthrough, a delta report — and,
+in an Understanding Card, the questions the agent suggests. Blocks live in
+notes; a capture needs none, since `origin` already says whose the
+whole file is.
 
 ## Per kind
 
-**Raw item** — `origin: human`, `generated.by` is the user (they dictated it),
-`verified` entries are the agent's. Normally not rewritten once written — a
-later correction is a section appended to the end of it.
+**Capture** — the raw layer. `origin` says whose it is, and that is the only
+thing separating the two cases below; they are one kind.
+
+**Dictated** (`origin: human`) — `generated.by` is the user, `verified`
+entries are the agent's. Append-only: a later correction is a section at the
+end. A capture is a finished item; nothing downstream is owed. A general
+pattern harvested from one is an ordinary capture with its own evidence, not a
+derivative of it.
 
 ```yaml
 ---
 id: retry-wrapper_1
-type: Raw Capture
+type: Capture
 title: Retry wrapper ordering
 origin: human
 generated: { by: human:jan, at: 2026-08-10T14:32:00Z }
@@ -136,19 +194,51 @@ sources:
 first and the retry re-enqueues it rather than holding it.
 ```
 
-**Note** — the slug of the raw item it came from, with the next free number.
-`generated.by` is the agent (it wrote the text), `origin: human` (the
-claims are the user's). `sources` begins with the raw item — with every one of
-them, where the note draws on several — then every evidence source. `verified`
-carries the raw item's entries plus a `human:` entry stamped at approval. A note
-does not list its cards — references run from the derived item to what it came
-from, so a note's cards are found by searching the cards for its path. A
-back-reference would be a second copy of that fact, free to drift out of step
-with the first.
+**Written by the agent** (`origin: machine`) — `generated.by` is the agent:
+what it produced while working with the user — a flow diagram, a walkthrough,
+a trace summary — and the `## Open / follow-ups` section every skill writes
+its leftovers into. It sits beside the capture it accompanies (first source,
+shared slug) or stands alone, and is created the first time there is anything
+to put in it. Never approved, never carded, never redacted as the user's
+words; `/kb-redact` mines it for scaffolding, `/kb-quiz` for questions.
+Machine blocks are pointless here — the whole file is one.
 
 ```yaml
 ---
 id: retry-wrapper_2
+type: Capture
+title: Retry wrapper — consumer flow
+origin: machine
+generated: { by: claude-code/opus-5, at: 2026-08-10T14:40:00Z }
+verified:
+  - { by: claude-code/opus-5, at: 2026-08-10T14:40:00Z }
+status: stable
+sources:
+  - resource: /raw/2026-08-10_retry-wrapper_1.md
+  - resource: https://github.com/acme/backend
+    paths: [src/queue/retry.py, src/queue/consumer.py]
+    commit: a1b2c3d
+---
+
+A mermaid diagram of the consumer flow, then:
+
+## Open / follow-ups
+
+- Not checked: whether the DLQ path acks at all.
+- The same wrapper is applied in `Scheduler.run` — worth a look.
+```
+
+**Note** — the capture's slug, next free number. `generated.by` is the agent,
+`origin: human`: every sentence outside a machine block traces to something
+the user said. `sources`: the captures and notes it drew on, then evidence
+read beyond them. `verified` carries the captures' entries plus
+the agent's own; `approved` is what `status: stable` waits on. A note does not
+list its cards — they are found by searching the cards for its path. A note
+with `origin: machine` is allowed as reference and is never carded.
+
+```yaml
+---
+id: retry-wrapper_3
 type: Note
 title: Retry wrapper ordering
 origin: human
@@ -156,24 +246,22 @@ generated: { by: claude-code/opus-5, at: 2026-08-10T14:41:00Z }
 status: stable
 sources:
   - resource: /raw/2026-08-10_retry-wrapper_1.md
-  - resource: https://github.com/acme/backend
-    path: src/queue/retry.py
-    symbol: RetryWrapper
-    commit: a1b2c3d
+  - resource: /raw/2026-08-10_retry-wrapper_2.md
 verified:
   - { by: claude-code/opus-5, at: 2026-08-10T14:35:00Z }
-  - { by: human:jan, at: 2026-08-10T14:41:00Z }
+approved: { by: human:jan, at: 2026-08-10T14:41:00Z }
 ---
 ```
 
-**Card** — `sources` are notes only, never a repository or a document directly:
-a card is a question about a note, and where the claim came from is recorded
-there. **A card kind is a `type` ending in `Card`** — export dispatches on that
-and names the subdeck after what precedes it, so a kind spelled otherwise is
-silently never exported. Two kinds are in use — `Recall Card` and
-`Understanding Card`. A card's
-`title` names what it asks about, so it can be identified in a listing without
-being read; it is not the question, which lives in the body.
+**Card** — `sources` are notes or captures in this base, never a repository or
+a document directly: a card is a question about an item, and where the claim
+came from is recorded there. It is drawn only from outside machine blocks, and
+only from an approved item. **A card kind is a `type` ending in `Card`** —
+export dispatches on that and names the subdeck after what precedes it, so a
+kind spelled otherwise is silently never exported. Two kinds are in use —
+`Recall Card` and `Understanding Card`. A card's `title` names what it asks
+about, so it can be identified in a listing without being read; it is not the
+question, which lives in the body.
 
 `importance` is `core` or `extra`, and splits the kind's deck again —
 `Knowledge::Recall::Core`, `Knowledge::Recall::Extra` — so review load and
@@ -189,7 +277,8 @@ reconcile — the same way the base records no interval or ease.
 
 **Recall Card** — one fact, one answer. The body is `## Question` and
 `## Answer`, and export reads those two headings. A body with neither is
-exported whole as the front.
+exported whole as the front. `approved` is what export reads; a card carries no
+`verified`, since its claim was checked where it came from.
 
 ```yaml
 ---
@@ -201,9 +290,8 @@ generated: { by: claude-code/opus-5, at: 2026-08-10T14:42:00Z }
 status: stable                         # deprecated ⇒ suspend, don't delete
 importance: core                       # core | extra — initial deck only;
                                        # absent ⇒ held back from export
-sources: [{ resource: /notes/2026-08-10_retry-wrapper_2.md }]
-verified:
-  - { by: human:jan, at: 2026-08-10T14:43:00Z }
+sources: [{ resource: /notes/2026-08-10_retry-wrapper_3.md }]
+approved: { by: human:jan, at: 2026-08-10T14:43:00Z }
 ---
 
 ## Question
@@ -216,11 +304,16 @@ Ack first — the retry re-enqueues the message rather than holding it.
 ```
 
 **Understanding Card** — asks whether the user can *reason* with a note, and is
-graded by `/kb-quiz`, never in Anki's reviewer. It carries no question: **the
-card is the note**, so at most one exists per note, and both fields Anki
-receives are generated at export from the frontmatter — no body is read, or
-needed. Rewriting the note therefore never obsoletes its card. Its `sources` is
-the note it stands for, and that is what `/kb-quiz` resolves.
+graded by `/kb-quiz`, never in Anki's reviewer. It carries no question of its
+own: **the card is the note**, so at most one exists per note, and both fields
+Anki receives are generated at export from the frontmatter. Rewriting the note
+therefore never obsoletes its card. Its `sources` is the note it stands for,
+and that is what `/kb-quiz` resolves.
+
+Its body is optional and **never exported**: a machine block there holds the
+questions and follow-ups the agent suggests, which `/kb-quiz` draws on and
+rewrites freely. They are suggestions, not claims — nothing the user approved,
+and nothing that reaches Anki.
 
 ```yaml
 ---
@@ -231,10 +324,14 @@ origin: human
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:42:00Z }
 status: stable
 importance: core                        # graded at export, as for any kind
-sources: [{ resource: /notes/2026-08-10_retry-wrapper_2.md }]
-verified:
-  - { by: human:jan, at: 2026-08-10T14:43:00Z }
+sources: [{ resource: /notes/2026-08-10_retry-wrapper_3.md }]
+approved: { by: human:jan, at: 2026-08-10T14:43:00Z }
 ---
+
+<!-- machine: claude-code/opus-5, 2026-09-13, commit a1b2c3d -->
+- Why can the retry not hold the message instead of re-enqueueing it?
+- What breaks if the wrapper is applied outside `Consumer.handle`?
+<!-- /machine -->
 ```
 
 **Quiz log** — what `/kb-quiz` asked, what the user answered, and how each
@@ -254,14 +351,14 @@ usually does.
 
 ```yaml
 ---
-id: retry-wrapper_3
+id: retry-wrapper_4
 type: Quiz Log
 title: Quiz — retry wrapper ordering
 origin: machine
 generated: { by: claude-code/opus-5, at: 2026-08-14T09:20:00Z }
 status: stable
 sources:
-  - resource: /notes/2026-08-10_retry-wrapper_2.md
+  - resource: /notes/2026-08-10_retry-wrapper_3.md
 verified:
   - { by: claude-code/opus-5, at: 2026-08-14T09:20:00Z }
 ---

@@ -9,10 +9,13 @@ what should trigger revisiting it.
 | **Relating an item to what is already known** (the overlap check, the `related:` graph) | `/kb-capture` now glances at the existing items so a restatement becomes an update rather than a second capture, which covers the case that hurts; the general check needs a corpus large enough for a new note to plausibly duplicate an old one, and needs the index below to be affordable | A capture turns out to restate an existing note and nothing catches it |
 | **The generated index** | Its only consumer is the overlap check; cataloguing a corpus you can still read in one sitting earns nothing | Overlap detection is built, or reading the corpus whole stops being feasible |
 | **Restructuring the corpus** — a whole-corpus findings pass, and a log with it | A pass over a corpus this small finds nothing, and its shape is unknown until revalidation has run by hand a few times. Scheduling either pass automatically comes after that | Revalidation exists and has been run manually a few times |
-| **Synthesis / wiki layer** | Needs volume to say anything; regeneration is unsolved | Overlap between notes becomes a felt problem |
+| **Synthesis / wiki layer** | Reorganising the user's own claims across notes is what the note layer now allows (a note may draw on several captures and notes). Genuine synthesis is machine material at corpus scale — same fence, same rules — and needs volume to say anything | Overlap between notes becomes a felt problem |
 | **Cards derived from the wiki** | Not forbidden — the wiki reorganises claims the user already articulated. Blocked on telling reorganisation from genuine synthesis, and on overlapping cards already drawn from the same notes. Free-recall cards especially may belong here, since causation, ordering and tradeoff emerge *across* notes rather than within one | The wiki exists, and note-derived cards are numerous enough to test the overlap against |
 | **Machine-graded free recall** — for *recall* cards; understanding cards are graded through `/kb-quiz` already | Adds friction where the habit is weakest, and recall review on a phone is most of what keeps it going | Self-graded review has been unbroken for a month, and the understanding-card grading has proved itself |
-| **Knowledge authored by the agent** (answers worth keeping from asking the corpus questions) | Where it lives is unresolved, and whether it may ever become a card sits exactly on the articulation boundary | After the wiki layer settles |
+| **A `visibility` key, and a mechanical sanitisation check** | Only a general pattern crosses to the private base, and it is written to cross from the start (`kb-common`), so there is nothing else to label and nothing a second check would catch that writing it did not | Something other than a harvested pattern needs to cross, or a pattern is found to have carried a client identifier across |
+| **Checklists offered by the agent** — naming the shape of a task ("threads one field end to end") and offering its closed questions, as a stopping rule for tracing | Working-session behaviour, not knowledge-base design; needs no mechanism | The open items a skill records turn out to be mostly unanswered checklist questions |
+| **A drill skill** — predict-then-run, break-and-read, specify-then-diff, with a log across sessions | Any session with an agent can run these on request, and a wrong prediction is just a capture. A skill earns its place only if history across sessions turns out to matter | The user is running these regularly and wants the record |
+| **Knowledge authored by the agent** (answers worth keeping from asking the corpus questions) | Now has a place — a machine-origin capture, or a machine block in the note it concerns — and may never become a card. The open half is only whether such answers accumulate enough to need cataloguing | After the wiki layer settles |
 | **Deletion reconciliation with the scheduler** | Nothing has been retired yet | The first card is retired |
 
 Deferring these costs nothing structurally, with one exception worth naming:
@@ -44,6 +47,13 @@ frontmatter for both is already being written.
 **A hit does not mean "wrong" — it means "recheck."** The pass re-reads only the
 flagged items, reports, and on confirmation sets `status: deprecated` and
 suspends the card in the scheduler. Never deletes.
+
+**Retirement is the cheaper sibling**, and needs no change detection: at
+project exit, the cards whose chain ends in that repository are suspended in
+the scheduler and their items marked `deprecated` or left as reference. The
+chain is what identifies them — no item needs a key saying which lane it is
+in. Revalidation is then only for what outlives the project, a far smaller
+set.
 
 **Staleness reaches a card through its notes.** Do not add `commit` or a check
 date to a card when building this: it would create a second copy of the same
