@@ -144,7 +144,7 @@ if [ -n "$kb" ]; then
   find "$kb" -mindepth 1 -maxdepth 2 -type d \
     ! -path "$kb/.git*" 2>/dev/null |
     sed "s#^$kb/#  #" | sort
-  printf '# Put each item where its kind already lives; ask if nothing fits.\n'
+  printf '# Follow KB conventions when saving new items; ask if nothing fits.\n'
 else
   # Capture never blocks on this: dictation happens at the moment of learning,
   # so friction here does not delay a capture, it loses one.  A file in the
