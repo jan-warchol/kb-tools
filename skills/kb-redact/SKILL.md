@@ -21,16 +21,21 @@ Invoke `/kb-common` skill if you haven't already.
    add or drop a claim never. A hedge that verification settled goes; a scope
    qualifier ("only when…") stays. A contradiction — within the material or
    against the code — stops you: quote both sides, let the user settle it.
-3. **Outline first**, except at quick effort. Propose only the skeleton —
-   headings, "these five steps become a flow", "this becomes a table with
-   these columns" — and take the correction before writing prose. Useful
-   shapes: **flow** (trigger, ordered steps with real identifiers, decisions
-   with their conditions, terminal states, the invariant; mermaid for topology
-   plus a numbered list for detail), **comparison** (the axis, the subjects,
-   the choosing rule), **gotcha** (symptom, the wrong model that made it
-   surprising, cause, fix). Plain prose stays legitimate.
-4. **Fill.** Bullets over prose for lists of facts; code formatting speech
-   could not carry. Diagrams and walkthroughs from the machine-origin capture
+3. **Outline first**, except at quick effort. The outline is the note's
+   structure, never its content: one line per section, `<heading> —
+   <shape> with <what's inside>`, where what's inside is two to five words.
+   No claims, identifiers, code or examples; if a line teaches something
+   about the subject, it is a draft, not an outline. E.g.
+   `Embedding is not subtyping — gotcha with the failed call`.
+   Raise any contradiction separately, below the outline. Take the
+   correction before filling.
+4. **Fill.** Shapes: **flow** (trigger, ordered steps with real identifiers,
+   decisions with their conditions, terminal states, the invariant; mermaid
+   for topology plus a numbered list for detail), **comparison** (the axis,
+   the subjects, the choosing rule), **gotcha** (symptom, the wrong model
+   that made it surprising, cause, fix). Plain prose stays legitimate.
+   Bullets over prose for lists of facts; code formatting speech could not
+   carry. Diagrams and walkthroughs from the machine-origin capture
    go in **machine blocks**; the scaffolding you fill in yourself (paths,
    symbols, topology) too. The note stands on its own without the capture.
 5. **Record what you left open** — unchecked claims, follow-ups, patterns you
