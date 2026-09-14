@@ -168,8 +168,11 @@ whole file is.
 thing separating the two cases below; they are one kind.
 
 **Dictated** (`origin: human`) — `generated.by` is the user, `verified`
-entries are the agent's. Append-only: a later correction is a section at the
-end. A capture is a finished item; nothing downstream is owed. A general
+entries are the agent's. **Editable in the session that wrote it**: a misheard
+name, a claim the user rewords or adds a moment later — fixed in place, still
+only the user's words, the changed claims verified again, `generated.at` moved.
+**Append-only once that session is over**: a later correction is a section at
+the end. A capture is a finished item; nothing downstream is owed. A general
 pattern harvested from one is an ordinary capture with its own evidence, not a
 derivative of it.
 
@@ -224,8 +227,8 @@ A mermaid diagram of the consumer flow, then:
 
 ## Open / follow-ups
 
-- Not checked: whether the DLQ path acks at all.
-- The same wrapper is applied in `Scheduler.run` — worth a look.
+- Unchecked: does the DLQ path ack?
+- Same wrapper in `Scheduler.run`.
 ```
 
 **Note** — the capture's slug, next free number. `generated.by` is the agent,

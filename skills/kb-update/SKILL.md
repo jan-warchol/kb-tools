@@ -20,10 +20,13 @@ Invoke `/kb-common` skill if you haven't already.
    on shutdown" is both: the claim is recorded, the instruction carried out
    and never recorded. Ask where a fragment could be either.
 3. **Repair, verify at the requested effort** (`/kb-common`).
-4. **Append the claim to the capture** under `## Update — <date>` (or
-   `## Correction`); `generated.at` moves, `generated.by` stays the user; add
-   your `verified` entry and sources. Quick ⇒ heading `## Update (unverified)`
-   and **stop here**: a note must not mix checked and unchecked claims.
+4. **Record the claim in the capture.** Written earlier in this session ⇒
+   edit it in place (schema). Otherwise append it under `## Update — <date>`
+   (or `## Correction`). Either way `generated.at` moves, `generated.by` stays
+   the user; add your `verified` entry and sources. Quick ⇒ an in-place edit
+   leaves the capture `draft`, an appended one is headed
+   `## Update (unverified)`; **stop here**: a note must not mix checked and
+   unchecked claims.
 5. **Fold it into the note.** The note loses whatever the update made false and
    never narrates its history. Then re-read the whole note: does it read as
    one document written today, or as a document with a postscript? Reordering

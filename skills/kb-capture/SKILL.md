@@ -25,7 +25,9 @@ Invoke `/kb-common` skill if you haven't already.
 3. **Repair the transcription, verify at the requested effort, record the
    sources** (`/kb-common`). `generated` is the user, `verified` is you.
 4. **Write it** per the schema: title = the subject, not the claim. Don't
-   list repairs or sources to the user.
+   list repairs or sources to the user. Until this session ends the capture
+   stays open: a correction or addition the user dictates now is edited into
+   the text, not appended (schema), repaired and verified like the rest.
 5. **Asked to keep something you produced** — a diagram, a trace, a summary —
    write a second capture with `origin: machine`, citing the one it
    accompanies (same slug, next number), verified against the code you read.
@@ -34,7 +36,7 @@ Invoke `/kb-common` skill if you haven't already.
 6. **Suggest the general pattern** underneath, where the effort allows and
    you see one (`/kb-common`): one line, offered once. A sentence dictated
    back is its own capture, verified against the code in front of you and
-   written to cross. Declined, it goes under `## Open / follow-ups` and is
+   written to travel. Declined, it goes under `## Open / follow-ups` and is
    not raised again.
 7. **Record what you left open** in that machine-origin capture, and report it
    (`/kb-common`). Run the check.

@@ -27,7 +27,7 @@ Invoke `/kb-common` skill if you haven't already.
 5. **An Understanding Card asks nothing itself**: `sources` names the note and
    export generates its two fields. Put the questions worth asking about the
    note — and follow-ups the note deserves — in a **machine block** in its
-   body, for `/kb-quiz` to draw on. They are suggestions, not claims: the user
+   body, for `/kb-quiz` to draw on, one line each. They are suggestions, not claims: the user
    approves the card, not them, and nothing there is ever exported.
 6. **Approve one at a time.** Turned down ⇒ dropped; reworded ⇒ shown again.
    Write only approved cards: `approved` at approval, `status: stable`, no
