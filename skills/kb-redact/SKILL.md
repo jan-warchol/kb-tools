@@ -1,7 +1,7 @@
 ---
 name: kb-redact
 description: Turn captures in the knowledge base into short, structured notes. Use when the user wants to redact, process, or work through their capture backlog — "redact", "process a capture", "turn these into notes". Every claim stays the user's; the shape is the agent's. Verifies anything captured unverified, and never marks a note approved without the user's say-so. Does not make cards.
-allowed-tools: Read, Write, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+allowed-tools: Read, Write, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-redact
@@ -10,8 +10,6 @@ One subject, one note. Usually one capture in; several where they are about
 the same thing, each cited.
 
 Invoke `/kb-common` skill if you haven't already.
-
-!`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
 1. **Gather**: the capture(s), the machine-origin captures beside them, any
    note already on the subject. Verify what was captured unverified, at the

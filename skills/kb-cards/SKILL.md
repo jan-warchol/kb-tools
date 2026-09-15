@@ -1,7 +1,7 @@
 ---
 name: kb-cards
 description: Make recall cards from an approved note or capture. Use when the user wants cards — "make cards", "card this note". Does not export.
-allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh *), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh *), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-cards
@@ -9,8 +9,6 @@ allowed-tools: Read, Write, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_be
 One item in, cards out. You propose, the user approves. Export is separate.
 
 Invoke `/kb-common` skill if you haven't already.
-
-!`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
 1. **Eligible**: `origin: human`, `status: stable`, and `approved` — a note,
    or a capture the user points at directly, where asking for cards is itself

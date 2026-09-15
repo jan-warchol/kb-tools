@@ -1,7 +1,7 @@
 ---
 name: kb-quiz
 description: Quiz the user on topics from their knowledge base. Use when the user wants to be tested — "quiz me", "test me on X", "quiz me on last week's notes". Asks about reasoning rather than plain recall, grades understanding cards, and logs the session so the next quiz leads with what was missed.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_anki.py *), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), AskUserQuestion
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_anki.py *), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), AskUserQuestion
 ---
 
 # kb-quiz
@@ -9,8 +9,6 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(${CLAUDE_PLUGIN_ROOT}/scripts
 **No topic → review what Anki says is due. A topic → quiz that topic.**
 
 Invoke `/kb-common` skill if you haven't already.
-
-!`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
 | Mode | Per note | An answer is |
 |---|---|---|

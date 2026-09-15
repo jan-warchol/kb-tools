@@ -1,7 +1,7 @@
 ---
 name: kb-update
 description: Correct or extend something already in the knowledge base and carry the change downstream. Use when the user amends or corrects existing knowledge — "update the note about X", "actually it's ..." — when a capture has an appended section nothing has processed yet, or when a note's diagrams need redrawing against changed code.
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-update
@@ -10,8 +10,6 @@ The subject is already in the base: the raw layer is the log, the note is the
 current state.
 
 Invoke `/kb-common` skill if you haven't already.
-
-!`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
 1. **Find the chain**: the capture above what was named, the note and cards
    below (search for the path; there are no back-references). Nothing covers

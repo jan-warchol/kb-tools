@@ -1,7 +1,7 @@
 ---
 name: kb-capture
 description: Capture something the user has learned into their knowledge base as a verified, timestamped capture. Use when the user dictates a piece of knowledge to keep — "capture this", "note that ...", "kb this", "add to my knowledge base" — typically while working inside a project repository. Repairs transcription against the real source, verifies the claims, reports discrepancies without fixing them. Also keeps agent-produced scaffolding (a diagram, a walkthrough) as a machine-origin capture, and suggests the general pattern under a project-specific one.
-allowed-tools: Read, Write, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+allowed-tools: Read, Write, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
 ---
 
 # kb-capture
@@ -11,8 +11,6 @@ timestamped. Or, with `origin: machine`, your own output — when the user asks
 to keep it, and always for what you leave open.
 
 Invoke `/kb-common` skill if you haven't already.
-
-!`${CLAUDE_PLUGIN_ROOT}/scripts/kb_bearings.sh`
 
 1. **The dictation is the whole material** — the argument, or the message
    that invoked you. Never write a capture from the session, your analysis,

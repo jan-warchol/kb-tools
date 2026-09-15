@@ -1,7 +1,26 @@
 ---
 name: kb-common
 description: General instructions for working on the knowledge base. Use always when interacting with knowledge bases managed by kb-tools plugin.
+allowed-tools: Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_home.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_layout.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_user.sh), Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_repo.sh)
 ---
+
+## Bearings
+
+**Knowledge base location:** !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_home.sh`
+**KB user:** !`${CLAUDE_PLUGIN_ROOT}/scripts/kb_user.sh`
+
+KB layout:
+
+!`${CLAUDE_PLUGIN_ROOT}/scripts/kb_layout.sh`
+
+Save new items according to knowledge base conventions; ask if nothing fits.
+
+Current repository:
+
+!`${CLAUDE_PLUGIN_ROOT}/scripts/kb_repo.sh`
+
+Source paths are relative to the repository root. No repository, or no
+origin: cite the documents you read instead.
 
 ## Flow
 
