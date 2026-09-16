@@ -26,7 +26,12 @@ kb=$(cd "$kb" && pwd)
 
 # The base has to be readable without this plugin installed — and its presence
 # is what identifies a directory as a knowledge base.
-cp "$root/reference/frontmatter.md" "$kb/SCHEMA.md"
+# One file there, several here: skills load only the parts they need.
+schema="$root/reference/schema"
+for part in core capture note card quiz-log; do
+  cat "$schema/$part.md"
+  printf '\n'
+done > "$kb/SCHEMA.md"
 echo "wrote SCHEMA.md"
 
 # A file, not an environment variable: nothing here depends on a shell restart.

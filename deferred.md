@@ -5,7 +5,7 @@ what should trigger revisiting it.
 
 | Deferred | Why not now | Revisit when |
 |---|---|---|
-| **Revalidation** — material verified at capture rechecked as its subject changes: the change- and time-triggered passes, `stale_after`, `reviewed`, and `status: deprecated` on confirmation | Nothing captured is old enough to have gone stale, and correctness *at* capture is the harder half. Until it exists, the staleness obligation rests on remembering to look, which is exactly what does not work | The oldest verified item is a few months old, or a claim is first found to have quietly stopped being true |
+| **Revalidation as a sweep** — the change- and time-triggered passes over the whole base, `stale_after`, `reviewed`. The manual single-note check exists: `/kb-verify` | A sweep is `/kb-verify` run over every note, and its shape is worth deciding only once the manual check has been used a few times; until then staleness rests on remembering to look | `/kb-verify` has been run by hand a few times, or the oldest verified note is a few months old |
 | **Relating an item to what is already known** (the overlap check, the `related:` graph) | `/kb-capture` now glances at the existing items so a restatement becomes an update rather than a second capture, which covers the case that hurts; the general check needs a corpus large enough for a new note to plausibly duplicate an old one, and needs the index below to be affordable | A capture turns out to restate an existing note and nothing catches it |
 | **The generated index** | Its only consumer is the overlap check; cataloguing a corpus you can still read in one sitting earns nothing | Overlap detection is built, or reading the corpus whole stops being feasible |
 | **Restructuring the corpus** — a whole-corpus findings pass, and a log with it | A pass over a corpus this small finds nothing, and its shape is unknown until revalidation has run by hand a few times. Scheduling either pass automatically comes after that | Revalidation exists and has been run manually a few times |
@@ -37,7 +37,7 @@ frontmatter for both is already being written.
   what makes a sweep affordable: most items are untouched, so most of a pass is
   a cheap negative. Only entries carrying `commit` participate. **Resolving that
   URL to a checkout on this machine is the unbuilt half** — an item deliberately
-  records no local path (`reference/frontmatter.md`), so the pass needs some
+  records no local path (`reference/schema/core.md`), so the pass needs some
   way to be told where the repo is. Decide it with the pass; anything decided
   now would be a convention kept ready rather than a mechanism.
 - **Time-triggered.** `stale_after: <YYYY-MM-DD>` on the item, measured against

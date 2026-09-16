@@ -155,3 +155,56 @@ Reading agent prose and thinking "yes, exactly" is the illusion of
 understanding `motivation.md` §1.3 exists to prevent; what the user says in
 answering a question about a block is theirs, and enters through capture or
 update. This removes a per-item decision and closes the only real hazard.
+
+## 7. Format choices that look arbitrary
+
+The schema in `reference/schema/` states rules only; the reasons live here.
+
+- **Two ID forms.** Items that stay in the base read well as `<slug>_<n>`, and
+  kind is not part of identity, so a capture, its note and its verify reports
+  share one number pool — the slug pool, which is also how a subject's history
+  is found. A card leaves the base, and its ID becomes an Anki guid, a namespace
+  shared with every deck ever imported: twelve base62 characters is 62¹² ≈
+  3.2×10²¹ values, so even with ten million drawn the chance of any collision is
+  about one in 64 million. Drawn by a script, because a model asked for a random
+  string does not produce one.
+- **References by ID, not path.** Items move between directories as a base is
+  reorganised, and every path reference went stale with them. The filename
+  contains the ID, so resolving one is a glob and survives any move.
+- **Repositories by URL, never a local path.** Where a checkout sits is
+  machine-local; an item naming it would be false on the next machine.
+- **Evidence recorded once, where it was read.** Copying a capture's evidence
+  into its note made notes' frontmatter longer than their bodies and gave the
+  same fact two places to drift apart. Revalidation follows the chain.
+- **`verified` holds the latest check, not a history.** A growing list said
+  nothing a reader acted on; the history of what changed is in verify reports.
+- **A card's sources are never evidence.** Staleness reaches a card through
+  the item it was drawn from; a `commit` on a card would be a second copy of
+  the same fact.
+- **`importance` is the initial deck only.** Anki does not move an existing
+  card on re-import, so a grade takes effect only before the first import —
+  which is why an ungraded card is held back rather than defaulted. Demoting a
+  card afterwards is a judgement made in review, from history this base cannot
+  see.
+
+## 8. How items change
+
+- **A capture is open during the session that wrote it, and closed after —
+  whichever origin.** Session, not day: an agent can know whether it wrote a
+  file in this conversation, and a same-day rule would let a session with no
+  memory of a file write into it, which is how an agent's claims once landed
+  under the user's byline. One author per capture follows: `generated.by` is
+  true by construction.
+- **Captures are records, never to-do lists.** An `## Open / follow-ups`
+  ledger was tried in 0.13 and dropped: a list meant to be crossed off cannot
+  live in a closed file, and carrying it forward session to session is an
+  obligation in another form. What a run skipped is reported in the
+  conversation, and that is allowed to be the end of it.
+- **Approval covers claims.** A scaffolding edit — a URL, a path, a diagram —
+  keeps approval and `generated.at`; rewording the user asked for is approved
+  by the asking; a claim change comes only from a dictated claim, re-stamped on
+  acceptance. Clearing approval on every body change made a URL fix a review.
+- **One item per run.** A run touching several notes produced a diff nobody
+  could review, and the notes done one at a time gave the same result.
+- **Verification is read-only and writes a report.** A check that may edit
+  what it checks will, as soon as nothing dictated stands in its way.

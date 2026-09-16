@@ -7,8 +7,8 @@ Reads every card in the knowledge base and writes one importable file. It
 reads only: nothing here writes back into a note or a card.
 
 - Only approved cards are exported: `status: stable` plus an `approved` stamp
-  by a `human:` actor (a `human:` entry in `verified` is read the same way, for
-  cards written before the two were split). A proposal awaiting the user is
+  by a `human:` actor (a `human:` entry in a legacy `verified` list is read
+  the same way, for cards written before the two were split). A proposal awaiting the user is
   `status: draft` and stays out.
 - `status: deprecated` cards are omitted and listed. **Omission does not
   suspend them** — a package can only add and update, so a card already in the
@@ -83,6 +83,9 @@ IMPORTANCE = ("core", "extra")
 # Written for every kind, not only the one that needs it, so nothing here
 # dispatches on kind to produce it.
 TAG_PREFIX = "kb::"
+
+# How `sources` names another item: by ID, which survives the file moving.
+ID_SCHEME = "kb:"
 
 UNDERSTANDING = "Understanding"
 
@@ -197,9 +200,33 @@ def is_human(entry):
 def is_approved(meta):
     if meta.get("status") != "stable":
         return False
-    return is_human(meta.get("approved")) or any(
-        is_human(e) for e in meta.get("verified") or []
-    )
+    verified = meta.get("verified")
+    legacy = verified if isinstance(verified, list) else []
+    return is_human(meta.get("approved")) or any(is_human(e) for e in legacy)
+
+
+def items_by_id(items):
+    """Every item's path by ID, as a list: more than one is a duplicate."""
+    out = {}
+    for path, meta, _ in items:
+        out.setdefault(str(meta.get("id", "")), []).append(path)
+    return out
+
+
+def resolve_resource(kb, resource, by_id):
+    """The file a `sources` resource names in this base, or None.
+
+    `kb:<id>` is the form written now; a base-relative `/path` is the legacy
+    form, still read until `kb_migrate.py` has run.
+    """
+    resource = str(resource or "")
+    if resource.startswith(ID_SCHEME):
+        paths = by_id.get(resource[len(ID_SCHEME):]) or []
+        return paths[0] if len(paths) == 1 else None
+    if resource.startswith("/"):
+        candidate = os.path.join(kb, resource.lstrip("/"))
+        return candidate if os.path.isfile(candidate) else None
+    return None
 
 
 def unwrap(text):
@@ -313,24 +340,13 @@ def split_qa(body):
     return to_field(body), ""
 
 
-def note_ids(kb, items):
-    """Every item by its base-relative path, leading slash and all, as
-    `sources` names it."""
-    return {
-        "/" + os.path.relpath(path, kb).replace(os.sep, "/"): str(meta.get("id", ""))
-        for path, meta, _ in items
-    }
-
-
-def note_of(meta, by_path):
-    """The ID of the note a card stands for, or None where it names none.
-
-    `sources` names it by path; the ID is what means anything on the Anki side.
-    """
+def note_of(kb, meta, by_id, id_of):
+    """The ID of the note a card stands for, or None where it names none."""
     sources = meta.get("sources") or []
     if not sources or not isinstance(sources[0], dict):
         return None
-    return by_path.get(str(sources[0].get("resource", ""))) or None
+    path = resolve_resource(kb, sources[0].get("resource"), by_id)
+    return id_of.get(path) if path else None
 
 
 def render_understanding(meta, note_id):
@@ -366,7 +382,8 @@ def main(argv):
     root = deck_root(kb)
 
     items = list(read_items(kb))
-    by_path = note_ids(kb, items)
+    by_id = items_by_id(items)
+    id_of = {path: str(meta.get("id", "")) for path, meta, _ in items}
 
     cards, seen, misgraded, ungraded = [], {}, [], []
     for path, meta, body in items:
@@ -404,7 +421,7 @@ def main(argv):
             held_back.append(str(meta.get("id")))
             continue
         if kind == UNDERSTANDING:
-            note_id = note_of(meta, by_path)
+            note_id = note_of(kb, meta, by_id, id_of)
             # Held back rather than fatal: it makes one card useless and
             # corrupts nothing, unlike a repeated ID.
             if note_id is None:

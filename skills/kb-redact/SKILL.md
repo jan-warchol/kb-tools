@@ -1,24 +1,28 @@
 ---
 name: kb-redact
 description: Turn captures in the knowledge base into short, structured notes. Use when the user wants to redact, process, or work through their capture backlog — "redact", "process a capture", "turn these into notes". Every claim stays the user's; the shape is the agent's. Verifies anything captured unverified, and never marks a note approved without the user's say-so. Does not make cards.
-allowed-tools: Read, Write, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *)
+allowed-tools: Read, Write, Glob, Grep, Agent, Bash(${CLAUDE_PLUGIN_ROOT}/scripts/kb_init.sh *), Bash(cat ${CLAUDE_PLUGIN_ROOT}/reference/schema/*), Bash(date -u *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_check.py *), Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/kb_find.py *)
 ---
 
 # kb-redact
 
-One subject, one note. Usually one capture in; several where they are about
-the same thing, each cited.
+One subject, one note, one run. Its captures are the slug pool
+(`kb_find.py --pool`); a capture from another subject is another run.
 
 Invoke `/kb-common` skill if you haven't already.
 
-1. **Gather**: the capture(s), the machine-origin captures beside them, any
-   note already on the subject. Verify what was captured unverified, at the
-   requested effort (`/kb-common`).
+1. **Gather**: the slug pool — human captures, the machine captures beside
+   them, any note already made from them. A note exists ⇒ at normal effort edit
+   the sections newer captures affect; at thorough, rebuild it from the whole
+   pool. Verify what was captured unverified, at the requested effort
+   (`/kb-common`).
 2. **Claims are theirs, shape is yours.** Every sentence outside a machine
    block must trace to something the user said; reorder and recast freely,
-   add or drop a claim never. A hedge that verification settled goes; a scope
+   add or drop a claim never. Where captures disagree, the newer one is the
+   current state. A hedge that verification settled goes; a scope
    qualifier ("only when…") stays. A contradiction — within the material or
    against the code — stops you: quote both sides, let the user settle it.
+   Their answer is a claim: a new capture, verified on the spot.
 3. **Outline first**, except at quick effort. The outline is the note's
    structure, never its content: one line per section, `<heading> —
    <shape> with <what's inside>`, where what's inside is two to five words.
@@ -35,18 +39,21 @@ Invoke `/kb-common` skill if you haven't already.
    Bullets over prose for lists of facts; code formatting speech could not
    carry. Diagrams and walkthroughs from the machine-origin capture
    go in **machine blocks**; the scaffolding you fill in yourself (paths,
-   symbols, topology) too. The note stands on its own without the capture.
-5. **Record what you left open** — unchecked claims, follow-ups, patterns you
-   noticed — under `## Open / follow-ups` in the machine-origin capture, never
-   in the note (`/kb-common`).
-6. **Present, then on approval write** it under the capture's slug, next free
-   number: `verified` from the captures plus yours, `approved` stamped now,
-   `status: stable`. A capture already short enough is promoted as-is.
-   Unapproved stays `draft`.
-7. Run the check.
+   symbols, topology) too. Never a history of what changed. The note stands on
+   its own without the captures.
+5. **Present, then on approval write** it under the pool's slug, next free
+   number (an existing note keeps its ID): `sources` the captures by
+   `kb:<id>` and only evidence you read beyond theirs, `verified` your check,
+   `approved` stamped now, `status: stable`. A capture already short enough is
+   promoted as-is. Unapproved stays `draft`.
+6. Say what you left open (`/kb-common`, Stopping), and run the check.
 
 ---
 
 # Schema
 
-!`cat ${CLAUDE_PLUGIN_ROOT}/reference/frontmatter.md`
+!`cat ${CLAUDE_PLUGIN_ROOT}/reference/schema/core.md`
+
+!`cat ${CLAUDE_PLUGIN_ROOT}/reference/schema/capture.md`
+
+!`cat ${CLAUDE_PLUGIN_ROOT}/reference/schema/note.md`

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check knowledge-base frontmatter against ../reference/frontmatter.md.
+"""Check knowledge-base frontmatter against ../reference/schema/.
 
 Usage:  kb_check.py <file-or-directory>...
 
@@ -13,6 +13,12 @@ open and close in turn, and nothing that depends on what kind of item this is
 or where it lives. Types are open (OKF permits any) and the
 layout is free to change, so a checker that enumerated either would be wrong
 before it was useful. Everything about meaning is the reader's job.
+
+The one thing it looks beyond a file for is identity: a `kb:<id>` in `sources`
+must name exactly one item in the enclosing base, and no other item may share
+the file's own `id`. Warnings flag legacy forms `kb_migrate.py` converts, a
+frontmatter block past its budget, and approval older than the claims it
+covers.
 """
 
 import datetime
@@ -36,6 +42,38 @@ SLUG = r"[a-z0-9]+(?:-[a-z0-9]+)*"
 ID_RE = re.compile(rf"^(?:{SLUG}_\d+|[A-Za-z0-9]{{12}})$")
 TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# A soft budget: past it, frontmatter is usually carrying copied evidence or
+# history that belongs elsewhere.
+FRONTMATTER_LINES = 20
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from kb_export import ID_SCHEME, items_by_id, read_items  # noqa: E402
+
+_indexes = {}
+
+
+def base_of(path):
+    """The knowledge base enclosing a file — the nearest SCHEMA.md above it."""
+    directory = os.path.dirname(os.path.abspath(path))
+    while directory != os.path.dirname(directory):
+        if os.path.isfile(os.path.join(directory, "SCHEMA.md")):
+            return directory
+        directory = os.path.dirname(directory)
+    return None
+
+
+def index_of(kb):
+    if kb not in _indexes:
+        _indexes[kb] = items_by_id(read_items(kb))
+    return _indexes[kb]
+
+
+def as_time(value):
+    if isinstance(value, datetime.datetime):
+        return value if value.tzinfo else value.replace(tzinfo=datetime.timezone.utc)
+    if isinstance(value, str) and TS_RE.match(value):
+        return datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return None
 
 
 def split_frontmatter(text):
@@ -79,7 +117,7 @@ def check_actor_stamp(problems, label, value):
         problems.append(("error", f"{label}.at is not an ISO 8601 timestamp"))
 
 
-def check_sources(problems, sources):
+def check_sources(problems, sources, kb):
     if not isinstance(sources, list):
         problems.append(("error", "`sources` must be a list"))
         return
@@ -98,6 +136,15 @@ def check_sources(problems, sources):
                 )
         if "retrieved" in entry and not DATE_RE.match(str(entry["retrieved"])):
             problems.append(("error", f"{label}.retrieved is not a YYYY-MM-DD date"))
+        resource = str(entry["resource"])
+        if resource.startswith(ID_SCHEME) and kb:
+            found = len(index_of(kb).get(resource[len(ID_SCHEME):]) or [])
+            if found != 1:
+                problems.append(("error", f"{label} `{resource}` names {found} items"))
+        elif resource.startswith("/"):
+            problems.append(
+                ("warning", f"{label} names an item by path; use `{ID_SCHEME}<id>`")
+            )
 
 
 def check_file(path):
@@ -139,13 +186,12 @@ def check_file(path):
         check_actor_stamp(problems, "generated", meta["generated"])
 
     verified = meta.get("verified")
-    if verified is not None:
-        if not isinstance(verified, list):
-            problems.append(("error", "`verified` must be a list of { by, at }"))
-            verified = None
-        else:
-            for i, entry in enumerate(verified):
-                check_actor_stamp(problems, f"verified[{i}]", entry)
+    if isinstance(verified, list):
+        problems.append(("warning", "`verified` is a legacy list; keep the latest check only"))
+        for i, entry in enumerate(verified):
+            check_actor_stamp(problems, f"verified[{i}]", entry)
+    elif verified is not None:
+        check_actor_stamp(problems, "verified", verified)
 
     approved = meta.get("approved")
     if approved is not None:
@@ -161,8 +207,25 @@ def check_file(path):
     if not verified and not approved and meta.get("status") != "draft":
         problems.append(("error", "unverified item must carry `status: draft`"))
 
+    kb = base_of(path)
     if "sources" in meta:
-        check_sources(problems, meta["sources"])
+        check_sources(problems, meta["sources"], kb)
+    if kb and item_id and len(index_of(kb).get(item_id) or []) > 1:
+        problems.append(("error", f"`id` {item_id!r} is shared with another item"))
+
+    # Approval covers claims; `generated.at` moves only when claims change, so
+    # a later one means the user approved text that has since changed.
+    generated = meta.get("generated")
+    if isinstance(approved, dict) and isinstance(generated, dict):
+        changed, stamped = as_time(generated.get("at")), as_time(approved.get("at"))
+        if changed and stamped and changed > stamped:
+            problems.append(("warning", "claims changed after `approved.at`; re-approve"))
+
+    lines = block.count("\n") + 1
+    if lines > FRONTMATTER_LINES:
+        problems.append(
+            ("warning", f"frontmatter is {lines} lines (budget {FRONTMATTER_LINES})")
+        )
 
     check_blocks(problems, raw[len(block) + 8:])
 

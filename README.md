@@ -28,6 +28,7 @@ nothing to remember.
 | `/kb-capture` | dictate something learned |
 | `/kb-redact` | work captures into notes |
 | `/kb-update` | correct or extend something already captured |
+| `/kb-verify` | check a note against the current code, without touching it |
 | `/kb-cards` | make cards from a note |
 | `/kb-quiz` | review what Anki says is due, or be questioned on a note |
 | `/kb-export` | write the Anki import file |
@@ -38,6 +39,17 @@ nothing to remember.
 
 There is no lookup command: asking an agent inside the knowledge base is
 sufficient, and needs no dedicated mechanism.
+
+## Upgrading a base
+
+0.14 names items by ID rather than path and slims frontmatter. Once per base,
+under git:
+
+```
+scripts/kb_migrate.py            # dry run: what would change
+scripts/kb_migrate.py --apply    # then review the diff
+scripts/kb_init.sh <base>        # refresh SCHEMA.md
+```
 
 ## Anki
 
@@ -67,5 +79,5 @@ anki_deck_name: Knowledge    # the default
 | [`motivation.md`](motivation.md) | the problem this exists for, and the obligations that follow |
 | [`decisions.md`](decisions.md) | choices made about Anki, and where the boundary sits |
 | [`reference/anki-setup.md`](reference/anki-setup.md) | the scheduler settings this depends on, and backups |
-| [`reference/frontmatter.md`](reference/frontmatter.md) | the file format, specified once |
+| [`reference/schema/`](reference/schema/core.md) | the file format: core, plus one file per kind |
 | [`deferred.md`](deferred.md) | what it deliberately does not do yet |

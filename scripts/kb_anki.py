@@ -35,7 +35,15 @@ import urllib.error
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from kb_export import INIT, TAG_PREFIX, deck_root, read_items, resolve_kb  # noqa: E402
+from kb_export import (  # noqa: E402
+    INIT,
+    TAG_PREFIX,
+    deck_root,
+    items_by_id,
+    read_items,
+    resolve_kb,
+    resolve_resource,
+)
 
 ENDPOINT = os.environ.get("ANKI_CONNECT_URL", "http://127.0.0.1:8765")
 TIMEOUT = 15
@@ -93,11 +101,7 @@ def note_path(kb, meta):
     sources = meta.get("sources") or []
     if not sources or not isinstance(sources[0], dict):
         return None
-    resource = str(sources[0].get("resource", ""))
-    if not resource.startswith("/"):
-        return None
-    candidate = os.path.join(kb, resource.lstrip("/"))
-    return candidate if os.path.isfile(candidate) else None
+    return resolve_resource(kb, sources[0].get("resource"), items_by_id(read_items(kb)))
 
 
 def kb_tag(tags):
