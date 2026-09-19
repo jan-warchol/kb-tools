@@ -10,7 +10,7 @@ the format: directory names in examples are illustrative.
 
 | Scope | ID form | Example |
 |---|---|---|
-| stays in the base (capture, note, quiz log) | `<slug>_<n>` | `retry-wrapper_1` |
+| stays in the base (capture, note) | `<slug>_<n>` | `retry-wrapper_1` |
 | leaves the base (a card) | 12 random base62 characters | `Xo1jycAlN4xQ` |
 
 `<n>` is the lowest number free among items sharing the slug, whatever their
@@ -27,7 +27,7 @@ item — use it rather than guessing paths.
 
 ```yaml
 id: retry-wrapper_2
-type: Note          # Capture, Note, Recall Card, Understanding Card, Quiz Log
+type: Note          # Capture, Note, Recall Card, Understanding Card
 title: Retry wrapper ordering        # the subject, not a claim
 origin: human                        # human | machine
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:35:00Z }
@@ -92,7 +92,6 @@ sources:
 | Capture, machine | the item it concerns, if any, then evidence |
 | Note | its captures (and notes), then evidence read beyond them |
 | Card | the note or capture it is drawn from — never evidence directly |
-| Quiz Log | every note quizzed |
 
 ## Machine blocks
 
@@ -108,7 +107,6 @@ graph LR
 ````
 
 Nothing inside is carded; the file stays `origin: human`; the agent redraws a
-block freely with a new stamp; the quiz may ask about one. What belongs inside
-is scaffolding for the current state — a diagram, a walkthrough, suggested quiz
-questions. **Never history**: a delta report is a verify report (a machine
+block freely with a new stamp. What belongs inside is scaffolding for the
+current state — a diagram, a walkthrough. **Never history**: a delta report is a verify report (a machine
 capture). Captures need no blocks — `origin` covers the whole file.

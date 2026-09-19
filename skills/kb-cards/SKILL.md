@@ -18,18 +18,15 @@ Invoke `/kb-common` skill if you haven't already.
 2. **How many is the effort** (`/kb-common`) — the obvious one or two, or a
    full sweep. Never cards across items. **The understanding card is always
    proposed** for a note that has none, at every effort, alongside the recall
-   cards; at quick, without its quiz questions.
+   cards.
 3. **Draw IDs** for every card in one call, never write one yourself:
    `${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh <how-many>`.
 4. **Draft**: one fact, one card, never the same fact twice; asks only what
    the item says, in its vocabulary; stands alone months later with one right
    answer. Short — answers under 10 words ideally, never over 20, up to 4
    bullets; an example is visually separate from the answer.
-5. **An Understanding Card asks nothing itself**: `sources` names the note and
-   export generates its two fields. Put the questions worth asking about the
-   note in a **machine block** in its body, for `/kb-quiz` to draw on, one line
-   each — skipped at quick effort. They are suggestions, not claims: the user
-   approves the card, not them, and nothing there is ever exported.
+5. **An Understanding Card asks nothing itself**: `sources` names the note,
+   export generates its two fields, and it has no body.
 6. **Approve one at a time.** Turned down ⇒ dropped; reworded ⇒ shown again.
    Write only approved cards: `sources` the item by `kb:<id>`, `approved` at
    approval, `status: stable`, no `importance` (graded at export). Filename

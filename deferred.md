@@ -11,7 +11,7 @@ what should trigger revisiting it.
 | **Restructuring the corpus** — a whole-corpus findings pass, and a log with it | A pass over a corpus this small finds nothing, and its shape is unknown until revalidation has run by hand a few times. Scheduling either pass automatically comes after that | Revalidation exists and has been run manually a few times |
 | **Synthesis / wiki layer** | Reorganising the user's own claims across notes is what the note layer now allows (a note may draw on several captures and notes). Genuine synthesis is machine material at corpus scale — same fence, same rules — and needs volume to say anything | Overlap between notes becomes a felt problem |
 | **Cards derived from the wiki** | Not forbidden — the wiki reorganises claims the user already articulated. Blocked on telling reorganisation from genuine synthesis, and on overlapping cards already drawn from the same notes. Free-recall cards especially may belong here, since causation, ordering and tradeoff emerge *across* notes rather than within one | The wiki exists, and note-derived cards are numerous enough to test the overlap against |
-| **Machine-graded free recall** — for *recall* cards; understanding cards are graded through `/kb-quiz` already | Adds friction where the habit is weakest, and recall review on a phone is most of what keeps it going | Self-graded review has been unbroken for a month, and the understanding-card grading has proved itself |
+| **Machine-graded free recall** | Adds friction where the habit is weakest, and recall review on a phone is most of what keeps it going. A first attempt, `/kb-quiz` for understanding cards, was removed in 0.15 as not working well | Self-graded review has been unbroken for a month, and a design addresses why the quiz fell short |
 | **A `visibility` key, and a mechanical sanitisation check** | Only a general pattern is meant to leave for another knowledge base, and it is written to travel from the start (`kb-common`), so there is nothing else to label and nothing a second check would catch that writing it did not | Something other than a harvested pattern needs to leave, or a pattern is found to have carried a project identifier out |
 | **Checklists offered by the agent** — naming the shape of a task ("threads one field end to end") and offering its closed questions, as a stopping rule for tracing | Working-session behaviour, not knowledge-base design; needs no mechanism | The open items a skill records turn out to be mostly unanswered checklist questions |
 | **A drill skill** — predict-then-run, break-and-read, specify-then-diff, with a log across sessions | Any session with an agent can run these on request, and a wrong prediction is just a capture. A skill earns its place only if history across sessions turns out to matter | The user is running these regularly and wants the record |
@@ -62,21 +62,18 @@ only.
 
 ### The scheduler integration
 
-**It now exists** — `scripts/kb_anki.py`, built for understanding cards, which
-needed a grade to travel from a conversation to the scheduler. Suspension of
-deprecated cards, deletion reconciliation and machine-graded free recall are
-the same integration and now hang off it rather than waiting for one.
+**A connection exists** — `scripts/kb_anki.py` talks to AnkiConnect for status,
+backup and sync. Suspension of deprecated cards, deletion reconciliation and
+machine-graded free recall would hang off it.
 
 - **Report, do not delete.** A card missing from the markdown is reported, never
   removed — a parser bug must not be able to reach review history.
-- **The grade is proposed, never sent unasked.** What `/kb-quiz` does for
-  understanding cards is the pattern: the agent says what was right and wrong
-  and recommends a button; the user presses it. That is what makes lenient
-  grading harmless — nobody is grading themselves against their own memory of
-  what they meant.
+- **The grade is proposed, never sent unasked.** The agent says what was
+  right and wrong and recommends a button; the user presses it. That is what
+  makes lenient grading harmless — nobody is grading themselves against their
+  own memory of what they meant.
 
 ## Appendix: scheduler setup
 
 **Moved to [`reference/anki-setup.md`](reference/anki-setup.md).** It stopped
-being a note about deferred work the moment `/kb-quiz` began driving the
-scheduler, and it is now the setup a working system depends on.
+being a note about deferred work once the system depended on it.

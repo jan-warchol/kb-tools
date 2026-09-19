@@ -30,12 +30,12 @@ inline code, bold and italic. Everything else is escaped and passed through.
 
 Every card also carries the tag `kb::<card id>` — the ID is the guid too, but
 no Anki interface reads a guid back out, so the tag is the only thing on that
-side leading back to the file. `/kb-quiz` needs it.
+side leading back to the file.
 
 An Understanding Card is the one exception to reading the body: it has no
 question of its own, so both fields are generated here from the frontmatter,
 and a card naming no note in this base is held back. Its body, where it has
-one, holds questions the agent suggested for `/kb-quiz` and is never exported.
+one, is never exported.
 
 Cards land in a subdeck per kind, then per importance, under `anki_deck_name:`
 from the optional `<kb>/knowledge-base.yaml` (or `.yml`), falling back to
@@ -352,17 +352,16 @@ def note_of(kb, meta, by_id, id_of):
 def render_understanding(meta, note_id):
     """The two fields of an Understanding Card, generated from frontmatter.
 
-    The kind carries no question of its own, so the body — suggested questions
-    for `/kb-quiz`, where there are any — is not read. Both fields are a
-    fallback for whoever opens the card in Anki; the tag is the mechanism.
+    The kind carries no question of its own, so the body is not read. The
+    front asks for the note from memory; the back sends the reviewer to the
+    note to check, and the grade is theirs.
     """
     title = escape(str(meta.get("title", "")))
-    front = f"<p>{title}</p><p><small>{escape(note_id)}</small></p>"
-    back = (
-        "<p>Understanding card — not answered here.</p>"
-        f"<p>Run <code>/kb-quiz</code> on <code>{escape(note_id)}</code>;"
-        " it grades this card.</p>"
+    front = (
+        f"<p>{title}</p>"
+        "<p>Explain it: what the note says, and why it holds.</p>"
     )
+    back = f"<p>Check against note <code>{escape(note_id)}</code>.</p>"
     return front, back
 
 

@@ -78,8 +78,9 @@ review is expensive enough to be worth buying interval with.
 **One learning step and one relearning step, both 20 minutes.** A series of
 steps second-guesses the scheduler; a single number lets it work. Steps are
 preset-wide with no per-deck override, so this is a compromise chosen with
-understanding cards in mind — a card whose review is a ten-minute conversation
-must not reappear two minutes after it is failed. Steps must stay under a day.
+understanding cards in mind — a card whose review means reasoning through a
+whole note must not reappear two minutes after it is failed. Steps must stay
+under a day.
 
 **Set the learn-ahead limit to 5 minutes** — Preferences → Review, and
 **global, not per preset**. At its default of 20 minutes it exactly cancels a
@@ -100,31 +101,18 @@ confirming after a week that what was introduced matches the 3/2 split.
 `Core` sorts before `Extra`, so a session abandoned halfway has done the core
 cards. It changes only the order they arrive in, not which are gathered.
 
-## Understanding cards are not reviewed in Anki
+## Understanding cards
 
-`/kb-quiz` drives Anki's reviewer through AnkiConnect, pointed at
-`<root>::Understanding`. What Anki shows for such a card is a placeholder.
-
-**Never click the parent `<root>` deck.** It pulls understanding cards into the
-manual reviewer, where there is no answer to reveal and every button is a wrong
-grade. Click `<root>::Recall` for recall, and let `/kb-quiz` open the other.
-Ancestor limits apply only to the deck actually clicked.
-
-If one does get graded by accident: **Forget** it in the browser (restoring its
-original position) and re-run the quiz.
+The front names a note and asks for it from memory — what it says, and why it
+holds; the back names the note to check against. Explain it before revealing,
+then open the note. Grade as strictly as recall: a part missed is a part
+missed.
 
 ## Grading
 
-**Press Again on failure, never Hard — in recall review.** Hard means
-"recalled, with effort"; using it for a failure inflates every subsequent
-interval, silently and irreversibly.
-
-**Hard is legitimate on an understanding card**, and this is not an
-inconsistency. The rule exists because a self-graded failure has nothing to
-stop it being dressed up as partial success. An understanding card is graded
-from an exchange that recorded which part was missed, and the next quiz leads
-with it — so the missed part is dealt with by the log rather than by repeating
-the card tomorrow, and reviewing one is expensive enough that this matters.
+**Press Again on failure, never Hard.** Hard means "recalled, with effort";
+using it for a failure inflates every subsequent interval, silently and
+irreversibly.
 
 **Demote during review, in Anki, not here.** Whether a card has earned its
 place is visible only from review history. Flag it (Ctrl+1…7) rather than
@@ -147,8 +135,8 @@ notes, and any past state is recoverable rather than only the last. Each export
 is a fresh zip and nothing dedupes — a few MB a year at weekly cadence;
 gitignore the directory if that stops being worth it.
 
-`/kb-quiz` and `/kb-export` report the newest backup's age whenever they talk to
-Anki, because forgetting is the actual failure mode. Neither makes one unasked.
+`kb_anki.py status` reports the newest backup's age, because forgetting is the
+actual failure mode. Nothing makes one unasked.
 
 Two things to know before the day it matters:
 

@@ -45,10 +45,10 @@ Ack first — the retry re-enqueues the message rather than holding it.
 
 ## Understanding Card
 
-Whether the user can reason with a note; graded by `/kb-quiz`, never in Anki's
-reviewer. **The card is the note**: at most one per note, no question of its
-own, both Anki fields generated at export. Its optional body is a machine
-block of suggested questions for `/kb-quiz`, rewritten freely, never exported.
+Whether the user can reason with a note, self-graded in Anki: the front asks
+for the note from memory, the back names the note to check against. **The card
+is the note**: at most one per note, no question of its own, no body, both
+Anki fields generated at export.
 
 ```yaml
 ---
@@ -62,9 +62,4 @@ importance: core
 sources: [{ resource: kb:retry-wrapper_3 }]
 approved: { by: human:jan, at: 2026-08-10T14:43:00Z }
 ---
-
-<!-- machine: claude-code/opus-5, 2026-09-13, commit a1b2c3d -->
-- Why can the retry not hold the message instead of re-enqueueing it?
-- What breaks if the wrapper is applied outside `Consumer.handle`?
-<!-- /machine -->
 ```

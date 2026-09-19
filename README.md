@@ -30,7 +30,6 @@ nothing to remember.
 | `/kb-update` | correct or extend something already captured |
 | `/kb-verify` | check a note against the current code, without touching it |
 | `/kb-cards` | make cards from a note |
-| `/kb-quiz` | review what Anki says is due, or be questioned on a note |
 | `/kb-export` | write the Anki import file |
 
 ```
@@ -53,11 +52,10 @@ scripts/kb_init.sh <base>        # refresh SCHEMA.md
 
 ## Anki
 
-Recall cards are reviewed in Anki as usual. **Understanding cards are reviewed
-by `/kb-quiz`**, which drives Anki's own reviewer over
-[AnkiConnect](https://foosoft.net/projects/anki-connect/) and sends the grade
-you pick — so that half needs Anki running locally with the add-on. Everything
-else works without it.
+Every card is reviewed and graded in Anki as usual. `scripts/kb_anki.py`
+reports what is due and makes scheduling-preserving backups over
+[AnkiConnect](https://foosoft.net/projects/anki-connect/), which needs Anki
+running locally with the add-on. Everything else works without it.
 
 [`reference/anki-setup.md`](reference/anki-setup.md) holds the settings that
 matter, worth reading once before the first import.

@@ -17,7 +17,7 @@ pointer="${XDG_CONFIG_HOME:-$HOME/.config}/kb-tools/kb-home"
 kb=${1:-$HOME/knowledge-base}
 case "$kb" in "~") kb=$HOME ;; "~/"*) kb="$HOME/${kb#\~/}" ;; esac
 
-mkdir -p "$kb/raw" "$kb/notes" "$kb/cards" "$kb/quizzes"
+mkdir -p "$kb/raw" "$kb/notes" "$kb/cards"
 
 # Absolute from here on: the pointer file is read from wherever a skill happens
 # to run, so a relative path given here would resolve against the wrong
@@ -28,7 +28,7 @@ kb=$(cd "$kb" && pwd)
 # is what identifies a directory as a knowledge base.
 # One file there, several here: skills load only the parts they need.
 schema="$root/reference/schema"
-for part in core capture note card quiz-log; do
+for part in core capture note card; do
   cat "$schema/$part.md"
   printf '\n'
 done > "$kb/SCHEMA.md"
