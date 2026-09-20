@@ -27,7 +27,7 @@ item — use it rather than guessing paths.
 
 ```yaml
 id: retry-wrapper_2
-type: Note          # Capture, Note, Recall Card, Understanding Card
+type: Note          # Capture, Note, Recall Card
 title: Retry wrapper ordering        # the subject, not a claim
 origin: human                        # human | machine
 generated: { by: claude-code/opus-5, at: 2026-08-10T14:35:00Z }

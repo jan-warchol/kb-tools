@@ -14,9 +14,11 @@ inside the boundary.
 **Understanding cards once crossed it**: `/kb-quiz` questioned the user on a
 note and sent the grade through AnkiConnect, on the grounds that a self-graded
 "did I understand that?" is the unreliable judgement. The quiz was removed in
-0.15 — it did not work well in practice. Understanding cards are now reviewed
-and self-graded in Anki like recall ones, and the line holds without
-exception; `scripts/kb_anki.py` keeps only status, backup and sync.
+0.15 and the kind itself in 0.16: a review that means reasoning through a whole
+note costs far more than a recall card and did not return it, so the cards went
+unreviewed. Recall cards are the only kind, the line holds without exception,
+and `scripts/kb_anki.py` keeps only status, backup and sync. The question the
+kind was for is open, not settled — `deferred.md`.
 
 ## 2. Why the card ID goes in Anki's `guid` column
 
@@ -100,16 +102,11 @@ column, and **no Anki interface reads a guid back out**: not the browser, not
 AnkiConnect. So it cannot be the mechanism, however right it is as the
 identity.
 
-The tag is written for **every kind** though only one needs it today. Printing
-the ID in a field of that kind instead would work and cost two fewer API calls,
-but it makes the export dispatch on kind for something that is not about kind,
-and puts an identifier on the face of a card a person reads. The cost is one
-collapsed `kb` parent in Anki's tag sidebar; browser searchability pays for it.
-
-Understanding cards additionally show their note's ID on the front and an
-instruction on the back. **That is a fallback for a human, not a mechanism** —
-both are generated from `sources` at export, so neither can drift, and nothing
-reads them back.
+The tag is written for **every kind**, and nothing in the export dispatches on
+kind to produce it. Printing the ID in a field instead would work and cost two
+fewer API calls, but it puts an identifier on the face of a card a person
+reads. The cost is one collapsed `kb` parent in Anki's tag sidebar; browser
+searchability pays for it.
 
 ## 6. Agent material is fenced, and never converted
 
@@ -118,8 +115,8 @@ suggested follow-ups — because re-dictating it is the cost that made it
 unaffordable. Where it lives is decided by what fragmentation costs at each
 layer: at the raw layer **its own file**, because the raw layer is a journal
 nobody rereads and a capture's value is that it is exactly what the user said;
-in a note or an understanding card a **machine block**, because those are what
-the user reads, and one subject must stay one file.
+in a note a **machine block**, because that is what the user reads, and one
+subject must stay one file.
 
 **`origin` carries the distinction, not `type`.** A separate kind for the
 agent's file was considered and dropped: every skill that could confuse the two
