@@ -23,7 +23,8 @@ Invoke `/kb-common` skill if you haven't already.
    the item says, in its vocabulary; stands alone months later with one right
    answer. Short — answers under 10 words ideally, never over 20, up to 4
    bullets; an example is visually separate from the answer.
-5. **Approve one at a time.** Turned down ⇒ dropped; reworded ⇒ shown again.
+5. **Show all drafts together**, numbered; the user approves, rewords or
+   drops each. Turned down ⇒ dropped; reworded ⇒ shown again.
    Write only approved cards: `sources` the item by `kb:<id>`, `approved` at
    approval, `status: stable`, no `importance` (graded at export). Filename
    `<slug>_<id>.md`.
