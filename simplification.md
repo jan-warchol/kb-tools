@@ -1,21 +1,24 @@
-# Simplification proposal — 0.15
+# Simplification proposal — 0.17
 
 Everything humans and agents read is too long. This cuts it by about three
 quarters without losing a capability the system is used for.
 
-**Status: proposed, nothing implemented.**
+**Status: proposed, nothing implemented. Reconciled with `main` at 0.16.0**,
+which removed `/kb-quiz`, the Quiz Log kind and the Understanding Card kind —
+cuts in the same direction as this one, so what remains is six commands rather
+than seven and four schema files rather than five.
 
 | | now | after | |
 |---|---|---|---|
-| **agent-loaded** — `skills/`, `reference/schema/` | 847 | ~295 | −65% |
-| **human-read** — `README`, `decisions`, `motivation`, `deferred`, the reviews | 1835 | ~260 | −86% |
-| `reference/anki-setup.md`, read once, absorbs export's half | 169 | ~175 | — |
-| **total** | 2851 | ~730 | −74% |
+| **agent-loaded** — `skills/`, `reference/schema/` | 709 | ~250 | −65% |
+| **human-read** — `README`, `decisions`, `motivation`, `deferred`, the reviews | 1807 | ~255 | −86% |
+| `reference/anki-setup.md`, read once, absorbs export's half | 137 | ~145 | — |
+| **total** | 2653 | ~650 | −75% |
 
 What an agent loads on one invocation — the skill, `kb-common`, and the schema
-files that skill injects — falls from 400–500 lines to about 150:
-`/kb-capture` 399 → 148, `/kb-redact` 439 → 160, `/kb-cards` 395 → 152,
-`/kb-verify` 398 → 136, `/kb-quiz` 371 → 160, `/kb-update` 505 → dissolved.
+files that skill injects — falls from 350–470 lines to about 140:
+`/kb-capture` 393 → 143, `/kb-redact` 433 → 157, `/kb-cards` 358 → 147,
+`/kb-verify` 392 → 131, `/kb-export` 198 → 83, `/kb-update` 472 → dissolved.
 
 Five changes, in order of what they pay.
 
@@ -104,7 +107,7 @@ shape.
 ```yaml
 ---
 id: retry-wrapper_3
-type: Note                       # Capture | Note | Recall Card | Understanding Card | Quiz Log
+type: Note                       # Capture | Note | Recall Card
 title: Retry wrapper ordering
 authored: human
 date: 2026-08-10
@@ -129,20 +132,19 @@ stays — without it a note can hold no diagram, which is `design-review.md` C1.
 
 ## 2. One schema file instead of five
 
-`reference/schema/` is 321 lines across five files, and a skill injects two to
-four of them — 220 lines for `/kb-redact`, 290 for `/kb-update`. Most is
-rationale `decisions.md` also holds, plus five frontmatter examples differing
+`reference/schema/` is 260 lines across four files, and a skill injects two to
+four of them — 217 lines for `/kb-redact`, 260 for `/kb-update`. Most is
+rationale `decisions.md` also holds, plus four frontmatter examples differing
 in three lines.
 
-**`reference/schema.md`, about 55 lines**: identity, the nine keys, agent
-blocks, one worked example, and a four-row table saying what each kind's
-`from:` holds and what is special about it. Every skill injects that one file;
-`Quiz Log` becomes four cells rather than its own document; `kb_init.sh` copies
-one file instead of joining five. Drafted in the appendix.
+**`reference/schema.md`, about 50 lines**: identity, the nine keys, agent
+blocks, one worked example, and a three-row table saying what each kind's
+`from:` holds and what is special about it. Every skill injects that one file,
+and `kb_init.sh` copies it instead of joining four. Drafted in the appendix.
 
 ---
 
-## 3. Six commands instead of seven
+## 3. Five commands instead of six
 
 **`/kb-update` dissolves** into `/kb-capture` then `/kb-redact`:
 
@@ -200,7 +202,8 @@ and costs a longer file and a longer run.
 
 `design-review.md` (750), `design-review-2.md` (171), `verification-gaps.md`
 (401) and `Problems2.txt` (10) are 1332 lines of narrative about releases that
-shipped. A human reads them to find out why something is the way it is — which
+shipped — much of it about a quiz that no longer exists. A human reads them to
+find out why something is the way it is — which
 is `decisions.md`'s job, in a twentieth of the space.
 
 Delete all four; git keeps them. Carry into `decisions.md`, as short entries,
@@ -212,20 +215,20 @@ byline — as why the byline is the only authorship signal and why `/kb-verify`
 cannot edit; and **the note layer is a projection of its slug pool**, with a
 rebuild from the whole pool as thorough effort, not the default.
 
-`decisions.md` 210 → ~95: §§1–5 (the Anki boundary) compress; §7's entries on
+`decisions.md` 186 → ~90: §§1–5 (the Anki boundary) compress; §7's entries on
 `verified`-as-a-list and on evidence-copying die with the keys they explain.
 
 `motivation.md` 128 → ~85: §3 (Karpathy, OKF) becomes four lines naming what
 was taken. §1 and §2 keep their argument — this is the one document that should
 read like one.
 
-`deferred.md` 82 → ~30: the table stays, its cells lose their second and third
+`deferred.md` 80 → ~30: the table stays, its cells lose their second and third
 sentences, and the appendix keeps only what cannot be re-derived — a repository
 URL needs some way to be resolved to a checkout, and staleness must reach a
 card through its note.
 
-`README.md` 83 → ~50: one row fewer, the 0.14 upgrade section replaced by the
-0.15 one, and "Reading" without the deleted files.
+`README.md` 81 → ~50: one row fewer, the 0.14 upgrade section replaced by the
+0.17 one, and "Reading" without the deleted files.
 
 ---
 
@@ -242,11 +245,10 @@ Not cut, but they follow the format:
   stale-approval warning; replace it with one the new shape makes computable:
   **a `confirmed` note whose slug pool holds an `authored: human` capture not
   named in its `from:` is behind its pool.** That catches staleness the old
-  pair never saw, and it is the same computation `/kb-quiz` uses for "what
-  changed".
+  pair never saw: a dictated correction that never reached the note.
 - **`kb_export.py`** — gate on `status: confirmed`; drop the legacy
   `verified`-list path.
-- **`kb_migrate.py`** — a 0.15 pass: `origin`+`generated` → `authored`+`date`,
+- **`kb_migrate.py`** — a 0.17 pass: `origin`+`generated` → `authored`+`date`,
   `verified`/`approved` → `status`, `sources` → `from`/`code`/`paths`,
   `deprecated`|`abandoned` → `retired`, `<!-- machine: … -->` → `<!-- agent -->`.
   The 0.14 pass goes once the one base is migrated.
@@ -289,7 +291,7 @@ Not cut, but they follow the format:
 
 ## 9. Sequence
 
-One release, 0.15.0, because the format touches every file. Inside it:
+One release, 0.17.0, because the format touches every file. Inside it:
 `reference/schema.md` first (everything quotes it), then `kb_check.py` and
 `kb_migrate.py`, then `kb-common`, then the skills, then the prose. Migrate the
 base, then delete this file — its conclusions are in `decisions.md` by then,
@@ -310,7 +312,7 @@ which is the point of §5.
 
 An item that stays in the base is `<slug>_<n>`, where `<n>` is the lowest free
 number in **the slug pool** — one subject's captures, its note, its verify
-reports and quiz logs, whatever their kind. A card leaves the base and is 12
+reports, whatever their kind. A card leaves the base and is 12
 random base62 characters from `scripts/kb_randomid.sh`, never invented. The
 filename ends in the ID, optionally after a prefix
 (`2026-08-10_retry-wrapper_1.md`). Find items with `scripts/kb_find.py` — by
@@ -321,7 +323,7 @@ ID, by pool, or by what refers to them — never by guessing a path.
 ```yaml
 ---
 id: retry-wrapper_3
-type: Note                  # Capture | Note | Recall Card | Understanding Card | Quiz Log
+type: Note                  # Capture | Note | Recall Card
 title: Retry wrapper ordering        # the subject, not a claim
 authored: human                      # human | agent — whose claims these are
 date: 2026-08-10                     # when the claims last changed
@@ -349,17 +351,16 @@ paths: [src/queue/retry.py]
 | Capture | evidence only; the item it concerns when `authored: agent` | one session, one author; open while the session that wrote it runs, closed after |
 | Note | its captures, then other notes | the current state of one subject; every sentence outside an agent block traces to a human capture |
 | Card | the one item it is drawn from | never evidence directly; `importance: core \| extra`; the ID is permanent |
-| Quiz Log | every note quizzed | written once, never revised |
 
 ## Agent blocks
 
-Inside an `authored: human` note or card, agent-written material is fenced:
+Inside an `authored: human` note, agent-written material is fenced:
 
 <!-- agent -->
-a diagram, a walkthrough, questions for /kb-quiz — never history
+a diagram, a walkthrough — never history
 <!-- /agent -->
 
 Nothing inside is carded; the file stays `authored: human`; the agent redraws a
-block freely; the quiz may ask about one. A delta report is not one — that is a
-verify report, an `authored: agent` capture.
+block freely. A delta report is not one — that is a verify report, an
+`authored: agent` capture.
 ````
