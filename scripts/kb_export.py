@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""Export approved cards as an Anki-importable text file, one deck per kind.
+"""Export confirmed cards as an Anki-importable text file, one deck per kind.
 
 Usage:  kb_export.py [--out PATH] [--dry-run]
 
 Reads every card in the knowledge base and writes one importable file. It
 reads only: nothing here writes back into a note or a card.
 
-- Only approved cards are exported: `status: stable` plus an `approved` stamp
-  by a `human:` actor (a `human:` entry in a legacy `verified` list is read
-  the same way, for cards written before the two were split). A proposal awaiting the user is
-  `status: draft` and stays out.
-- `status: deprecated` cards are omitted and listed. **Omission does not
+- Only `status: confirmed` cards are exported: the user has read the card and
+  keeps it. A proposal awaiting them is `status: draft` and stays out.
+- `status: retired` cards are omitted and listed. **Omission does not
   suspend them** — a package can only add and update, so a card already in the
   scheduler stays active until it is suspended there by hand.
 - A card with no `importance:` is held back too — undecided is a state, not a
@@ -81,7 +79,7 @@ IMPORTANCE = ("core", "extra")
 # too, but no Anki interface reads a guid back out.
 TAG_PREFIX = "kb::"
 
-# How `sources` names another item: by ID, which survives the file moving.
+# How `from` names another item: by ID, which survives the file moving.
 ID_SCHEME = "kb:"
 
 HEADER = [
@@ -188,16 +186,8 @@ def read_items(kb):
                 yield path, meta, body.strip()
 
 
-def is_human(entry):
-    return isinstance(entry, dict) and str(entry.get("by", "")).startswith("human:")
-
-
-def is_approved(meta):
-    if meta.get("status") != "stable":
-        return False
-    verified = meta.get("verified")
-    legacy = verified if isinstance(verified, list) else []
-    return is_human(meta.get("approved")) or any(is_human(e) for e in legacy)
+def is_confirmed(meta):
+    return meta.get("status") == "confirmed"
 
 
 def items_by_id(items):
@@ -209,7 +199,7 @@ def items_by_id(items):
 
 
 def resolve_resource(kb, resource, by_id):
-    """The file a `sources` resource names in this base, or None.
+    """The file a `from` entry names in this base, or None.
 
     `kb:<id>` is the form written now; a base-relative `/path` is the legacy
     form, still read until `kb_migrate.py` has run.
@@ -379,12 +369,12 @@ def main(argv):
             print(f"  {grade!r} in {path}")
         return print("kb_export: nothing written") or 1
 
-    rows, deprecated, held_back, empty = [], [], [], []
+    rows, retired, held_back, empty = [], [], [], []
     for path, meta, body, deck in cards:
-        if meta.get("status") == "deprecated":
-            deprecated.append(str(meta.get("id")))
+        if meta.get("status") == "retired":
+            retired.append(str(meta.get("id")))
             continue
-        if not is_approved(meta):
+        if not is_confirmed(meta):
             held_back.append(str(meta.get("id")))
             continue
         front, back = split_qa(body)
@@ -412,14 +402,14 @@ def main(argv):
     for deck, count in sorted(per_deck.items()):
         print(f"  {deck}: {count}")
     if held_back:
-        print(f"kb_export: {len(held_back)} unapproved, held back: {' '.join(held_back)}")
+        print(f"kb_export: {len(held_back)} unconfirmed, held back: {' '.join(held_back)}")
     if ungraded:
         print(f"kb_export: {len(ungraded)} ungraded, held back: {' '.join(ungraded)}")
     if empty:
         print(f"kb_export: {len(empty)} with an empty body, held back: {' '.join(empty)}")
         print("  a card with no body asks nothing; an import would blank an existing card")
-    if deprecated:
-        print(f"kb_export: {len(deprecated)} deprecated, omitted: {' '.join(deprecated)}")
+    if retired:
+        print(f"kb_export: {len(retired)} retired, omitted: {' '.join(retired)}")
         print("  omission does not suspend them — suspend in the scheduler by hand")
     return 0
 

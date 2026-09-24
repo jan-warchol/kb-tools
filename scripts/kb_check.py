@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check knowledge-base frontmatter against ../reference/schema/.
+"""Check knowledge-base frontmatter against ../reference/schema.md.
 
 Usage:  kb_check.py <file-or-directory>...
 
@@ -8,20 +8,19 @@ affect the exit code. Requires PyYAML; without it the check is skipped rather
 than failed, since it is an aid and never a gate.
 
 Deliberately mechanical. It checks the shape of the frontmatter — keys that
-must be present, values that must parse — plus that machine blocks in the body
-open and close in turn, and nothing that depends on what kind of item this is
-or where it lives. Types are open (OKF permits any) and the
-layout is free to change, so a checker that enumerated either would be wrong
-before it was useful. Everything about meaning is the reader's job.
+must be present, values that must parse — plus that agent blocks in the body
+open and close in turn, and nothing that depends on where an item lives. Types
+are open (OKF permits any) and the layout is free to change, so a checker that
+enumerated either would be wrong before it was useful. Everything about meaning
+is the reader's job.
 
-The one thing it looks beyond a file for is identity: a `kb:<id>` in `sources`
-must name exactly one item in the enclosing base, and no other item may share
-the file's own `id`. Warnings flag legacy forms `kb_migrate.py` converts, a
-frontmatter block past its budget, and approval older than the claims it
-covers.
+It looks beyond a file for two things. Identity: a `kb:<id>` in `from` must
+name exactly one item in the enclosing base, and no other item may share the
+file's own `id`. And staleness: a `confirmed` note whose slug pool holds a
+human capture the note does not list has a dictated claim that never reached
+it.
 """
 
-import datetime
 import os
 import re
 import sys
@@ -32,7 +31,8 @@ except ImportError:
     print("kb_check: PyYAML not installed — frontmatter check skipped")
     sys.exit(0)
 
-STATUSES = {"draft", "stable", "deprecated", "abandoned"}
+AUTHORS = {"human", "agent"}
+STATUSES = {"draft", "confirmed", "retired"}
 # Two shapes (see the schema): an item that stays in the base is
 # `<slug>_<n>`, no date — a card, which leaves the base, is twelve random
 # base62 characters instead. A slug ending in a number is indistinguishable
@@ -40,16 +40,18 @@ STATUSES = {"draft", "stable", "deprecated", "abandoned"}
 # of uniqueness.
 SLUG = r"[a-z0-9]+(?:-[a-z0-9]+)*"
 ID_RE = re.compile(rf"^(?:{SLUG}_\d+|[A-Za-z0-9]{{12}})$")
-TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# A repository by URL, then the commit the claims were checked against.
+CODE_RE = re.compile(r"^https?://\S+@\S+$")
+REQUIRED = ("id", "type", "title", "authored", "date", "status")
 # A soft budget: past it, frontmatter is usually carrying copied evidence or
 # history that belongs elsewhere.
-FRONTMATTER_LINES = 20
+FRONTMATTER_LINES = 12
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from kb_export import ID_SCHEME, items_by_id, read_items  # noqa: E402
 
-_indexes = {}
+_bases = {}
 
 
 def base_of(path):
@@ -62,18 +64,13 @@ def base_of(path):
     return None
 
 
-def index_of(kb):
-    if kb not in _indexes:
-        _indexes[kb] = items_by_id(read_items(kb))
-    return _indexes[kb]
-
-
-def as_time(value):
-    if isinstance(value, datetime.datetime):
-        return value if value.tzinfo else value.replace(tzinfo=datetime.timezone.utc)
-    if isinstance(value, str) and TS_RE.match(value):
-        return datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
-    return None
+def base(kb):
+    """(every item's paths by ID, every item's frontmatter by ID)."""
+    if kb not in _bases:
+        items = list(read_items(kb))
+        metas = {str(m.get("id", "")): m for _, m, _ in items}
+        _bases[kb] = (items_by_id(items), metas)
+    return _bases[kb]
 
 
 def split_frontmatter(text):
@@ -84,67 +81,73 @@ def split_frontmatter(text):
 
 
 def check_blocks(problems, body):
-    """Machine blocks must open and close in turn; an unclosed one would
+    """Agent blocks must open and close in turn; an unclosed one would
     swallow the user's claims, a stray close would leak the agent's."""
     depth = 0
-    for match in re.finditer(r"^<!-- (machine:.*|/machine) -->\s*$", body, re.M):
-        if match.group(1).startswith("machine:"):
+    for match in re.finditer(r"^<!-- (/?agent) -->\s*$", body, re.M):
+        if match.group(1) == "agent":
             if depth:
-                problems.append(("error", "machine block opened inside another"))
+                problems.append(("error", "agent block opened inside another"))
             depth = 1
         else:
             if not depth:
-                problems.append(("error", "machine block closed but never opened"))
+                problems.append(("error", "agent block closed but never opened"))
             depth = 0
     if depth:
-        problems.append(("error", "machine block never closed"))
+        problems.append(("error", "agent block never closed"))
 
 
-def is_timestamp(value):
-    if isinstance(value, datetime.datetime):
-        return True
-    return isinstance(value, str) and bool(TS_RE.match(value))
+def check_strings(problems, meta, key):
+    """A flat list of strings, which `from` and `paths` both are."""
+    value = meta[key]
+    if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
+        problems.append(("error", f"`{key}` must be a list of strings"))
+        return False
+    return True
 
 
-def check_actor_stamp(problems, label, value):
-    if not isinstance(value, dict):
-        problems.append(("error", f"{label} must be a mapping with `by` and `at`"))
+def check_from(problems, meta, kb):
+    if not check_strings(problems, meta, "from"):
         return
-    for key in ("by", "at"):
-        if key not in value:
-            problems.append(("error", f"{label} is missing `{key}`"))
-    if "at" in value and not is_timestamp(value["at"]):
-        problems.append(("error", f"{label}.at is not an ISO 8601 timestamp"))
-
-
-def check_sources(problems, sources, kb):
-    if not isinstance(sources, list):
-        problems.append(("error", "`sources` must be a list"))
-        return
-    for i, entry in enumerate(sources):
-        label = f"sources[{i}]"
-        if not isinstance(entry, dict):
-            problems.append(("error", f"{label} must be a mapping"))
-            continue
-        if not entry.get("resource"):
-            problems.append(("error", f"{label} is missing `resource`"))
-            continue
-        for singular, plural in (("path", "paths"), ("symbol", "symbols")):
-            if singular in entry and plural in entry:
-                problems.append(
-                    ("error", f"{label} carries both `{singular}` and `{plural}`")
-                )
-        if "retrieved" in entry and not DATE_RE.match(str(entry["retrieved"])):
-            problems.append(("error", f"{label}.retrieved is not a YYYY-MM-DD date"))
-        resource = str(entry["resource"])
-        if resource.startswith(ID_SCHEME) and kb:
-            found = len(index_of(kb).get(resource[len(ID_SCHEME):]) or [])
-            if found != 1:
-                problems.append(("error", f"{label} `{resource}` names {found} items"))
-        elif resource.startswith("/"):
+    for resource in meta["from"]:
+        if resource.startswith(ID_SCHEME):
+            if kb:
+                found = len(base(kb)[0].get(resource[len(ID_SCHEME):]) or [])
+                if found != 1:
+                    problems.append(("error", f"`{resource}` names {found} items"))
+        elif not resource.startswith("http"):
             problems.append(
-                ("warning", f"{label} names an item by path; use `{ID_SCHEME}<id>`")
+                ("error", f"`from` entry {resource!r} is not `kb:<id>` or a URL")
             )
+
+
+def check_pool(problems, meta, kb):
+    """A confirmed note must list every human capture of its subject: one it
+    does not is a dictated claim that never reached the note."""
+    if not kb or meta.get("type") != "Note" or meta.get("status") != "confirmed":
+        return
+    match = re.match(rf"^({SLUG})_\d+$", str(meta.get("id", "")))
+    if not match:
+        return
+    listed = {
+        r[len(ID_SCHEME):]
+        for r in (meta.get("from") or [])
+        if isinstance(r, str) and r.startswith(ID_SCHEME)
+    }
+    pool = re.compile(rf"^{re.escape(match.group(1))}_\d+$")
+    missing = sorted(
+        item_id
+        for item_id, other in base(kb)[1].items()
+        if pool.match(item_id)
+        and other.get("type") == "Capture"
+        and other.get("authored") == "human"
+        and other.get("status") != "retired"
+        and item_id not in listed
+    )
+    if missing:
+        problems.append(
+            ("warning", f"note is behind its pool; not in `from`: {' '.join(missing)}")
+        )
 
 
 def check_file(path):
@@ -163,7 +166,7 @@ def check_file(path):
     if not isinstance(meta, dict):
         return [("error", "frontmatter is not a mapping")]
 
-    for key in ("id", "type", "title", "origin", "generated", "status"):
+    for key in REQUIRED:
         if key not in meta:
             problems.append(("error", f"missing required key `{key}`"))
 
@@ -174,52 +177,27 @@ def check_file(path):
             ("error", f"filename {stem!r} does not end in `id` {item_id!r}")
         )
     elif item_id and not ID_RE.match(item_id):
-        problems.append(
-            ("error", "`id` is not `<slug>_<n>` or 12 base62 characters")
-        )
+        problems.append(("error", "`id` is not `<slug>_<n>` or 12 base62 characters"))
 
-    if meta.get("origin") not in {"human", "machine"}:
-        problems.append(("error", "`origin` must be `human` or `machine`"))
+    if meta.get("authored") not in AUTHORS:
+        problems.append(("error", f"`authored` must be one of {sorted(AUTHORS)}"))
     if meta.get("status") not in STATUSES:
         problems.append(("error", f"`status` must be one of {sorted(STATUSES)}"))
-    if "generated" in meta:
-        check_actor_stamp(problems, "generated", meta["generated"])
-
-    verified = meta.get("verified")
-    if isinstance(verified, list):
-        problems.append(("warning", "`verified` is a legacy list; keep the latest check only"))
-        for i, entry in enumerate(verified):
-            check_actor_stamp(problems, f"verified[{i}]", entry)
-    elif verified is not None:
-        check_actor_stamp(problems, "verified", verified)
-
-    approved = meta.get("approved")
-    if approved is not None:
-        check_actor_stamp(problems, "approved", approved)
-        by = str(approved.get("by", "")) if isinstance(approved, dict) else ""
-        if isinstance(approved, dict) and not by.startswith("human:"):
-            problems.append(("error", "`approved.by` must be a `human:` actor"))
-
-    # The one rule with teeth: nothing unverified may claim to be settled.
-    # A draft is how anything not yet checked is spelled. A card carries no
-    # `verified` of its own — its claim was checked where it came from — so
-    # approval stands in for it there.
-    if not verified and not approved and meta.get("status") != "draft":
-        problems.append(("error", "unverified item must carry `status: draft`"))
+    if "date" in meta and not DATE_RE.match(str(meta["date"])):
+        problems.append(("error", "`date` is not a YYYY-MM-DD date"))
+    if "code" in meta and not CODE_RE.match(str(meta["code"])):
+        problems.append(("error", "`code` is not `<repository url>@<commit>`"))
+    if "paths" in meta:
+        check_strings(problems, meta, "paths")
+        if "code" not in meta:
+            problems.append(("error", "`paths` without `code`: paths of what?"))
 
     kb = base_of(path)
-    if "sources" in meta:
-        check_sources(problems, meta["sources"], kb)
-    if kb and item_id and len(index_of(kb).get(item_id) or []) > 1:
+    if "from" in meta:
+        check_from(problems, meta, kb)
+    check_pool(problems, meta, kb)
+    if kb and item_id and len(base(kb)[0].get(item_id) or []) > 1:
         problems.append(("error", f"`id` {item_id!r} is shared with another item"))
-
-    # Approval covers claims; `generated.at` moves only when claims change, so
-    # a later one means the user approved text that has since changed.
-    generated = meta.get("generated")
-    if isinstance(approved, dict) and isinstance(generated, dict):
-        changed, stamped = as_time(generated.get("at")), as_time(approved.get("at"))
-        if changed and stamped and changed > stamped:
-            problems.append(("warning", "claims changed after `approved.at`; re-approve"))
 
     lines = block.count("\n") + 1
     if lines > FRONTMATTER_LINES:

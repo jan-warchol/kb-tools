@@ -4,10 +4,10 @@
 Usage:
   kb_find.py <id>...           the file each ID names
   kb_find.py --pool <slug>     every item sharing the slug, oldest number first
-  kb_find.py --refs <id>       every item whose `sources` name that item
+  kb_find.py --refs <id>       every item whose `from` names that item
 
 Pool and refs print one item per line:
-  <path>  <id>  <type>  <origin>  <status>  <generated.at>
+  <path>  <id>  <type>  <authored>  <status>  <date>
 
 A slug pool is one subject's history — its captures, note and verify reports —
 and `--refs` is how a note's cards are found. Both read
@@ -15,7 +15,6 @@ frontmatter, so they work however the base is arranged. Exits 1 when an ID
 names no item, or more than one.
 """
 
-import datetime
 import os
 import re
 import sys
@@ -31,17 +30,13 @@ from kb_export import (  # noqa: E402
 
 
 def row(kb, path, meta):
-    generated = meta.get("generated")
-    at = generated.get("at", "") if isinstance(generated, dict) else ""
-    if isinstance(at, datetime.datetime):
-        at = at.strftime("%Y-%m-%dT%H:%M:%SZ")
     fields = [
         os.path.relpath(path, kb),
         meta.get("id", ""),
         meta.get("type", ""),
-        meta.get("origin", ""),
+        meta.get("authored", ""),
         meta.get("status", ""),
-        at,
+        meta.get("date", ""),
     ]
     return "  ".join(str(f) for f in fields)
 
@@ -78,14 +73,10 @@ def main(argv):
             print(f"kb_find: {argv[1]!r} names {len(paths)} items")
             return 1
         for path, meta, _ in items:
-            sources = meta.get("sources")
-            if not isinstance(sources, list):
+            origins = meta.get("from")
+            if not isinstance(origins, list):
                 continue
-            if any(
-                isinstance(s, dict)
-                and resolve_resource(kb, s.get("resource"), by_id) == paths[0]
-                for s in sources
-            ):
+            if any(resolve_resource(kb, o, by_id) == paths[0] for o in origins):
                 print(row(kb, path, meta))
         return 0
 

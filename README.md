@@ -18,16 +18,14 @@ scripts/kb_init.sh                     # or scripts/kb_init.sh ~/somewhere-else
 ```
 
 It is a plain script rather than a command because it runs once and needs no
-judgement. Every skill prints its full path when it finds no base, so there is
-nothing to remember.
+judgement. Every skill prints its full path when it finds no base.
 
 ## Commands
 
 | | |
 |---|---|
-| `/kb-capture` | dictate something learned |
-| `/kb-redact` | work captures into notes |
-| `/kb-update` | correct or extend something already captured |
+| `/kb-capture` | dictate something learned, or a correction to something already captured |
+| `/kb-redact` | work captures into a note, and carry a change out to its cards |
 | `/kb-verify` | check a note against the current code, without touching it |
 | `/kb-cards` | make cards from a note |
 | `/kb-export` | write the Anki import file |
@@ -37,18 +35,23 @@ nothing to remember.
 ```
 
 There is no lookup command: asking an agent inside the knowledge base is
-sufficient, and needs no dedicated mechanism.
+sufficient. There is no update command either — a correction is a new capture,
+then `/kb-redact`.
 
 ## Upgrading a base
 
-0.14 names items by ID rather than path and slims frontmatter. Once per base,
-under git:
+0.17 replaces `origin`/`generated` with `authored`/`date`, `verified`/`approved`
+with `status: confirmed`, and `sources` with `from`/`code`/`paths`. Once per
+base, under git:
 
 ```
 scripts/kb_migrate.py            # dry run: what would change
 scripts/kb_migrate.py --apply    # then review the diff
 scripts/kb_init.sh <base>        # refresh SCHEMA.md
 ```
+
+It reports anything it cannot carry — in particular an item citing more than
+one repository, which the format no longer holds.
 
 ## Anki
 
@@ -75,7 +78,7 @@ anki_deck_name: Knowledge    # the default
 | | |
 |---|---|
 | [`motivation.md`](motivation.md) | the problem this exists for, and the obligations that follow |
-| [`decisions.md`](decisions.md) | choices made about Anki, and where the boundary sits |
+| [`decisions.md`](decisions.md) | choices already made, so they are not re-argued |
+| [`reference/schema.md`](reference/schema.md) | the file format, in one page |
 | [`reference/anki-setup.md`](reference/anki-setup.md) | the scheduler settings this depends on, and backups |
-| [`reference/schema/`](reference/schema/core.md) | the file format: core, plus one file per kind |
 | [`deferred.md`](deferred.md) | what it deliberately does not do yet |

@@ -2,47 +2,47 @@
 
 ## 1. Problem
 
-Moving through technical material fast — under work pressure, with AI assistance
-— produces understanding at the moment of contact and no retention afterwards.
-Reading more does not fix that; scheduled recall can. Note systems optimise
-capture because friction is measurable and retention is not, but a system that
-never forces re-contact produces an archive, not knowledge.
+Moving through technical material fast — under work pressure, with AI
+assistance — produces understanding at the moment of contact and no retention
+afterwards. Reading more does not fix that; scheduled recall can. Note systems
+optimise capture because friction is measurable and retention is not, but a
+system that never forces re-contact produces an archive, not knowledge.
 
 ### 1.1 Two kinds of knowledge, both first-class
 
-- **General knowledge** survives changes of project and employer.
-- **Project-specific knowledge** — which module owns what, where the non-obvious
-  behaviour lives — is valuable only on that codebase, and expires when the code
-  changes.
+**General knowledge** survives changes of project and employer.
+**Project-specific knowledge** — which module owns what, where the non-obvious
+behaviour lives — is valuable only on that codebase, and expires when the code
+changes.
 
 The tempting conclusion is that the second kind is not worth memorising. Wrong:
 learning an unfamiliar codebase is a memorisation task — costly to lack, not
 reconstructible from first principles, forgotten fast without practice. The mix
-will shift, so neither may be the secondary case — which means the system must
+will shift, so neither may be the secondary case, which means the system must
 own the problem of knowledge going stale.
 
 Project knowledge is worth memorising for the duration of the engagement, not
-for ever. That makes retirement, not revalidation, the right answer for most
-of it: its cards are retired when the project is left, rather than maintained
+for ever. That makes **retirement, not revalidation, the right answer for most
+of it**: its cards are retired when the project is left, rather than maintained
 against a codebase nobody is reading any more. Revalidation is for what
-outlives the project. Which of the two an item is needs no label: it is
-legible in the sources it was checked against.
+outlives the project. Which of the two an item is needs no label: it is legible
+in the sources it was checked against.
 
 ### 1.2 Dictation is the input, and dictation is lossy
 
-Knowledge enters by voice; anything with more friction goes unused at the moment
-learning happens. Three error classes, not to be handled as one:
+Knowledge enters by voice; anything with more friction goes unused at the
+moment learning happens. Three error classes, not to be handled as one:
 
-1. **Factual.** The user misunderstands or misremembers and states a falsehood.
-   Most dangerous: if not corrected, review would reinforce it until it is
-   reliably remembered — worse than no memory. A stale memory is the same thing
-   on a delay fuse. However, discovering the error is the most valuable signal
-   the pipeline produces — a silent repair would spend it.
-2. **Transcription.** Casing lost, `camelCase` / `kebab-case` indistinguishable
-   by ear, words swapped for similar-sounding ones. Recognition predicts from
-   context, so errors land on the terms carrying the meaning.
-3. **Noise.** Repetition, self-correction, digression. Harmless; must be cleaned
-   up.
+1. **Factual.** The user misunderstands and states a falsehood. Most dangerous:
+   uncorrected, review would reinforce it until it is reliably remembered —
+   worse than no memory, and a stale memory is the same thing on a delay fuse.
+   Discovering the error is also the most valuable signal the pipeline
+   produces, so a silent repair would spend it.
+2. **Transcription.** Casing lost, `camelCase` / `kebab-case`
+   indistinguishable by ear, words swapped for similar-sounding ones.
+   Recognition predicts from context, so errors land on the terms carrying the
+   meaning.
+3. **Noise.** Repetition, self-correction, digression. Harmless; cleaned up.
 
 ### 1.3 Articulation cannot be delegated
 
@@ -53,24 +53,24 @@ the effort of finding the words, so the raw material has to be the user's own.
 Agent-written material is not prohibited in principle, but the line has to be
 drawn in the right place. **Claims** — causation, consequence, why, tradeoffs,
 what follows from what — must be the user's, always. **Scaffolding** —
-identifiers, paths, call order, the topology of a diagram — is transcription
-of the source, not composition of knowledge, and an agent supplying it takes
+identifiers, paths, call order, the topology of a diagram — is transcription of
+the source, not composition of knowledge, and an agent supplying it takes
 nothing from the user.
 
 So agent material is kept, mechanically separable, and never carded. The route
 out of it is not approval: reading a paragraph and agreeing with it is the
-illusion of understanding, which is what this section is about. The route is
-a question — **the claim the user states in answering is theirs**, whatever
+illusion of understanding, which is what this section is about. The route is a
+question — **the claim the user states in answering is theirs**, whatever
 prompted it, and it enters the way any other articulation does.
 
 ### 1.4 The corpus drifts toward whatever the trigger catches
 
-Capture fires on stumbling under work pressure, so what accumulates is
-whatever was in the way: plumbing. What would have prevented the stumble — the
-language, the framework's execution model — is never what one is stuck on, and
-so is never captured. The bias is structural, so the system corrects for it
-rather than hoping: under most specific stumbles there is a general pattern,
-and it is cheapest to name with the instance still on screen.
+Capture fires on stumbling under work pressure, so what accumulates is whatever
+was in the way: plumbing. What would have prevented the stumble — the language,
+the framework's execution model — is never what one is stuck on, and so is
+never captured. The bias is structural, so the system corrects for it rather
+than hoping: under most specific stumbles there is a general pattern, and it is
+cheapest to name with the instance still on screen.
 
 ## 2. Goal
 
@@ -99,30 +99,19 @@ plain files readable without it.
 **Scope.** Recall — knowing without lookup — is the purpose; lookup is a
 secondary benefit, possibly served in another layer with different rules.
 Verification settles whether a claim is true, not whether recalling it is worth
-anything — only the user can judge that.
+anything; only the user can judge that.
 
 ## 3. Influences
 
 [**Karpathy's LLM-wiki pattern**](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
-— immutable raw sources, an LLM-maintained wiki derived from them, and a config
-document that makes the agent a disciplined maintainer.
-
-- **The architecture is adopted directly:** immutable raw material, derived
-  items maintained on top of it, and a config document — here, the skill files —
-  that makes the agent a disciplined maintainer. Maintaining derived material is
-  what humans abandon and agents do not mind.
-- **Its authorship model is not rejected in principle.** The LLM writes and the
-  human curates — likely to be used for external sources, plausibly in this
-  same repository.
-- **The focus of the learning part is different:** here, the user's own
-  articulation is critical (§1.3).
+— immutable raw sources, derived items maintained on top of them, and a config
+document that makes the agent a disciplined maintainer. The architecture is
+adopted directly, the config document being the skill files; maintaining
+derived material is what humans abandon and agents do not mind. Its authorship
+model (the LLM writes, the human curates) is not rejected in principle, but the
+focus here is different: the user's own articulation is the point (§1.3).
 
 [**Open Knowledge Format v0.2**](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
-— markdown files whose YAML frontmatter carries the machine-readable half: what
-links to what, and the fields automated passes read and write:
-
-- The knowledge base is an OKF bundle, so a leading `/` in a reference is
-  base-relative, and derivation and evidence share one field because both
-  answer "where did this come from".
-- `generated` / `verified` already spells the who-wrote / who-confirmed split.
-- The `human:` actor prefix marks sign-off by a person, not a machine.
+— markdown whose YAML frontmatter carries the machine-readable half. Taken
+from it: derivation and evidence answer one question and share one field, and
+an item is a plain file that reads without the tooling.

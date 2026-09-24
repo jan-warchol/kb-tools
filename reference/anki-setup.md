@@ -130,8 +130,19 @@ If you sync to AnkiWeb, `kb_anki.py sync` is the better primary and the `.apkg`
 is belt-and-braces. Decide which you rely on — "I have both" and "I have
 neither" look identical until you need one.
 
-## Two things never done in Anki's own interface
+## What an import carries, and what it does not
 
-**Renaming decks or note types**, and **editing card text**. Both break the
-identity contract the export depends on: renames do not round-trip, and edited
-text is overwritten by the next import. Edit the markdown and re-export.
+It matches on the card ID in the guid column, so an existing card is updated in
+its current deck with its scheduling intact (`decisions.md` §2). Three
+consequences:
+
+- **Editing card text in Anki does not survive** the next import. Edit the
+  markdown and re-export. Renaming a note type breaks the same contract.
+- **Moving a card between decks in Anki does survive**, and is meant to: an
+  import never relocates an existing card, so `importance:` places a card once
+  and demoting it later belongs in Anki, where the review history that
+  justifies it lives.
+- **Renaming a deck means renaming it in both places** — `anki_deck_name:` in
+  `<kb>/knowledge-base.yaml` (or `.yml`) and Anki. Renaming in Anki alone
+  leaves the existing cards where they are, but the next new card recreates a
+  deck under the old name and splits the collection in two.

@@ -1,24 +1,31 @@
 # Simplification proposal — 0.17
 
-Everything humans and agents read is too long. This cuts it by about three
-quarters without losing a capability the system is used for.
+Everything humans and agents read is too long. This cuts it by about two
+thirds without losing a capability the system is used for.
 
-**Status: proposed, nothing implemented. Reconciled with `main` at 0.16.0**,
-which removed `/kb-quiz`, the Quiz Log kind and the Understanding Card kind —
-cuts in the same direction as this one, so what remains is six commands rather
-than seven and four schema files rather than five.
+**Status: implemented in 0.17.0**, against `main` at 0.16.0 — which had itself
+removed `/kb-quiz`, the Quiz Log kind and the Understanding Card kind, cuts in
+the same direction, leaving six commands rather than seven and four schema
+files rather than five. The counts below are what landed; where an estimate was
+optimistic the actual is beside it.
 
-| | now | after | |
-|---|---|---|---|
-| **agent-loaded** — `skills/`, `reference/schema/` | 709 | ~250 | −65% |
-| **human-read** — `README`, `decisions`, `motivation`, `deferred`, the reviews | 1807 | ~255 | −86% |
-| `reference/anki-setup.md`, read once, absorbs export's half | 137 | ~145 | — |
-| **total** | 2653 | ~650 | −75% |
+| | before | after | | estimated |
+|---|---|---|---|---|
+| **agent-loaded** — `skills/`, `reference/schema/` | 709 | 389 | −45% | ~250 |
+| **human-read** — `README`, `decisions`, `motivation`, `deferred`, the reviews | 1807 | 416 | −77% | ~255 |
+| `reference/anki-setup.md`, read once, absorbs export's half | 137 | 148 | — | ~145 |
+| **total** | 2653 | 953 | −64% | ~650 |
 
 What an agent loads on one invocation — the skill, `kb-common`, and the schema
-files that skill injects — falls from 350–470 lines to about 140:
-`/kb-capture` 393 → 143, `/kb-redact` 433 → 157, `/kb-cards` 358 → 147,
-`/kb-verify` 392 → 131, `/kb-export` 198 → 83, `/kb-update` 472 → dissolved.
+it injects — falls from 350–470 lines to about 210: `/kb-capture` 393 → 208,
+`/kb-redact` 433 → 228, `/kb-cards` 358 → 207, `/kb-verify` 392 → 215,
+`/kb-export` 198 → 130, `/kb-update` 472 → dissolved.
+
+**Where it came in over.** `kb-common` (157 → 101, not 65) and `decisions.md`
+(186 → 165, not 90) hold rules and arguments that could only be tightened, not
+dropped, and `decisions.md` absorbed the conclusions of the four deleted
+documents besides. The estimates assumed prose could be halved everywhere;
+where a line was a rule, it could not.
 
 Five changes, in order of what they pay.
 
