@@ -112,12 +112,9 @@ Effort is depth, never breadth: no row reaches beyond the item in hand.
 | **verifying** | nothing; record the repository and `commit` from the bearings and any path the user named; no `verified` key, `status: draft` | the claims the item turns on, hedged ones first | everything, following the code paths |
 | **capture** | the dictation, and stop | plus the glance at the base, and the general pattern suggested where you see one | as normal, verifying thoroughly |
 | **redact** | promote as-is or compress minimally; no outline step | outline then fill; an existing note edited in the affected sections | the note rebuilt from its whole slug pool |
-| **cards** | the one or two obvious facts | a full sweep of the item | plus an understanding card |
+| **cards** | the one or two obvious facts | a full sweep of the item | as normal |
 | **update** | the new capture, and stop | plus the note's affected sections and its cards | the note rebuilt from its whole slug pool, then its cards |
 | **verify** | paths changed since `commit`: scaffolding only | plus the claims the note turns on | every claim |
-
-`/kb-quiz` has its own three modes, which set the length of an answer rather
-than the amount of work; they are in that skill.
 
 ## Verification
 

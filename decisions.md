@@ -4,40 +4,21 @@ Choices made about things outside this system, recorded so they are not
 re-litigated. Nothing here is an instruction, and editing a skill never obliges
 a change to this file — that is the point of keeping it separate.
 
-## 1. Review is Anki's, not ours — with one deliberate exception
+## 1. Review is Anki's, not ours
 
 The system owns everything from the spoken sentence to the moment a card is
 handed to the scheduler. It does not own scheduling and does not implement a
 review interface. Noticing when what it holds has stopped being true stays
 inside the boundary.
 
-**Understanding cards cross it, knowingly.** They ask whether the user can
-reason with a note, which a self-graded "did I understand that?" cannot answer
-— that judgement is exactly the unreliable one. So for that kind the grade is
-produced here: `/kb-quiz` conducts the review, `scripts/kb_anki.py` sends the
-result.
-
-Scheduling is still not ours, and the split is sharper than it looks: the quiz
-drives **Anki's own reviewer** through AnkiConnect rather than searching for
-due cards, so limits, orders and steps stay the scheduler's. Only the grade
-crosses — and even that is proposed, not sent: the user presses the button.
-
-**Topic mode is the one grade that does not come from the reviewer.** Asked to
-quiz a note by name, `/kb-quiz` grades its understanding card with `grade-card`
-whether or not the scheduler had it due — a real crossing of the line above,
-recorded here rather than left as an inconsistency. It is taken because the
-alternative is worse: the review happened and the user answered, and discarding
-that to keep the boundary tidy would throw away the only signal the kind
-produces. What it costs is one card pulled forward inside its interval, which
-FSRS already handles as the early review it is; nothing is gathered, no limit is
-consulted and no other card moves. The scheduled path stays the default, and
-there the reviewer is never bypassed.
-
-Two consequences, accepted. **`/kb-quiz` is the only review path for the kind**
-— no phone, no AnkiWeb, Anki running locally; recall review is unaffected. And
-**the kind cannot be reviewed in Anki's interface at all**, since what it shows
-there is a placeholder and any button pressed on it is a wrong grade, which is
-why `reference/anki-setup.md` makes "never click the parent deck" a rule.
+**Understanding cards once crossed it**: `/kb-quiz` questioned the user on a
+note and sent the grade through AnkiConnect, on the grounds that a self-graded
+"did I understand that?" is the unreliable judgement. The quiz was removed in
+0.15 and the kind itself in 0.16: a review that means reasoning through a whole
+note costs far more than a recall card and did not return it, so the cards went
+unreviewed. Recall cards are the only kind, the line holds without exception,
+and `scripts/kb_anki.py` keeps only status, backup and sync. The question the
+kind was for is open, not settled — `deferred.md`.
 
 ## 2. Why the card ID goes in Anki's `guid` column
 
@@ -115,22 +96,17 @@ library would not have had.
 
 ## 5. Every exported card carries a `kb::<id>` tag
 
-A card found in Anki has to lead back to the file that made it — `/kb-quiz`
-needs that when the scheduler hands it one. The ID is already in the `guid`
+A card found in Anki has to lead back to the file that made it — to fix it,
+suspend it, or open its note. The ID is already in the `guid`
 column, and **no Anki interface reads a guid back out**: not the browser, not
 AnkiConnect. So it cannot be the mechanism, however right it is as the
 identity.
 
-The tag is written for **every kind** though only one needs it today. Printing
-the ID in a field of that kind instead would work and cost two fewer API calls,
-but it makes the export dispatch on kind for something that is not about kind,
-and puts an identifier on the face of a card a person reads. The cost is one
-collapsed `kb` parent in Anki's tag sidebar; browser searchability pays for it.
-
-Understanding cards additionally show their note's ID on the front and an
-instruction on the back. **That is a fallback for a human, not a mechanism** —
-both are generated from `sources` at export, so neither can drift, and nothing
-reads them back.
+The tag is written for **every kind**, and nothing in the export dispatches on
+kind to produce it. Printing the ID in a field instead would work and cost two
+fewer API calls, but it puts an identifier on the face of a card a person
+reads. The cost is one collapsed `kb` parent in Anki's tag sidebar; browser
+searchability pays for it.
 
 ## 6. Agent material is fenced, and never converted
 
@@ -139,8 +115,8 @@ suggested follow-ups — because re-dictating it is the cost that made it
 unaffordable. Where it lives is decided by what fragmentation costs at each
 layer: at the raw layer **its own file**, because the raw layer is a journal
 nobody rereads and a capture's value is that it is exactly what the user said;
-in a note or an understanding card a **machine block**, because those are what
-the user reads, and one subject must stay one file.
+in a note a **machine block**, because that is what the user reads, and one
+subject must stay one file.
 
 **`origin` carries the distinction, not `type`.** A separate kind for the
 agent's file was considered and dropped: every skill that could confuse the two
@@ -149,7 +125,7 @@ wherever it sits — so a second kind would be a duplicate switch, one more thin
 to keep in step, and a false suggestion that the layer has two halves.
 
 The rules travel with the origin and the fence, not the file: never carded,
-rewritten freely by the agent, quizzable. **No operation converts machine text
+rewritten freely by the agent. **No operation converts machine text
 into the user's.**
 Reading agent prose and thinking "yes, exactly" is the illusion of
 understanding `motivation.md` §1.3 exists to prevent; what the user says in

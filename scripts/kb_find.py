@@ -10,7 +10,7 @@ Pool and refs print one item per line:
   <path>  <id>  <type>  <origin>  <status>  <generated.at>
 
 A slug pool is one subject's history — its captures, note and verify reports —
-and `--refs` is how a note's cards and quiz logs are found. Both read
+and `--refs` is how a note's cards are found. Both read
 frontmatter, so they work however the base is arranged. Exits 1 when an ID
 names no item, or more than one.
 """

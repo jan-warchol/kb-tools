@@ -8,7 +8,7 @@
     {
       "name": "kb-tools",
       "source": "./",
-      "description": "Personal learning system: capture dictated knowledge, verify it against the source, redact it into notes, turn those into cards, quiz them and export to Anki. Contains tooling only, never knowledge."
+      "description": "Personal learning system: capture dictated knowledge, verify it against the source, redact it into notes, turn those into cards and export them to Anki. Contains tooling only, never knowledge."
     }
   ]
 }

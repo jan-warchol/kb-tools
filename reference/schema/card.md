@@ -1,8 +1,7 @@
 # Cards
 
 A card kind is a `type` ending in `Card` — export dispatches on that, and
-names the deck after what precedes it. Two kinds: `Recall Card`,
-`Understanding Card`.
+names the deck after what precedes it. One kind: `Recall Card`.
 
 - **Sources**: the note or capture it is drawn from, by `kb:<id>` — never
   evidence directly.
@@ -41,30 +40,4 @@ In what order do the ack and the retry happen for a failed message?
 ## Answer
 
 Ack first — the retry re-enqueues the message rather than holding it.
-```
-
-## Understanding Card
-
-Whether the user can reason with a note; graded by `/kb-quiz`, never in Anki's
-reviewer. **The card is the note**: at most one per note, no question of its
-own, both Anki fields generated at export. Its optional body is a machine
-block of suggested questions for `/kb-quiz`, rewritten freely, never exported.
-
-```yaml
----
-id: 7bQr2mKp9xLd
-type: Understanding Card
-title: Retry wrapper ordering
-origin: human
-generated: { by: claude-code/opus-5, at: 2026-08-10T14:42:00Z }
-status: stable
-importance: core
-sources: [{ resource: kb:retry-wrapper_3 }]
-approved: { by: human:jan, at: 2026-08-10T14:43:00Z }
----
-
-<!-- machine: claude-code/opus-5, 2026-09-13, commit a1b2c3d -->
-- Why can the retry not hold the message instead of re-enqueueing it?
-- What breaks if the wrapper is applied outside `Consumer.handle`?
-<!-- /machine -->
 ```

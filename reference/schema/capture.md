@@ -42,8 +42,7 @@ first and the retry re-enqueues it rather than holding it.
 The agent's material: a diagram, a walkthrough, a trace summary, a verify
 report. **A record, not a worklist** — nothing in it is meant to be crossed
 off. Never approved, carded, or redacted as the user's words; `/kb-redact`
-mines it for scaffolding, `/kb-quiz` for questions. Sources: the item it
-concerns, then evidence.
+mines it for scaffolding. Sources: the item it concerns, then evidence.
 
 ```yaml
 ---

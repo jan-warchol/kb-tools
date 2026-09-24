@@ -2,25 +2,20 @@
 
 Review belongs to Anki, not to this system (`decisions.md` §1), but a few of its
 settings are load-bearing for decisions made *here*: the deck split by
-importance means nothing unless the limits differ, and understanding cards
-depend on a step length chosen once for a whole preset. These are the settings
-that get lost and then quietly stop working.
+importance means nothing unless the limits differ. These are the settings that
+get lost and then quietly stop working.
 
 `kb_anki.py status` and the deck options show the current state in a minute.
 
 ## Presets
 
-**One preset per area, spanning both kinds and both importances** — all of
-`<root>::Recall::*` and `<root>::Understanding::*`.
+**One preset per area, spanning every kind and both importances** — all of
+`<root>::Recall::*`, and any kind added later.
 
 FSRS parameters are fitted per preset from its own history, so a preset is a
 claim about how one body of material is forgotten. Importance is not such a
-claim; it is a policy about how much to hold on to. Recall and understanding
-plausibly *are* forgotten differently, and share a preset anyway for a duller
-reason: understanding cards are too few to ever reach the several hundred
-reviews the optimiser needs, and parameters fitted mostly from recall history
-are wrong for them but far better than untuned defaults. **Revisit when the
-understanding decks alone have ~400 reviews.**
+claim; it is a policy about how much to hold on to, so splitting the preset by
+it would only starve the optimiser of the history it needs.
 
 **Genuinely different material gets its own preset** — technical knowledge and
 a spoken language are not forgotten alike. A preset is assigned per deck, so
@@ -44,9 +39,6 @@ lets the leaf limits mean what they say:
 | `<root>::Recall` | 5 | 30 |
 | `<root>::Recall::Core` | 3 | 20 |
 | `<root>::Recall::Extra` | 2 | 10 |
-| `<root>::Understanding` | 1 | 3 |
-| `<root>::Understanding::Core` | 1 | 2 |
-| `<root>::Understanding::Extra` | 0 | 1 |
 
 **This is what gives core priority, and the only thing that does.** The
 tempting alternative — a low parent limit and generous leaves — cannot: limits
@@ -62,24 +54,20 @@ Two consequences to accept knowingly:
 - **Change a leaf and the parent must change too**, or it silently starts
   binding and the guarantee is gone with no visible sign.
 
-`Understanding::Extra` gets **0 new/day** rather than splitting the one new
-card: at one a day, splitting makes it a coin flip which kind is introduced
-today. Core-only until extra is deliberately opened.
-
 ## Desired retention
 
 Per deck like the limits, and **lower primarily for lower importance** — that
-is what the knob is for. A starting point: `0.90` (the default) on the Core
-decks, `0.85` on `Recall::Extra`, `0.80` on `Understanding::Extra`, where a
-review is expensive enough to be worth buying interval with.
+is what the knob is for. A starting point: `0.90` (the default) on
+`Recall::Core` and `0.85` on `Recall::Extra`, where a review is expensive
+enough to be worth buying interval with.
 
 ## Steps, and the learn-ahead limit
 
 **One learning step and one relearning step, both 20 minutes.** A series of
 steps second-guesses the scheduler; a single number lets it work. Steps are
-preset-wide with no per-deck override, so this is a compromise chosen with
-understanding cards in mind — a card whose review is a ten-minute conversation
-must not reappear two minutes after it is failed. Steps must stay under a day.
+preset-wide with no per-deck override, and 20 minutes is long enough that a
+failed card is not asked again inside the same few minutes, which is the grind
+that ends a session early. Steps must stay under a day.
 
 **Set the learn-ahead limit to 5 minutes** — Preferences → Review, and
 **global, not per preset**. At its default of 20 minutes it exactly cancels a
@@ -100,31 +88,11 @@ confirming after a week that what was introduced matches the 3/2 split.
 `Core` sorts before `Extra`, so a session abandoned halfway has done the core
 cards. It changes only the order they arrive in, not which are gathered.
 
-## Understanding cards are not reviewed in Anki
-
-`/kb-quiz` drives Anki's reviewer through AnkiConnect, pointed at
-`<root>::Understanding`. What Anki shows for such a card is a placeholder.
-
-**Never click the parent `<root>` deck.** It pulls understanding cards into the
-manual reviewer, where there is no answer to reveal and every button is a wrong
-grade. Click `<root>::Recall` for recall, and let `/kb-quiz` open the other.
-Ancestor limits apply only to the deck actually clicked.
-
-If one does get graded by accident: **Forget** it in the browser (restoring its
-original position) and re-run the quiz.
-
 ## Grading
 
-**Press Again on failure, never Hard — in recall review.** Hard means
-"recalled, with effort"; using it for a failure inflates every subsequent
-interval, silently and irreversibly.
-
-**Hard is legitimate on an understanding card**, and this is not an
-inconsistency. The rule exists because a self-graded failure has nothing to
-stop it being dressed up as partial success. An understanding card is graded
-from an exchange that recorded which part was missed, and the next quiz leads
-with it — so the missed part is dealt with by the log rather than by repeating
-the card tomorrow, and reviewing one is expensive enough that this matters.
+**Press Again on failure, never Hard.** Hard means "recalled, with effort";
+using it for a failure inflates every subsequent interval, silently and
+irreversibly.
 
 **Demote during review, in Anki, not here.** Whether a card has earned its
 place is visible only from review history. Flag it (Ctrl+1…7) rather than
@@ -147,8 +115,8 @@ notes, and any past state is recoverable rather than only the last. Each export
 is a fresh zip and nothing dedupes — a few MB a year at weekly cadence;
 gitignore the directory if that stops being worth it.
 
-`/kb-quiz` and `/kb-export` report the newest backup's age whenever they talk to
-Anki, because forgetting is the actual failure mode. Neither makes one unasked.
+`kb_anki.py status` reports the newest backup's age, because forgetting is the
+actual failure mode. Nothing makes one unasked.
 
 Two things to know before the day it matters:
 
