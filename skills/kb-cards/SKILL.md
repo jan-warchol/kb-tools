@@ -17,14 +17,28 @@ Invoke `/kb-common` skill if you haven't already.
    Existing cards: `kb_find.py --refs <id>`.
 2. **How many is the effort** (`/kb-common`) — the obvious one or two, or a
    full sweep. Never cards across items.
-3. **Draw IDs** for every card in one call, never write one yourself:
+3. **Draft**: one fact, one card, never the same fact twice; asks only what
+   the item says; stands alone months later with one right answer.
+   - **Scope**: ask at the most general level the claim holds — a fact
+     about HTTP isn't asked as a fact about the vendor the note came from.
+     Keep the specific name only where the item says it is specific.
+   - **Open questions**: the question names the subject, never the answer
+     or its category. No hints, no parts of the answer in the
+     setup, no judgement to confirm ("why is X better") — ask "what is the
+     difference" instead.
+   - **Short answers**: under 10 words ideally, never over 20, up to 4
+     bullets; count before showing. Keep the item's own load-bearing
+     phrase rather than paraphrasing it. An example is visually separate.
+   - **Coverage**: a "what is it" card for each central term the item
+     defines; avoid cards from asides or parentheticals; a what and its why
+     sharing one answer are one card.
+4. **Show all drafts together**, numbered; the user approves, rewords or
+   drops each. Turned down ⇒ dropped; reworded ⇒ shown again. Feedback on
+   one card that applies to others (scope, length, wording) is applied to
+   all of them before the next round.
+5. **Draw IDs** once the cards are approved, for all of them in one call,
+   never write one yourself:
    `${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh <how-many>`.
-4. **Draft**: one fact, one card, never the same fact twice; asks only what
-   the item says, in its vocabulary; stands alone months later with one right
-   answer. Short — answers under 10 words ideally, never over 20, up to 4
-   bullets; an example is visually separate from the answer.
-5. **Show all drafts together**, numbered; the user approves, rewords or
-   drops each. Turned down ⇒ dropped; reworded ⇒ shown again.
    Write only approved cards: `sources` the item by `kb:<id>`, `approved` at
    approval, `status: stable`, no `importance` (graded at export). Filename
    `<slug>_<id>.md`.
