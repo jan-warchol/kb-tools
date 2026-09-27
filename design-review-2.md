@@ -1,9 +1,9 @@
 # Design review 2 — September 2026
 
 Written after 0.13 was in use for a few days, from three inputs: the user's
-second list of problems, `verification-gaps.md` (two observed failures where
+second list of problems, `verification-gaps-analysis.md` (two observed failures where
 agent material landed in the user's items), and a session settling the plan
-below. Read `design-review.md` first; this document assumes it.
+below. Read `design-review-1.md` first; this document assumes it.
 
 **Status: implemented in 0.14.0**, except two steps that act on a knowledge
 base rather than on the tooling: running `scripts/kb_migrate.py` on each base,
@@ -144,7 +144,7 @@ of its own.
 
 ### W7. Updating a note — an experiment
 
-`verification-gaps.md` R5 proposed rebuilding a note from its captures on every
+`verification-gaps-analysis.md` R5 proposed rebuilding a note from its captures on every
 update. Adopted in part: the invariant holds everywhere (every sentence outside a
 machine block traces to a human capture), but the default operation edits the
 affected sections, and a rebuild from the slug pool is thorough effort. A

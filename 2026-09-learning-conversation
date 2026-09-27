@@ -1,0 +1,120 @@
+<!-- A session from the beginning of September discussing issues encountered at work -->
+
+❯ Here you can see my knowledge base. it's an attempt to understan better tho go code of <project>.
+❯ However, I'm still struggling a lot (partly due to little go experience). Do you have any suggestions for how I could learn more effectively?
+
+
+I'll look at your knowledge base and the codebase to give you grounded suggestions.
+
+I read through the KB (24 inbox items, notes, quiz logs) and the <project> backend (~21k lines Go, 111 files, 47 test files). The notes are genuinely good — your two densest notes are well sourced and honest about what's unused. So the problem isn't note quality. It's what the system is pointed at.
+
+Three mismatches
+
+1. Nothing in the KB is about Go. All 24 items are codebase plumbing: how a value travels from A to B, what an argument is for, why a field exists. Zero notes on interfaces, context, error wrapping, struct embedding, or why the small store-layer interfaces are shaped the way they are. If little Go experience is the bottleneck, the KB currently never touches it.
+
+2. Nothing is about Temporal's model. Your notes use UpdateWithStartWorkflow, UpsertMemo, search attributes, and continue-as-new fluently — but nothing explains them. A large share of what makes this code look strange is Temporal-imposed, not Go. <State> only exists because continue-as-new destroys the run. Until the execution model is solid, you'll keep attributing Temporal weirdness to Go weirdness.
+
+3. It's all reading, no writing. Every note derives from reading code or reviewing an MR. You can't acquire a language that way. Meanwhile 47 test files sit unused as a learning asset.
+
+What I'd change
+
+Write Go against the existing tests. Pick internal/<pkg>/<component>_test.go, delete one test, and rewrite it from <component>.go's doc comment alone. Then run it. That's a feedback loop measured in seconds, and it forces you into the language rather than around it. (Side note: those tests don't use table-driven style or t.Run — writing one that does is itself a good Go exercise.)
+
+Split the KB into two lanes. Your current notes are plumbing — correctly marked with 1–2 month half-lives, because they expire. Add a concept lane with long half-lives: "how Go interfaces are satisfied implicitly, and why <deps>.go declares them consumer-side", "what continue-as-new destroys". Those never rot, and they're what transfers to the next codebase.
+
+Read the doc comments before tracing. <State>'s comment in <component>.go explains the <field>-across-continue-as-new problem better than most notes could. This codebase is unusually well commented — mine it before doing manual archaeology.
+
+Make quizzes harder. 4/4 on multiple choice, on notes you wrote yourself, is measuring recognition. Try: here's a diff to <a core function> — what breaks? Or: given this failing test output, which layer is wrong?
+
+The backlog is a signal. Your oldest capture has been in inbox for six weeks, sixteen notes awaiting cards, seven cards awaiting export. Either clear it or accept that some captures don't earn cards and let them go straight to notes/.
+
+
+
+❯ the main problem with writing code is that with hand injury I'm relying mostly on dictation -
+❯ prose can be dictated quite reliiably, but code not so much. ideas?
+❯ as for tracing plumbing - I stumble on this regularly when working with the code: understanding what it does.
+❯ but maybe i'm trying too hard to get a bigger picture instead of focusing on local abstractions.
+❯ Maybe I'm just not used to this way of organizing code.
+
+
+Both constraints are real. Let me check something in the codebase before answering the second one.
+
+Confirmed what I suspected. Let me answer both.
+
+Dictation
+
+The learning value of "write code" isn't the typing — it's committing to a prediction and getting corrected. Typing is just the delivery mechanism, and it's the replaceable part. Voice-native versions:
+
+Predict-then-run. You dictate a prediction in prose: "if the resume guard used <foo> instead of <bar>, <component>_test.go fails on the republished gate." I make the change and run it. You're right or wrong in under a minute. This is what your plumbing traces are already reaching for — but with a verdict at the end instead of a conclusion you can't check.
+
+Break-and-read. I introduce a deliberate error; you read the compiler or test output and say what it means and which layer it's in. Go's compiler and go vet are unusually good teachers, and this is pure reading + speaking.
+
+Spec-then-diff. You dictate what a function must do at spec level; I write it; you review the diff against your own spec. This is different from reviewing someone's MR: the intent is yours, so a mismatch tells you specifically where your model was wrong.
+
+Also — don't write off editing entirely. "Rename fooNode to foo throughout <file>.go" dictates fine. It's greenfield 50-line functions that don't.
+
+Tracing
+
+You're not tracing too much. But you're entering from the expensive end.
+
+Your notes trace forward a value across all 6 layers and makes you re-derive the wiring each time. Go gives you two cheaper entry points, and they're worth learning once as language-culture facts:
+
+1. Interfaces are declared by the consumer. internal/<service>/<deps>.go declares <StoreIface> and <ExecIface> — the service states what it needs, and the concrete store type / client happen to satisfy it. There's no implements keyword to grep for. So "what can the service do to the database?" is answered by reading <deps>.go, not the store. And that file is heavily commented, including why status writes are deliberately excluded from <StoreIface>. That's exactly the local abstraction you're asking about, and here it's honest.
+
+2. The wiring lives in main(). No DI container, no annotations, no framework magic. cmd/<binary>/main.go's run() is a flat, linear construction of the whole system, with comments explaining the choices ("Wiring a real notifier is a change to this line alone"). Four main.go files, ~560 lines total — that is the architecture diagram.
+
+So the concrete swap: read <deps>.go plus the four main.gos once, deliberately, as a single exercise. After that the boundaries become trustworthy and you can stop at them.
+
+When to keep tracing anyway: when a boundary doesn't tell you enough, that's usually a finding about the code, not about you. Your <id-propagation> note crossed six layers and concluded an argument is unused and the signature should be folded — that trace was justified, because the signature was lying. You already write a "What should be refactored" section; trust it more. Difficulty tracing is diagnostic, not a verdict on your Go.
+
+And to answer the last part directly: consumer-side interfaces, internal/, cmd/, explicit struct-field DI, compile-time guards like var _ <ExecIface> = (*<pkg>.<struct>)(nil) — that's mainstream idiomatic Go done carefully, not <project> being idiosyncratic. What you learn from this layout transfers.
+
+
+
+❯ "with a verdict at the end instead of a conclusion you can't check." - well, I verify incrementally with an agent.
+❯ Break-and-read - very good idea
+❯ interesting points overall, I would likew to try some if the exercises you proposed.
+❯ but before that - how would you approach reviewing changes like this one <link to an MR in our GitLab> (current branch)? it ❯ took me 4 hours (as I was indeed tracing through the whole stack to make sense of confusing function signatures)
+
+
+Fair correction on the verification point — you do close that loop.
+
+Now I can see exactly what cost you the four hours.
+
+Four hours makes sense, and I don't think it was your Go. Here's how I'd have run it.
+
+Name the shape, get a checklist
+
+This is a thread-one-field-end-to-end change — the most common shape there is. Naming it converts open-ended tracing into four questions:
+
+- Is it minted at exactly one origin? (yes — caller mints, a dedicated commit validates the UUID)
+- Does it survive every hop unmodified?
+- What does absent mean? ("", and the migration tells you)
+- Is it written atomically with what it describes? (yes, SetStatus)
+
+You trace to check an invariant, not to understand. Much shorter trips, one hop at a time, no need to hold the stack in your head.
+
+The actual review comment
+
+
+<FooFunction> has four adjacent string parameters. At any call site you cannot tell if they're in the right order, and the compiler can't either — so you have to go read the definition. That's not a gap in your Go; that's a signature that forces a lookup on every reader, forever.
+
+
+
+
+❯ I have cloned the plugin that I use for managing my knowledge base to ../kb-tools.
+❯ Can you take a look at it in the context of our conversation, especially on the motivation?
+
+
+Three things worth saying.
+
+There's drift between the doc and the base: the stated design has two kinds; the corpus has essentially one. All 24 items are project-specific. Nothing on Go, nothing on Temporal's model.
+
+I don't think that needs a new habit to fix — it needs a harvesting step on the one you have. Your capture trigger is stumbling under work pressure, so you capture plumbing. But underneath most of those stumbles is a general item. Yesterday's four hours produced one: four adjacent same-typed positional parameters defeat the compiler and force a definition lookup at every call site. That's not about <project>, it survives your employer, and it fell out of a project-specific trace for free. Your notes already have a "What should be refactored" section — that section is where general knowledge is currently being generated and then filed as project-specific.
+
+The scope boundary worth naming out loud
+
+Five obligations, all about propositions — things that are true or false, storable, schedulable. §2 scopes it to "recall — knowing without lookup."
+
+Your felt problem ("still struggling, partly little Go experience") is substantially a skill, and skills aren't propositions. No card can drill "read a signature and judge whether it's honest." So the KB is working as designed and structurally cannot move that part. If you've been reading your continued struggle as the KB underperforming, that's misattribution — you need a second, smaller practice loop next to it, not a better knowledge base.
+

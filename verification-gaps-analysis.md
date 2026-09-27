@@ -1,8 +1,8 @@
 # Agent material keeps landing in the user's items — findings and remedies
 
 
-A follow-up to `design-review.md`, from two observed failures in 0.13.1. Read
-`design-review.md` §C1 and §2.1 (companion items, machine blocks) first; this
+A follow-up to `design-review-1.md`, from two observed failures in 0.13.1. Read
+`design-review-1.md` §C1 and §2.1 (companion items, machine blocks) first; this
 document assumes them.
 
 
@@ -142,7 +142,7 @@ top-down folds first and reports afterwards, which is the order observed.
 ### 2.3 "Report" has no durable surface — C1 at an unenumerated stage
 
 
-Report to whom, into what? Conversation evaporates, and `design-review.md` §C5
+Report to whom, into what? Conversation evaporates, and `design-review-1.md` §C5
 is explicit that redaction assumes no shared session context, so anything that
 matters has to be in a file. At verification time the only writable surface in
 reach is the item itself, so findings go into the item.
@@ -375,7 +375,7 @@ question, because if nothing is ever appended, a never-append rule yields one
 fresh ledger per session per subject.
 
 
-Argue it rather than assume it: `design-review.md` §2.3 already tried pulling
+Argue it rather than assume it: `design-review-1.md` §2.3 already tried pulling
 follow-ups out and dropped it, because a global `<kb>/open.md` "reinvented the
 stray `inbox/inbox.md` of C2, with no format behind it". A per-subject typed
 item with a slug and a format is not the same thing, but it is close enough to
