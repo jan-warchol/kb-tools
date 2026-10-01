@@ -8,6 +8,10 @@ their evidence copied. `verified` is the agent's latest check; `approved` is
 what `status: stable` waits on. A note does not list its cards or its history
 — `kb_find.py --refs` finds the cards, the slug pool holds the history.
 
+A **promoted** note is a capture turned into a note in place: it keeps its ID,
+its `generated` (the text is still the user's) and its evidence as `sources`,
+having no capture to list.
+
 A note with `origin: machine` is reference only, never carded.
 
 ```yaml

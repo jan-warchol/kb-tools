@@ -171,6 +171,11 @@ The schema in `reference/schema/` states rules only; the reasons live here.
   memory of a file write into it, which is how an agent's claims once landed
   under the user's byline. One author per capture follows: `generated.by` is
   true by construction.
+- **Promotion is in place.** A capture short enough to be its own note becomes
+  that note — same file, same ID. A separate note beside it repeated the
+  capture nearly word for word, two items for one piece of knowledge. It is
+  the one edit to a closed capture, and it changes only the type and shape,
+  never the claims.
 - **Captures are records, never to-do lists.** An `## Open / follow-ups`
   ledger was tried in 0.13 and dropped: a list meant to be crossed off cannot
   live in a closed file, and carrying it forward session to session is an

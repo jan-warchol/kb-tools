@@ -44,8 +44,11 @@ Invoke `/kb-common` skill if you haven't already.
 5. **Present, then on approval write** it under the pool's slug, next free
    number (an existing note keeps its ID): `sources` the captures by
    `kb:<id>` and only evidence you read beyond theirs, `verified` your check,
-   `approved` stamped now, `status: stable`. A capture already short enough is
-   promoted as-is. Unapproved stays `draft`.
+   `approved` stamped now, `status: stable`. Unapproved stays `draft`.
+   **Promotion:** a pool of one human capture already short enough to be the
+   note becomes the note in place — same file, same ID, `type: Note`. Its
+   `generated` and evidence `sources` stay, `verified` and `approved` are
+   stamped; body edits are shape only. No second item that repeats the first.
 6. Say what you left open (`/kb-common`, Stopping), and run the check.
 
 ---

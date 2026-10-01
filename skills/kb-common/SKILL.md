@@ -46,7 +46,8 @@ is one kind; `origin` says whether the user dictated it or you wrote it.
 - **A capture is open during the session that wrote it, closed after** — both
   origins. Open: add to it, reword it. Closed: never touched again; anything
   later is a new capture, same slug, next free number. Not certain this
-  conversation wrote it ⇒ closed.
+  conversation wrote it ⇒ closed. Except promotion: a lone short capture
+  becomes its note in place (`/kb-redact`).
 - **One author per capture.** Your claims never enter the user's capture — not
   as prose, not fenced. They are a machine capture.
 - **A note is the current state; the slug pool is its history.** Every sentence
@@ -111,7 +112,7 @@ Effort is depth, never breadth: no row reaches beyond the item in hand.
 |---|---|---|---|
 | **verifying** | nothing; record the repository and `commit` from the bearings and any path the user named; no `verified` key, `status: draft` | the claims the item turns on, hedged ones first | everything, following the code paths |
 | **capture** | the dictation, and stop | plus the glance at the base, and the general pattern suggested where you see one | as normal, verifying thoroughly |
-| **redact** | promote as-is or compress minimally; no outline step | outline then fill; an existing note edited in the affected sections | the note rebuilt from its whole slug pool |
+| **redact** | promote in place or compress minimally; no outline step | outline then fill; an existing note edited in the affected sections | the note rebuilt from its whole slug pool |
 | **cards** | the one or two obvious facts | a full sweep of the item | as normal |
 | **update** | the new capture, and stop | plus the note's affected sections and its cards | the note rebuilt from its whole slug pool, then its cards |
 | **verify** | paths changed since `commit`: scaffolding only | plus the claims the note turns on | every claim |

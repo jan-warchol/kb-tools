@@ -8,7 +8,8 @@ added to and reworded in place, changed claims verified again, `generated.at`
 moved. Closed: never edited again; anything later about the subject is a new
 capture, same slug, next free number. If you are not certain this conversation
 wrote the file, it is closed. A superseded capture is left as it is — the note
-carries the current state.
+carries the current state. The one exception is promotion (`/kb-redact`): a
+lone capture short enough to be its own note becomes that note in place.
 
 **One author per capture.** Mixed authorship is two captures.
 
