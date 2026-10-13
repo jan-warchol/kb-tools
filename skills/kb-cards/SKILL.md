@@ -44,14 +44,23 @@ Invoke `/kb-common` skill if you haven't already.
    the authoritative documentation, never from memory. One line per card —
    holds, wrong, or unverifiable — pointing at what is wrong, never at the
    fix. Every round after the first re-checks only the cards that changed.
-5. **Show all drafts together**, numbered, each with its blind-check
-   finding; the user approves, rewords or drops each. Turned down ⇒
-   dropped; reworded ⇒ checked and shown again. Feedback on one card that
+   **Fix before showing.** The user reviews only cards that hold. Each
+   finding is yours to resolve first:
+   - the card went beyond the item — a widened scope, a dropped qualifier,
+     your own wording — narrow or reword it back to what the item says,
+     and re-check;
+   - the card says what the item says ⇒ the finding is against the item:
+     no card wording fixes it, since the claim is the user's. Withhold the
+     card (step 6, the item turns out wrong).
+   Up to 3 rounds; a card still failing after them is withheld too.
+5. **Show the cards that hold together**, numbered; the user approves,
+   rewords or drops each. Below them, one line per withheld card: its
+   question, the finding, and whether it is against the item — those wait
+   for the user's correction of the item. Turned down ⇒ dropped; reworded ⇒
+   checked, fixed as in step 4, and shown again. Feedback on one card that
    applies to others (scope, length, wording) is applied to all of them
-   before the next round. A finding is never applied silently: where the
-   card says what the item says, the finding is against the item (step 6,
-   the item turns out wrong); where the card went beyond it — a widened
-   scope, a word the user added — narrow the card or let the user reword it.
+   before the next round. A fix is never silent: a card you narrowed says
+   so in a few words.
 6. **Draw IDs** once the cards are approved, for all of them in one call,
    never write one yourself:
    `${CLAUDE_PLUGIN_ROOT}/scripts/kb_randomid.sh <how-many>`.
