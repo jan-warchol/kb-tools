@@ -73,7 +73,16 @@ Invoke `/kb-common` skill if you haven't already.
    on from the corrected note.
 7. **IDs are permanent**: rewording keeps the ID, changing what is asked takes
    a new one.
-8. Report paths and what you left open (`/kb-common`), run the check, then
+8. **Revision report**, when the user reworded or dropped any card after
+   seeing it: write
+   `${CLAUDE_PLUGIN_ROOT}/kb-cases-to-analyze/<date>_<item-slug>-card-revisions.md`
+   so later sessions learn what the user changes. One section per card shown,
+   headed by its ID (a dropped card by its topic): the full first question and
+   answer, the full final one (or "dropped"), and one sentence on what the
+   change teaches. Self-contained: readable without the knowledge base — give
+   the subject in a line at the top, never refer to items by `kb:` alone, and
+   never invent a reason the user didn't give.
+9. Report paths and what you left open (`/kb-common`), run the check, then
    the export: new cards wait there for a grade (`/kb-export`), changed ones
    need an import.
 

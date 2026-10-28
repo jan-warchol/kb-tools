@@ -49,7 +49,16 @@ Invoke `/kb-common` skill if you haven't already.
    note becomes the note in place — same file, same ID, `type: Note`. Its
    `generated` and evidence `sources` stay, `verified` and `approved` are
    stamped; body edits are shape only. No second item that repeats the first.
-6. Say what you left open (`/kb-common`, Stopping), and run the check.
+6. **Revision report**, when the user changed the outline or the note after
+   seeing it: write
+   `${CLAUDE_PLUGIN_ROOT}/kb-cases-to-analyze/<date>_<slug>-note-revisions.md`
+   so later sessions learn what the user changes. At the top, the captures'
+   text as dictated. Then one section per changed outline line or note
+   section, headed by its heading: the full first version, the full final
+   one (or "dropped"), and one sentence on what the change teaches.
+   Self-contained: readable without the knowledge base — never refer to items
+   by `kb:` alone, and never invent a reason the user didn't give.
+7. Say what you left open (`/kb-common`, Stopping), and run the check.
 
 ---
 
